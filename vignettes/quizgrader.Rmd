@@ -1,0 +1,114 @@
+---
+title: "quizgrader Tutorial"
+author: "<a href=https://www.andreashandel.com>Andreas Handel</a>"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{quizgrader Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+## Summary
+This package is allows auto-grading of quizzes and is meant as an alternative to this functionality within standard learning managment systems (LMS)
+
+
+## Motivation
+
+I regularly teach online. In the past, I have used our university's LMS, but I dislike it because it is not user-friendly and elements, such as quizzes and student submissions are "locked up" inside the LMS and one can only extract very rudimentary statistics. Because of this, I have over the last years slowly moved away from our LMS and tried to replace as much as possible with open, or at least user-friendly resources.
+
+One feature I liked about the LMS is that it could auto-grade quizzes, so once the quiz was written, I didn't have much to do anymore, students just submitted and got graded automatically each week. I tend to do lots of small quizzes (generally 1-2 per week), so need this process automated.
+
+I decided to write the functionality I need myself in R.
+
+
+
+## Installation
+After having installed and opened R/Rstudio, you can install the package from CRAN by typing the following into the R console (the bottom left window if you are using RStudio):
+
+```r
+install.packages('quizgrader')
+```
+
+
+Alternatively, you can install the latest development version (with usually both more features and more bugs) from github, using the `remotes` package. The following commands, typed into the `R` console, will get you up and running:
+
+```r
+install.packages('remotes') #if not already installed
+remotes::install_github('andreashandel/quizgrader')
+```
+
+The package depends on other packages, which will also be installed as needed. Package installation is a one-time process, unless you update or re-install R itself, or want to install a newer version of `quizgrader`. 
+
+
+## Prep work
+
+
+
+
+## Setup
+
+Load package.
+
+start_course()
+
+Creates a new folder with course name and structure.
+
+* classlist
+* complete_solution_sheets
+* student_solution_sheets
+* submissions
+
+
+add_solutions()
+
+Feed in a vector of file names to xlsx solution sheets. 
+Need to have a specific format.
+
+
+
+add_classlist()
+
+Feed in file that contains the class roster. Will make master solution sheet based on what is found in the solution folder.
+
+
+
+
+
+
+## Use cases
+
+
+### Semi-automated
+
+You can ask students to email or otherwise send you their solution files. 
+
+Need to figure out naming and storing convention.
+
+
+
+### Fully automated
+
+Shiny deployment, student upload.
+
+
+
+
+
+## Contributing to the package
+The package is on GitHub and you can use the usual GitHub process to file bug reports, send feature requests, contribute updates and bug fixes, etc. If you have any comments or feedback, I very much welcome them. Please file a [GitHub issue](https://github.com/andreashandel/quizgrader/issues) and let me know what you think.
+
+
+## Further information
+
+## Contributors
+This R package is developed and maintained by [Andreas Handel](https://www.andreashandel.com). A full list of contributors [can be found here](https://andreashandel.github.io/quizgrader/authors.html).
+
+## Citation
+
+
+## References
