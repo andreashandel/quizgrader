@@ -220,12 +220,24 @@ _Note that if the student roster changes, or if you add further quizzes, you can
 
 
 
-## Deploying the student submission app
+
+## Deploying the student submission app on your own Shiny server
 
 Students are given the quiz sheets, asked to fill them, and then submit them online. 
 The online submission system is powered by another Shiny app and functionality of the `quizgrader` package. 
 
+
+
+Almost the same setup as described above works if you host your own shiny server. That's how I implemented it in the past. You just have to manually place the submission app and the various folders on the server. If you know how to operate and administer a shiny server, I assume it will be clear how to run this. Just make sure the file and folder permissions are set ok, since students (the app) need to be able to write their files to the server. Every so often, I recommend pulling files from the server. If you are trying to run it on your own shiny server and get stuck, feel free to reach out so I can help.
+
+
+
+
+## Deploying on shinyapps.io
+
 The following assumes that you will be hosting the submission system on RStudio's `shinyapps.io` service. For alternatives, see the end of the document.
+
+One problem with `shinyapps.io` is the fact that 
 
 You can deploy everything with this command.
 
@@ -237,9 +249,16 @@ This function takes the submission app file, the
 and places them to the Shiny server. Students should now be able to go to the website (e.g. shinyapps.io`) and, after entering their identifying information, upload their quiz. 
 The submission will be checked to make sure it is not past the due date or the number of allowed submissions has been exceeded. Then the quiz is graded by comparing the student submissions with those in the complete quiz files, the grade is recorded in the form of a score, and students are provided with immediate feedback on which questions they did get right and which they didn't. Anything entered into the `feedback` column is also displayed. In addition, students can see information about their cumulative performance so far. 
 
-
-
 Note that as long as any password is missing from the student list, the app will display a `not ready for submission` message. 
+
+
+## Storing and retrieving submissions
+
+One
+
+https://shiny.rstudio.com/articles/persistent-data-storage.html
+
+
 
 
 ## Alternative use cases
@@ -247,9 +266,6 @@ Note that as long as any password is missing from the student list, the app will
 The above approach assumes you will use `shinyapps.io` as the service to host your grading app and where students go to submit their quizzes. There are two other ways I can think of to use the package (there might be more, if you got an interesting one, I'd love to hear about it!) 
 
 
-### On your own Shiny server
-
-Almost the same setup as described above works if you host your own shiny server. That's how I implemented it in the past. You just have to manually place the submission app and the various folders on the server. If you know how to operate and administer a shiny server, I assume it will be clear how to run this. Just make sure the file and folder permissions are set ok, since students (the app) need to be able to write their files to the server. Every so often, I recommend pulling files from the server. If you are trying to run it on your own shiny server and get stuck, feel free to reach out so I can help.
 
 
 ### Semi-automated
