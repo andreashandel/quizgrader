@@ -12,7 +12,9 @@ Encoding: UTF-8
 LazyData: TRUE
 Imports:
     dplyr,
+    readxl,
     rlang,
+    shinyjs,
     stats,
     stringr,
     tidyr,
