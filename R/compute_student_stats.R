@@ -2,8 +2,9 @@
 #'
 #' @description This function
 #'
-#' @param studentid
-#' @param quizid
+#' @param studentid id of student
+#' @param quizid id of quiz
+#' @param classlist classlist data frame
 #'
 #' @return
 #' If things went well, a vector containing student stats.

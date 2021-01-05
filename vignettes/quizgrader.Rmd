@@ -56,6 +56,7 @@ The main use of this package is through Shiny apps, both locally for the instruc
 
 ## Getting started
 
+
 Start by loading the package with `library(quizgrader)`. 
 You can then start the main menu, which is a shiny app, with `quizmanager()`.
 In the app, click on `Start new course`, this will ask you to specify a location where you want to have the main folder and sub-folders created.
@@ -66,37 +67,47 @@ Alternatively, without starting the `quizmanager` shiny menu, from the command l
 start_course(coursename = "yourcoursename", courselocation = "path/to/location/for/course")
 ```
 
-You are required to provide a name for your course (which will be the name of the main directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current directory.
+You are required to provide a name for your course (which will be the name of the main directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current directory. Note that for windows paths, you need to specify paths as follows (double backslash): `C:\\tmp\newcourse`
 
 Either with the shiny app or the command line, if things go wrong, you'll get an error message. Otherwise, if things went well, there should be a new folder with the course name you specified in the location you chose. Inside that folder are several other folders and files, namely:
 
-* `/studentlists` - a folder that contains spreadsheets (template and filled ones) with student information. At the start, this folder will contain the file `studentlist_template.xlsx` which is a file that should be populated with student information, as described below. 
+**Folders**
+
+* `/studentlists` - a folder that contains spreadsheets (template and filled ones) with student information. 
 * `/courselists` - a folder that will contain the main tracking spreadsheets.
-* `/complete_quizzes` - a folder which will contain all your quizzes (with answers) once you made them. Initially, this folder contains the file `quiz_template.xlsx`, which should be used as template for creating your own quizzes, as described below. 
+* `/complete_quizzes` - a folder which will contain all your quizzes (with answers) once you made them. 
 * `/student_quizzes` - a folder that will contain quizzes to be given to the students for filling out and submitting. These files are auto-generated once you made your solution sheets.
 * `/submissions` - all individual submissions by students. This is mainly for record keeping and to run some question- and student-specific stats. For easier organization, a sub-folder for each quiz will be created and student submissions organized into those sub-folders.
 
+**Files**
+* `studentlist_template.xlsx` is generated template file inside the `/studentlists` folder that should be populated with student information, as described below. 
+* `quiz_template.xlsx` is generated inside the `/complete_quizzes` folder. This file should be used as template for creating your own quizzes, as described below. 
+
+If at any point you need a clean version of the templates, you can get them through the user interface (or find them in the `/templates` folder of the R package).
 
 
 ## Add students to the course
 
 Once you created the course as described above, you need to add students to the course. To that end, you need to fill out a provided template with student information.
-You can get this file by either clicking on `Get studentlist template` inside the shiny app, or manually navigating to the `/studentlists` folder where you'll find the `studentlist_template.xlsx` file. 
-There are 4 columns that you need to fill out. `Lastname` and `Firstname` should be self-explanatory.
+Get the `studentlist_template.xlsx` file either through the UI or you can find it in the `/studentlists` folder on your computer inside the course folder you just created. 
+The template file has several columns that you need to fill: 
 
-The `ID` needs to be a unique identifier for each student, and will be checked/matched when a student uploads their quiz. (Matching is not done on names since those can be non-unique. The ID needs to be something unique for each student.) The best option is probably to use student emails, but any other ID works as well.
+* `Lastname` and `Firstname` should be self-explanatory.
 
-The `Password` column is there to prevent a student accidentally or purposefully submitting something as another student. Of course this does not prevent cheating. If students want to, they can share passwords and submit for each other. Or they can send each other their filled out forms. **If you are worried about cheating, this package/setup is likely not for you!** Thus, it is not meant to prevent cheating, only the possibility that a student might try to submit as someone else (provided students keep their passwords to themselves). I collect passwords at the beginning of the course through a simple Google form. However you collect them, you then need to copy the passwords to this sheet. **Clearly tell the students that you will see their password and that they should use a simple _throw-away_ password for this course and not any passwords they use to protect real systems!** Fully disabling the password feature is not possible, but if you don't want to use one, just pick the same word for every student and tell the students what the password is. They'll still have to enter it during submission, but that should not be much of a nuisance.
+* `StudentID` needs to be a unique identifier for each student, and will be checked/matched when a student uploads their quiz. Matching is not done on names since those can be non-unique. The ID needs to be something unique for each student. The best option is probably to use student emails, but any other unique identifier works as well.
 
-**You need to provide the columns that are shown in the template.** If you want to add further columns to this spreadsheet, you can do so. They should not interfere with the working of the app and will be ignored.
+* Thee `Password` column is there to prevent a student accidentally or purposefully submitting as another student (provided students keep their passwords to themselves). Of course this does not prevent cheating. If students want to, they can share passwords and submit for each other. Or they can share their filled out quiz sheets before submission. **If you are worried about cheating on these kinds of quizzes, this package/setup is likely not suitable!** 
 
-Once you filled out the template with the student information, add it to the system by clicking the `Add studentlist` button or running
+I collect passwords at the beginning of the course through a simple Google form. I copy the passwords manually into the template. If you want to, you can likely automate this process with some R scripts. Disabling the password feature is currently not possible. If you think a setup without a password is a feature I should implement, let me know. For the time being, if you don't want to use this feature, just enter the same password for every student and tell the students what the password is. They'll still have to enter it during submission, but that should not be much of a nuisance.
 
-```{r, eval=FALSE, echo=TRUE}
-add_studentlist(coursename = "yourcoursename", studentfilelocation = "/location/to/file")
-```
+**You should tell students that you will be able to read their passwords and that this setup is not that secure, thus they should use a _throw-away_ password for this course and not any passwords they use to protect real systems (e.g. their bank accounts)!**
 
-This will take the file you made and place it into the `/studentlist` folder with a time-stamp. If you do this again at a later time, a new file with a newer time-stamp is created. Thus, all previous student lists are preserved, but only the most recent one is being used to generate the main quiz grade tracking list (as described below).
+**Your filled spreadsheet needs to have content in all the columns that are shown in the template.** If you want to add further columns to this spreadsheet, you can do so. They should not interfere with the working of the app and will be ignored.
+
+Add it to the system by clicking the `Add studentlist` button in the UI or manually place it into the `/studentlist` folder and rename/save it as `studentlist_filled.xlsx`. 
+This new name is required and prevents accidental overwriting if you re-generate the templates. 
+
+
 
 
 ## Create your quizzes 
