@@ -9,69 +9,92 @@
 #Set up some variables, define all as global (the <<- notation)
 #name of R package
 packagename <<- "quizgrader"
-#find path to apps
-#appdir <<- system.file("appinformation", package = packagename) #find path to apps
-#modeldir <<- system.file("mbmodels", package = packagename) #find path to apps
-#templatedir <<- system.file("templates", package = packagename) #find path to apps
-#load app table that has all the app information
-#at <<- read.table(file = paste0(appdir,"/apptable.tsv"), sep = '\t', header = TRUE)
-#appNames <<- at$appid
-#path to simulator function zip file
-
+#path to templates
 quiztemplatefile <<- file.path(system.file("templates", package = packagename),"quiz_template.xlsx")
 studentlisttemplatefile <<- file.path(system.file("templates", package = packagename),"studentlist_template.xlsx")
-
-
+# will contain location/path to course
+courselocation <<- NULL
 
 
 #######################################################
 #server part for shiny app
 #######################################################
 
-server <- function(input, output) {
-
+server <- function(input, output, session) {
 
 
         #######################################################
         #start code block that creates a new course
         #######################################################
 
-        shinyDirChoose(input, 'dir', roots = c(home = '~'), filetypes = c('', 'txt','bigWig',"tsv","csv","bw"))
+        #server functionality that lets user choose a folder for the new course
+        #this is taken from the shinyFilesExample() examples
+        volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
+        shinyFiles::shinyDirChoose(input, "newcoursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
 
-        dir <- reactive(input$dir)
-        output$dir <- renderText({parseDirPath(c(home = '~'), dir())})
-
-        observeEvent(
-                ignoreNULL = TRUE,
-                eventExpr = {
-                        input$dir
-                },
-                handlerExpr = {
-                        home <- normalizePath("~")
-                        datapath <<- file.path(home, paste(unlist(dir()$path[-1]), collapse = .Platform$file.sep))
+        output$newcoursedir <- renderPrint({
+                if (is.integer(input$newcoursedir)) {
+                        cat("No directory has been selected")
+                } else {
+                        #save course folder location to global variable
+                        courselocation <<- shinyFiles::parseDirPath(volumes, input$newcoursedir)
+                        shinyFiles::parseDirPath(volumes, input$newcoursedir)
                 }
-        )
+        })
 
-
+        #once user has entered course name and picked a folder location
+        #a course can be started
         observeEvent(input$startcourse, {
 
-                if (coursename == "")
+                msg <- NULL
+                if (input$coursename == "")
                 {
                         msg <- "Please choose a course name"
                 }
+                if (is.integer(input$newcoursedir)) #not sure why integer, but that's how the example is
+                {
+                        msg <- "Please choose a course location"
+                }
 
-                msg <- quizgrader::start_course(coursename, input$coursefolder)
+                if (is.null(msg)) #if no prior error, try to create course
+                {
+                        #format course path into a way that can be used by start_course
+                        newcoursedir = shinyFiles::parseDirPath(volumes, input$newcoursedir)
+                        msg <- quizgrader::start_course(isolate(input$coursename), isolate(newcoursedir))
+                }
+                if (is.null(msg)) #if start_course worked well, it won't sent a message back
+                {
+                        #save course folder to global variable
+                        courselocation <<- file.path(isolate(newcoursedir), isolate(input$coursename))
+
+                        msg <- paste0("The new course folder and its subfolders have been created at: ",courselocation)
+                }
 
                 showModal(modalDialog(
                         msg,
                         easyClose = FALSE
                 ))
-
-
         })
 
+
         #######################################################
-        #start code block that loads new student list
+        #start code block that selects an existing course folder
+        #######################################################
+        shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
+
+        output$coursedir <- renderPrint({
+                if (is.integer(input$coursedir)) {
+                        cat("No directory has been selected")
+                } else {
+                        courselocation <<- shinyFiles::parseDirPath(volumes, input$coursedir) #save course folder to global variable
+                        shinyFiles::parseDirPath(volumes, input$coursedir)
+                }
+        })
+
+
+
+        #######################################################
+        #start code block that gives users the student list template
         #######################################################
         output$getstudentlist <- downloadHandler(
                         filename <- function() {
@@ -84,7 +107,7 @@ server <- function(input, output) {
                 )
 
         #######################################################
-        #start code block that loads new student list
+        #start code block that gives users the quiz template
         #######################################################
         output$getquiztemplate <- downloadHandler(
                 filename <- function() {
@@ -95,6 +118,116 @@ server <- function(input, output) {
                 },
                 contentType = "application/xlsx"
         )
+
+
+        #######################################################
+        #start code block that adds filled student list to course
+        #######################################################
+        observeEvent(input$addstudentlist,{
+
+                #check that a course folder has been selected
+                msg <- NULL
+                if (is.null(courselocation))
+                {
+                        msg <- "Please set the course location"
+                        shinyjs::reset(id  = "addstudentlist")
+                }
+
+                if (is.null(msg)) #if no prior error, try to create course
+                {
+                        #add time stamp to filename
+                        timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+                        #find path to course folder
+                        filename = paste0("studentlist","_",timestamp,'.xlsx')
+                        new_path = file.path(courselocation,"studentlists",filename)
+
+                        #copy time-stamped file to student list folder
+                        fs::file_copy(path = input$addstudentlist$datapath,  new_path = new_path)
+
+                        msg <- paste0("student list has been saved to ", new_path)
+                }
+
+                showModal(modalDialog(
+                        msg,
+                        easyClose = FALSE
+                ))
+        })
+
+
+        #######################################################
+        #start code block that adds filled quizzes to course
+        #######################################################
+        observeEvent(input$addquiz,{
+
+                #check that a course folder has been selected
+                msg <- NULL
+                if (is.null(courselocation)) #not sure why integer, but that's how the example is
+                {
+                        msg <- "Please set the course location"
+                        shinyjs::reset(id  = "addquiz")
+                }
+
+                if (is.null(msg)) #if no prior error, try to create course
+                {
+                        #find path to course folder
+                        new_path = file.path(courselocation,"complete_quiz_sheets",input$addquiz$name)
+
+                        #copy time-stamped file to student list folder
+                        fs::file_copy(path = input$addquiz$datapath,  new_path = new_path, overwrite = TRUE)
+
+                        msg <- paste0("quiz has been saved to ", new_path)
+                }
+
+                showModal(modalDialog(
+                        msg,
+                        easyClose = FALSE
+                ))
+        })
+
+
+
+        #######################################################
+        #start code block that turns filled quizzes
+        #into student quizzes
+        #######################################################
+        observeEvent(input$createstudentquizzes,{
+
+
+                msg <- create_student_quizzes(courselocation)
+
+                if (is.null(msg)) #this means it worked
+                {
+                  msg <- paste0('All student quiz sheets have been created and copied to ', file.path(courselocation,'student_quiz_sheets'))
+                }
+
+                showModal(modalDialog(
+                        msg,
+                        easyClose = FALSE
+                ))
+
+
+        })
+
+        #######################################################
+        #start code block that returns zip file of student quizzes
+        #######################################################
+        output$getstudentquizzes <- downloadHandler(
+                        filename <- function() {
+                                "studentquizsheets.zip"
+                        },
+                        content <- function(file) {
+                                file.copy(file.path(courselocation,'student_quiz_sheets',"studentquizsheets.zip"), file)
+                        },
+                        contentType = "application/zip"
+                )
+
+
+        #######################################################
+        #Exit quizmanager menu
+        observeEvent(input$Exit, {
+                stopApp('Exit')
+        })
+
 
 } #end server function
 
@@ -116,27 +249,25 @@ ui <- fluidPage(
         p('Happy teaching!', class='maintext'),
         navbarPage(title = "quizmanager", id = 'alltabs', selected = "manage",
                    tabPanel(title = "Manage quizzes", value = "manage",
-                            textInput(coursename,label = "Course Name"),
-                            shinyDirButton("dir", "Input directory", "Upload"),
-                            verbatimTextOutput("dir", placeholder = TRUE),  # added a placeholder
+                            h2('Start a new Course'),
+                            textInput("coursename",label = "Course Name"),
+                            shinyFiles::shinyDirButton("newcoursedir", "Course location", "Select a parent folder for new course"),
+                            verbatimTextOutput("newcoursedir"),  # added a placeholder
                             actionButton("startcourse", "Start new course", class = "actionbutton"),
-                            fluidRow(
-                                    column(4,
-
-                                           downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
-
-                                           downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
-
-                                    ),
-                                    class = "mainmenurow"
-                            ), #close fluidRow structure for input
-
-                            actionButton("addstudentlist", "Add filled studentlist to course", class = "actionbutton"),
-
-                            actionButton("addquizzes", "Add quizzes to course", class = "actionbutton"),
-
+                            h2('Load existing Course'),
+                            shinyFiles::shinyDirButton("coursedir", "Course location", "Select an existing course folder"),
+                            verbatimTextOutput("coursedir"),  # added a placeholder
+                            h2('Get template files'),
+                            downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
+                            downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
+                            h2('Add files to course'),
+                            fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
+                            p('Any quiz with the same file name as the one being added will be overwritten.'),
+                            fileInput("addquiz", label = "", buttonLabel = "Add a finished quiz to course", accept = '.xlsx'),
                             actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
-
+                            downloadButton("getstudentquizzes", "Get zip file with all student quiz files", class = "actionbutton"),
+                            h2('Deploy course'),
+                            actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
                             p(textOutput("warningtext")),
 
                             fluidRow(
@@ -150,12 +281,10 @@ ui <- fluidPage(
                    ), #close "Manage" tab
 
                    tabPanel("Analyze Quizzes",  value = "analyze",
-                            fluidRow(
-                                    column(12,
-                                           uiOutput('analyzemodel')
-                                    ),
-                                    class = "mainmenurow"
-                            ) #close fluidRow structure for input
+                            h2('Retrieve submissions'),
+                            actionButton("retrieve", "Retrieve submissions from shiny server", class = "actionbutton"),
+                            h2('Analyze submissions'),
+                            actionButton("analyze", "Analyze submissions from shiny server", class = "actionbutton"),
                    ) #close "Analyze" tab
         ), #close NavBarPage
         tagList( hr(),

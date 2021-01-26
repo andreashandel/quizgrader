@@ -1,3 +1,7 @@
-Need to work on quizmanager.R shiny app to get folder selection working.
 
-Then continue implementing other features following text in vignette
+Get course deployment to work.
+
+Update vignettes.
+
+Continue implementing other features.
+

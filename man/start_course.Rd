@@ -16,7 +16,7 @@ is to be created}
 }
 \value{
 The script creates folders.
-If things went well, a message is returned stating where the new course was created.
+If things went well, folders a created and a NULL message is returned.
 Otherwise an error message is returned.
 }
 \description{

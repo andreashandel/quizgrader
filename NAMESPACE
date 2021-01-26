@@ -2,7 +2,11 @@
 
 export(check_file)
 export(compute_student_stats)
+export(create_student_quizzes)
 export(grade_quiz)
 export(make_course_list)
+export(quizmanager)
 export(read_classlist)
 export(start_course)
+export(start_course_shiny)
+import(shiny)

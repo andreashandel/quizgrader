@@ -11,7 +11,7 @@
 #' is to be created
 #'
 #' @return The script creates folders.
-#' If things went well, a message is returned stating where the new course was created.
+#' If things went well, folders a created and a NULL message is returned.
 #' Otherwise an error message is returned.
 #' @export
 
@@ -20,17 +20,19 @@
 start_course <- function(coursename, courselocation = NULL)
 {
 
+  errormessage <- NULL #if things went wrong, provide an error mssage
+
   # try to make provided path string valid if provided manually
   # currently needs double \\ on windows, e.g. "C:\\testfolder\"
   # shouldn't be an issue if this function is called through GUI
   courselocation = normalizePath(courselocation)
 
   #make directories for course and sub-folders
-  newfolder = file.path(courseolcation,coursename)
+  newfolder = file.path(courselocation,coursename)
   if (dir.exists(newfolder))
   {
-    errormsg = "Folder already exists! Please delete the existing folder or choose a different course name."
-    return(returnmessage) #stop rest of function/script
+    errormessage = "Folder already exists! Please delete the existing folder or choose a different course name."
+    return(errormessage) #stop rest of function/script
   }
   else
   {
@@ -50,11 +52,9 @@ start_course <- function(coursename, courselocation = NULL)
   #copy the quiz template
   file.copy(from = file.path(templatedir,'quiz_template.xlsx'), to = file.path(newfolder,'complete_quiz_sheets','quiz_template.xlsx') )
 
-
   #if no errors occurred above (which would lead to early return)
-  #write and return a success message here
-  returnmessage = paste0("The new course folder and its subfolders have been created at: ",newfolder)
-  return(returnmessage)
+  #return NULL
+  return(errormessage)
 
 } #end main function
 
