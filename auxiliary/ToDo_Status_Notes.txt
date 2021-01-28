@@ -1,4 +1,6 @@
 
+Set up pkpdown, build basic website. Add website link as project to my personal website
+
 Get course deployment to work.
 
 Update vignettes.
