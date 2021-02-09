@@ -6,13 +6,7 @@
 #' their information needed for login and multiple columns
 #' for each quiz tracking/recording student submission
 #'
-#' @param courselistfile Name of file that contains the course list.
-#' The file needs to be an Excel file with at least
-#' columns Lastname, Firstname, ID and Password.
-#' It should be based on the provided template.
-#' @param quizlocation The name of the folder where
-#' the complete quizzes are stored.
-#' Those quizzes will be parsed to generate the data frame.
+#' @param courselocation Path to course
 #'
 #' @return A data frame with each student as row, and columns
 #' containing student information and information for each quiz.
@@ -20,17 +14,25 @@
 
 
 
-make_course_list <- function(courselistfile,quizlocation)
+make_gradelist <- function(courselocation)
 {
 
-  #read in the csv file containing the student names, ID and password
-  #other columns can be in the original file, they will be ignored
-  courslist <- read.csv(courselistfile)
-  nstudent <- nrow(courselist) #number of students
+  #load file containing student information
+  #also check for proper formatting/content
+  studentlist <- read_studentlist(courselocation)
+  if (is.character(studentlist))
+  {
+    #something didn't go right, return error message to calling function
+    return(studentlist)
+  }
+
+  nstudent <- nrow(studentlist) #number of students
+
+
 
   # Pulls all of the xlsx files from the solution folder to get names for quizzes
   # Each xlsx file will be the name of a quiz. The file needs to end in _complete.xlsx
-  quizfilenames <- list.files(quizlocation,pattern='*.xlsx')
+  quizfilenames <- list.files( ,pattern='*.xlsx')
 
   #for each quiz that is found, add these columns:
   #due date, submit date, submit attempt max, submit attempt actual and grade

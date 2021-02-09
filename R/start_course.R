@@ -37,11 +37,11 @@ start_course <- function(coursename, courselocation = NULL)
   else
   {
     dir.create(newfolder)
-    dir.create(file.path(newfolder,'studentlists'))
-    dir.create(file.path(newfolder,'courselists'))
-    dir.create(file.path(newfolder,'student_quiz_sheets'))
-    dir.create(file.path(newfolder,'complete_quiz_sheets'))
-    dir.create(file.path(newfolder,'student_submissions'))
+    dir.create(file.path(newfolder,'studentlists')) #for student roster files
+    dir.create(file.path(newfolder,'gradelists')) #for file(s) that tracks all grades
+    dir.create(file.path(newfolder,'studentquizzes')) #for quiz sheets to be given to students
+    dir.create(file.path(newfolder,'completequizzes')) #for complete quiz sheets
+    dir.create(file.path(newfolder,'studentsubmissions')) #will contain all student submissions
   }
 
   #copy templates of files into folders
@@ -50,7 +50,7 @@ start_course <- function(coursename, courselocation = NULL)
   #copy the courselist template
   file.copy(from = file.path(templatedir,'studentlist_template.xlsx'), to = file.path(newfolder,'studentlists','studentlist_template.xlsx') )
   #copy the quiz template
-  file.copy(from = file.path(templatedir,'quiz_template.xlsx'), to = file.path(newfolder,'complete_quiz_sheets','quiz_template.xlsx') )
+  file.copy(from = file.path(templatedir,'quiz_template.xlsx'), to = file.path(newfolder,'completequizzes','quiz_template.xlsx') )
 
   #if no errors occurred above (which would lead to early return)
   #return NULL

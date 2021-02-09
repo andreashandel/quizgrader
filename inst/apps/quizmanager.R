@@ -60,6 +60,7 @@ server <- function(input, output, session) {
                 {
                         #format course path into a way that can be used by start_course
                         newcoursedir = shinyFiles::parseDirPath(volumes, input$newcoursedir)
+                        #run start_course function to make new folders and populate with files for the course
                         msg <- quizgrader::start_course(isolate(input$coursename), isolate(newcoursedir))
                 }
                 if (is.null(msg)) #if start_course worked well, it won't sent a message back
@@ -68,6 +69,10 @@ server <- function(input, output, session) {
                         courselocation <<- file.path(isolate(newcoursedir), isolate(input$coursename))
 
                         msg <- paste0("The new course folder and its subfolders have been created at: ",courselocation)
+
+                        #show the directory to the new course
+                        output$coursedir <- renderPrint(courselocation)
+
                 }
 
                 showModal(modalDialog(
@@ -79,8 +84,9 @@ server <- function(input, output, session) {
 
         #######################################################
         #start code block that selects an existing course folder
+        #this is used for working on an existing course
         #######################################################
-        shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
+        shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, session = session, allowDirCreate = FALSE)
 
         output$coursedir <- renderPrint({
                 if (is.integer(input$coursedir)) {
@@ -95,6 +101,8 @@ server <- function(input, output, session) {
 
         #######################################################
         #start code block that gives users the student list template
+        #this file is pulled out of the package, it's not the file copied over into the course
+        #this prevents/minimizes accidental editing of the template
         #######################################################
         output$getstudentlist <- downloadHandler(
                         filename <- function() {
@@ -170,7 +178,7 @@ server <- function(input, output, session) {
                 if (is.null(msg)) #if no prior error, try to create course
                 {
                         #find path to course folder
-                        new_path = file.path(courselocation,"complete_quiz_sheets",input$addquiz$name)
+                        new_path = file.path(courselocation,"completequizzes",input$addquiz$name)
 
                         #copy time-stamped file to student list folder
                         fs::file_copy(path = input$addquiz$datapath,  new_path = new_path, overwrite = TRUE)
@@ -185,6 +193,32 @@ server <- function(input, output, session) {
         })
 
 
+        #######################################################
+        #start code block that removes quizzes from course
+        #######################################################
+
+        observeEvent(input$removequiz,{
+
+                #NOT WORKING
+
+                if (is.null(courselocation)) #not sure why integer, but that's how the example is
+                {
+                        msg <- "Please set the course location"
+                } else {
+                        volumes = c(Coursefolder = file.path(courselocation,"completequizzes"))
+                        shinyFiles::shinyFileChoose(input, "removequiz", roots = volumes, session = session)
+                        deletefile <- shinyFiles::parseFilePaths(volumes, input$removequiz) #save course folder to global variable
+                        file.remove(deletefile)
+                        msg <- paste0("this quiz has been removed:", deletefile)
+                }
+                showModal(modalDialog(
+                        msg,
+                        easyClose = FALSE
+                ))
+        })
+
+
+
 
         #######################################################
         #start code block that turns filled quizzes
@@ -192,12 +226,15 @@ server <- function(input, output, session) {
         #######################################################
         observeEvent(input$createstudentquizzes,{
 
-
-                msg <- create_student_quizzes(courselocation)
+                #run function to generate student versions of quizzes
+                #this takes all quizzes in the specified location
+                #strips columns not needed for students, and copies
+                #quizzes for students into the student_quiz_sheets folder
+                msg <- quizgrader::create_student_quizzes(courselocation)
 
                 if (is.null(msg)) #this means it worked
                 {
-                  msg <- paste0('All student quiz sheets have been created and copied to ', file.path(courselocation,'student_quiz_sheets'))
+                  msg <- paste0('All student quiz sheets have been created and copied to ', file.path(courselocation,'studentquizzes'))
                 }
 
                 showModal(modalDialog(
@@ -216,10 +253,35 @@ server <- function(input, output, session) {
                                 "studentquizsheets.zip"
                         },
                         content <- function(file) {
-                                file.copy(file.path(courselocation,'student_quiz_sheets',"studentquizsheets.zip"), file)
+                                file.copy(file.path(courselocation,'studentquizzes',"studentquizsheets.zip"), file)
                         },
                         contentType = "application/zip"
                 )
+
+
+        #######################################################
+        #start code block that takes student list
+        #and adds info for all quizzes to the main grade tracking sheet
+        #######################################################
+        observeEvent(input$makecourselist,{
+
+                #run function to generate main grade tracking sheet
+                msg <- quizgrader::create_courselist(courselocation)
+
+                if (is.null(msg)) #this means it worked
+                {
+                        msg <- paste0('The grade tracking sheet has been created and copied to ', file.path(courselocation,'gradelists'))
+                }
+
+                showModal(modalDialog(
+                        msg,
+                        easyClose = FALSE
+                ))
+
+
+        })
+
+
 
 
         #######################################################
@@ -251,7 +313,7 @@ ui <- fluidPage(
                    tabPanel(title = "Manage quizzes", value = "manage",
                             h2('Start a new Course'),
                             textInput("coursename",label = "Course Name"),
-                            shinyFiles::shinyDirButton("newcoursedir", "Course location", "Select a parent folder for new course"),
+                            shinyFiles::shinyDirButton("newcoursedir", "Parent directory for course", "Select a parent folder for new course"),
                             verbatimTextOutput("newcoursedir"),  # added a placeholder
                             actionButton("startcourse", "Start new course", class = "actionbutton"),
                             h2('Load existing Course'),
@@ -263,9 +325,12 @@ ui <- fluidPage(
                             h2('Add files to course'),
                             fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
                             p('Any quiz with the same file name as the one being added will be overwritten.'),
-                            fileInput("addquiz", label = "", buttonLabel = "Add a finished quiz to course", accept = '.xlsx'),
+                            shiny::fileInput("addquiz", label = "", buttonLabel = "Add a finished quiz to course", accept = '.xlsx'),
+                            shinyFiles::shinyFilesButton("removequiz", label = "Remove quiz", title = "Remove a quiz from the course", multiple = TRUE),
                             actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
                             downloadButton("getstudentquizzes", "Get zip file with all student quiz files", class = "actionbutton"),
+                            h2('Make courselist'),
+                            actionButton("makecourselist", "Generate grade tracking list", class = "actionbutton"),
                             h2('Deploy course'),
                             actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
                             p(textOutput("warningtext")),

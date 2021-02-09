@@ -67,23 +67,23 @@ Alternatively, without starting the `quizmanager` shiny menu, from the command l
 start_course(coursename = "yourcoursename", courselocation = "path/to/location/for/course")
 ```
 
-You are required to provide a name for your course (which will be the name of the main directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current directory. Note that for windows paths, you need to specify paths as follows (double backslash): `C:\\tmp\newcourse`
+You are required to provide a name for your course (which will be the name of the main directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current working directory. Note that for windows paths, you need to specify paths as follows (double backslash): `C:\\tmp\newcourse`
 
 Either with the shiny app or the command line, if things go wrong, you'll get an error message. Otherwise, if things went well, there should be a new folder with the course name you specified in the location you chose. Inside that folder are several other folders and files, namely:
 
 **Folders**
 
 * `/studentlists` - a folder that contains spreadsheets (template and filled ones) with student information. 
-* `/courselists` - a folder that will contain the main tracking spreadsheets.
-* `/complete_quizzes` - a folder which will contain all your quizzes (with answers) once you made them. 
-* `/student_quizzes` - a folder that will contain quizzes to be given to the students for filling out and submitting. These files are auto-generated once you made your solution sheets.
-* `/submissions` - all individual submissions by students. This is mainly for record keeping and to run some question- and student-specific stats. For easier organization, a sub-folder for each quiz will be created and student submissions organized into those sub-folders.
+* `/gradelists` - a folder that will contain the main grade tracking spreadsheets.
+* `/completequizzes` - a folder which will contain all your quizzes (with answers) once you made them. 
+* `/studentquizzes` - a folder that will contain quizzes to be given to the students for filling out and submitting. These files are auto-generated once you made your solution sheets.
+* `/studentsubmissions` - all individual submissions by students. This is mainly for record keeping and to run some question- and student-specific stats. For easier organization, a sub-folder for each quiz will be created and student submissions organized into those sub-folders.
 
 **Files**
 * `studentlist_template.xlsx` is generated template file inside the `/studentlists` folder that should be populated with student information, as described below. 
 * `quiz_template.xlsx` is generated inside the `/complete_quizzes` folder. This file should be used as template for creating your own quizzes, as described below. 
 
-If at any point you need a clean version of the templates, you can get them through the user interface (or find them in the `/templates` folder of the R package).
+If at any point you need a clean version of the templates, you can get them through the user interface (or find them in the `/templates` subfolder of the `quizgrader` package).
 
 
 ## Add students to the course
@@ -104,8 +104,8 @@ I collect passwords at the beginning of the course through a simple Google form.
 
 **Your filled spreadsheet needs to have content in all the columns that are shown in the template.** If you want to add further columns to this spreadsheet, you can do so. They should not interfere with the working of the app and will be ignored.
 
-Add it to the system by clicking the `Add studentlist` button in the UI or manually place it into the `/studentlist` folder and rename/save it as `studentlist_filled.xlsx`. 
-This new name is required and prevents accidental overwriting if you re-generate the templates. 
+Add it to the system by clicking the `Add studentlist` button in the UI or manually place it into the `/studentlist` folder. You should give it a new name. If you upload it through the UI, it will add the current date/time to the filename so you will have a track record of all versions. If you add manually into the folder, it's your choice how to name.
+__When you generate the grade tracking sheet (see below), the most recently modified `.xlsx` file in this folder will be used.__
 
 
 
@@ -113,7 +113,7 @@ This new name is required and prevents accidental overwriting if you re-generate
 ## Create your quizzes 
 
 To create quizzes, use the template that is provided.
-You can get the template by clicking `Get quiz template` in the `quizmanager` menu, or by manually going into the `complete_quizzes` folder of your course.
+You can get the template by clicking `Get quiz template` in the `quizmanager` menu, or by manually going into the `complete_quiz_sheets` folder of your course.
 
 For each quiz you want to make, you need to create one file based on the template, they should all be structured as shown in the template. 
 The name of the quiz files does not matter, though I recommend a systematic naming scheme, e.g. file names that agree with the quizID (see below). 

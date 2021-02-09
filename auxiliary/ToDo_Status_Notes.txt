@@ -1,5 +1,9 @@
 
-Set up pkpdown, build basic website. Add website link as project to my personal website
+Get quiz deletion to work in quizmanager.
+
+After starting new course, currently not possible to switch to existing course.
+
+write code for quiz checking before making student quiz sheets
 
 Get course deployment to work.
 
@@ -7,3 +11,5 @@ Update vignettes.
 
 Continue implementing other features.
 
+
+https://shiny.rstudio.com/articles/persistent-data-storage.html

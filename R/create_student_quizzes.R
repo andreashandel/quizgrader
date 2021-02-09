@@ -7,7 +7,7 @@
 #' It places those quiz sheets into the student_quiz_sheets folder
 #'
 #' @param courselocation Path to main course directory
-#' @return errormsg Is null if quiz generation was successfull,
+#' @return errormsg Is null if quiz generation was successful,
 #' otherwise contains an error message
 #' @export
 
@@ -19,8 +19,8 @@ create_student_quizzes <- function(courselocation)
 
     errormsg <- NULL
 
-    allquizpath = file.path(courselocation,"complete_quiz_sheets")
-    studentquizpath = file.path(courselocation,"student_quiz_sheets")
+    allquizpath = file.path(courselocation,"completequizzes")
+    studentquizpath = file.path(courselocation,"studentquizzes")
 
     allfiles = list.files(allquizpath,  full.names = TRUE)
     allfilenames = list.files(allquizpath,  full.names = FALSE)
@@ -42,6 +42,13 @@ create_student_quizzes <- function(courselocation)
     {
         #load complete solution sheet
         nowfile <- readxl::read_excel(allfiles[i], col_types = "text")
+
+        ##############################
+        # Check that file is a quiz sheet in the required format.
+        ##############################
+
+        intersect(columns_to_keep, colnames(nowfile))
+
 
         ##############################
         # Make a sheet for the students

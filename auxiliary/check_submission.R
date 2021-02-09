@@ -23,7 +23,7 @@
 #check that submitted file looks right
 #also check that it hasn't been submitted yet
 #also check that it's not past the due date
-check_file <- function(submission,solution,studentid,quizid,classlist)
+check_submission <- function(submission,solution,studentid,quizid,classlist)
 {
   docerror = NULL #will contain error message if something went wrong
 

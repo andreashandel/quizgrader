@@ -1,0 +1,31 @@
+url: https://andreashandel.github.io/quizgrader/index.html
+
+authors:
+  Andreas Handel:
+    href: https://www.andreashandel.com
+
+navbar:
+  structure:
+    left:
+    - home
+    - intro
+    - reference
+    - news
+    right:
+    - github
+  components:
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    intro:
+      text: Get started
+      href: articles/DSAIDE.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    news:
+      text: Changelog
+      href: news/index.html
+    github:
+      icon: fab fa-github
+      href: https://github.com/andreashandel/quizgrader/

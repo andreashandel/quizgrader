@@ -10,7 +10,7 @@ create_student_quizzes(courselocation)
 \item{courselocation}{Path to main course directory}
 }
 \value{
-errormsg Is null if quiz generation was successfull,
+errormsg Is null if quiz generation was successful,
 otherwise contains an error message
 }
 \description{
