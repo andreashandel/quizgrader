@@ -5,7 +5,7 @@
 #' @param courselocation Path to course
 #'
 #' @return the studentlist as data frame
-#' If anything is not right, an error message is returned.
+#' If anything is not right, an error message is returned
 #' @export
 
 read_studentlist <- function(courselocation)
@@ -15,7 +15,7 @@ read_studentlist <- function(courselocation)
   #find the one with the newest time-stamp (as per modified date)
   courselistpath = file.path(courselocation,"studentlists")
   courslistfiles = list.files(path = courselistpath, recursive=FALSE, pattern = "\\.xlsx$", full.names = TRUE)
-  filenr = which.max(file.info(files)$ctime) #find most recently changed file
+  filenr = which.max(file.info(courselistfiles)$ctime) #find most recently changed file
   courselistfile = courslistfiles[filenr]
   courselist <- readxl::read_excel(path = courselistfile, col_types = "text")
 

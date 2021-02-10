@@ -11,15 +11,19 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, eval=TRUE, echo=FALSE}
+library('emo')
+```
+
 
 
 ## Summary
-This package allows auto-grading of quizzes and is meant as an alternative to this functionality within standard learning management systems (LMS).
+This package allows auto-grading of quizzes and is meant as an alternative to similar functionality within standard learning management systems (LMS).
 
 
 ## Motivation
 
-I regularly teach online. In the past, I have used our university's LMS, but I dislike it because it is not user-friendly and elements, such as quizzes and student submissions are "locked up" inside the LMS and one can only extract very rudimentary statistics. Because of this, I have over the last years slowly moved away from our LMS and tried to replace as much as possible with open, or at least user-friendly resources.
+I regularly teach online. In the past, I have used our university's LMS, but I dislike it because it is not user-friendly and elements, such as quizzes and student submissions are "locked up" inside the LMS and one can only extract very rudimentary statistics. Because of this, I have over the last years slowly moved away from our LMS and tried to replace as much as possible with resources that are as open as possible.
 
 One feature I liked about the LMS is that it could auto-grade quizzes, so once the quiz was written, I didn't have much to do anymore, students just submitted and got graded automatically each week. I tend to give lots of small quizzes (generally 1-2 per week), so I needed this process automated.
 
@@ -50,7 +54,9 @@ The package depends on other packages, which will also be installed as needed. P
 
 ## Main use
 
-The main use of this package is through Shiny apps, both locally for the instructor to manage the quizzes and remotely, through `shinyapps.io` deployment for students to go to a website and upload their quizzes, which will be instantly auto-graded and students will receive feedback. The following documentation focuses on that use-case, but it also explains what goes on behind the scenes and how some components could be done without `Shiny` apps. Towards the end of this document, a few other ways of using this package are described.
+The main use of this package is through Shiny apps. A shiny app called `quizmanager` is used locally by the instructor to make, manage and analyze the quizzes. Another shiny app called `quizgrader` is deployed remotely through `shinyapps.io` (or your own Shiny server), which allows students to go to a website and upload their quizzes, and receive instant feedback. 
+
+The following documentation focuses on using the package through these shiny apps. However, it is also possible to not use the apps and manage the quizzes more directly. How this can be done is described briefly in each section or towards the end of this document.
 
 
 
@@ -59,7 +65,11 @@ The main use of this package is through Shiny apps, both locally for the instruc
 
 Start by loading the package with `library(quizgrader)`. 
 You can then start the main menu, which is a shiny app, with `quizmanager()`.
-In the app, click on `Start new course`, this will ask you to specify a location where you want to have the main folder and sub-folders created.
+
+
+### Setting up a new course
+
+In the app, specify a name for the course, choose a directory in which you want to place all the folders and files for the new course, and click on `Start new course`.
 
 Alternatively, without starting the `quizmanager` shiny menu, from the command line you can start a new course with 
 
@@ -67,55 +77,74 @@ Alternatively, without starting the `quizmanager` shiny menu, from the command l
 start_course(coursename = "yourcoursename", courselocation = "path/to/location/for/course")
 ```
 
-You are required to provide a name for your course (which will be the name of the main directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current working directory. Note that for windows paths, you need to specify paths as follows (double backslash): `C:\\tmp\newcourse`
+You are required to provide a name for your course (which will be the name of the main directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current working directory. 
 
-Either with the shiny app or the command line, if things go wrong, you'll get an error message. Otherwise, if things went well, there should be a new folder with the course name you specified in the location you chose. Inside that folder are several other folders and files, namely:
+Either with the shiny app or the command line, if things go wrong, you should get an error message. Otherwise, if things went well, there should be a new folder with the course name you specified in the location you chose. You will also get a message telling you where the new folder has been created. Inside that main course folder are several other folders and files, namely:
 
 **Folders**
 
-* `/studentlists` - a folder that contains spreadsheets (template and filled ones) with student information. 
-* `/gradelists` - a folder that will contain the main grade tracking spreadsheets.
-* `/completequizzes` - a folder which will contain all your quizzes (with answers) once you made them. 
-* `/studentquizzes` - a folder that will contain quizzes to be given to the students for filling out and submitting. These files are auto-generated once you made your solution sheets.
-* `/studentsubmissions` - all individual submissions by students. This is mainly for record keeping and to run some question- and student-specific stats. For easier organization, a sub-folder for each quiz will be created and student submissions organized into those sub-folders.
+* `/studentlists` - a folder that will contains Excel spreadsheet(s) with student roster information. 
+* `/gradelists` - a folder that will contain the main Excel grade tracking spreadsheets, which is created by combining the student list and quiz information (see below for details).
+* `/completequizzes` - a folder which will contain all your quizzes (with answers) once you made them as Excel files. 
+* `/studentquizzes` - a folder that will contain Excel files with versions of the quizzes to be given to the students for filling out and submitting. These files are generated once you made your solution sheets.
+* `/studentsubmissions` - all individual submissions by students. Once the grading app is deployed and students start submitting, their grades will be recorded in the main `gradelist` file. For record keeping and detailed analysis, each individual submission is also kept. For easier organization, a sub-folder for each quiz will be created and student submissions organized into those sub-folders.
+* `/templates` - a folder containing templates for quizzes and student list. Use those as starting points.
 
 **Files**
-* `studentlist_template.xlsx` is generated template file inside the `/studentlists` folder that should be populated with student information, as described below. 
-* `quiz_template.xlsx` is generated inside the `/complete_quizzes` folder. This file should be used as template for creating your own quizzes, as described below. 
 
-If at any point you need a clean version of the templates, you can get them through the user interface (or find them in the `/templates` subfolder of the `quizgrader` package).
+* `studentlist_template.xlsx` is a template file inside the `/templates` folder that should be populated with student information, as described below. 
+* `quiz_template.xlsx` is a template file for quizzes, generated inside the `/templates` folder. This file should be used as template for creating your own quizzes, as described below. 
+
+_Note that if you retrieve template files through the Shiny app, it will pull it out of the package folder, not the `/templates` folder that is inside your course. This way, if you accidentally mess up the files in the `/templates` folder, you can get clean versions again._
+
+
+### Loading an existing course
+
+In the app, you can load a course you created previously, so you can continue working on it. If you are not going through the Shiny user interface, you will be directly copying files into the course folders. You therefore do not need to set a course folder.
+
 
 
 ## Add students to the course
 
-Once you created the course as described above, you need to add students to the course. To that end, you need to fill out a provided template with student information.
-Get the `studentlist_template.xlsx` file either through the UI or you can find it in the `/studentlists` folder on your computer inside the course folder you just created. 
+Once you created the course as described above, you need to add students to the course. To that end, you need to fill out the provided template with student information.
+Get the `studentlist_template.xlsx` file either through the UI or you can find it in the `/templates` folder on your computer inside the course folder you just created. 
 The template file has several columns that you need to fill: 
 
-* `Lastname` and `Firstname` should be self-explanatory.
+#### Lastname/Firstname
 
-* `StudentID` needs to be a unique identifier for each student, and will be checked/matched when a student uploads their quiz. Matching is not done on names since those can be non-unique. The ID needs to be something unique for each student. The best option is probably to use student emails, but any other unique identifier works as well.
+`Lastname` and `Firstname` columns should be self-explanatory.
 
-* Thee `Password` column is there to prevent a student accidentally or purposefully submitting as another student (provided students keep their passwords to themselves). Of course this does not prevent cheating. If students want to, they can share passwords and submit for each other. Or they can share their filled out quiz sheets before submission. **If you are worried about cheating on these kinds of quizzes, this package/setup is likely not suitable!** 
+#### StudentID 
 
-I collect passwords at the beginning of the course through a simple Google form. I copy the passwords manually into the template. If you want to, you can likely automate this process with some R scripts. Disabling the password feature is currently not possible. If you think a setup without a password is a feature I should implement, let me know. For the time being, if you don't want to use this feature, just enter the same password for every student and tell the students what the password is. They'll still have to enter it during submission, but that should not be much of a nuisance.
+`StudentID` needs to be a unique identifier for each student, and will be checked/matched when a student uploads their quiz. Matching is not done on names since those can be non-unique. The ID needs to be something unique for each student. The best option is probably to use student emails, but any other unique identifier works as well.
+
+#### Password
+
+The `Password` column is there to prevent a student from accidentally or purposefully submitting as another student. Of course, this requires students to keep their passwords to themselves. This does not prevent cheating. If students want to, they can share passwords and submit for each other. Or they can share their filled out quiz sheets before submission. I expect students to follow the academic honesty policy, I use lots of low-stake quizzes that count for little of the total grade (a single quiz usually <1% of the total grade) and most of my teaching is at the graduate level and students take my courses because they are interested in the topic. All of these features minimize the risk of cheating to a level that I don't worry about it. **If you are worried about cheating on these quizzes, this package/setup is likely not suitable for your situation!** 
+
+I collect passwords at the beginning of the course through a simple Google form. I suggest you tell students to only use letters and numbers in their password and nothing else (including no blank spaces). Other characters might work, but in my experience this can lead to occasional problems. I copy the passwords manually into the template. If you want to, you can likely automate this process with some R scripts. (Or you can contribute this feature to the package, pull-requests with features added are very welcome `r emo::ji('smile')`).
+
+Disabling the password feature is currently not possible. If you think a setup without a password is a feature I should implement, let me know. For the time being, if you don't want to use this feature, just enter the same password for every student and tell the students what the password is. They'll still have to enter it during submission, but that should not be much of a nuisance.
 
 **You should tell students that you will be able to read their passwords and that this setup is not that secure, thus they should use a _throw-away_ password for this course and not any passwords they use to protect real systems (e.g. their bank accounts)!**
 
+
+#### Other remarks
+
+Once you are done filling the student list, add it to the course by clicking the `Add studentlist` button in the UI or manually place it into the `/studentlist` folder. If you want to keep track of changes, give the file a new name (e.g. `studentlist_new.xlsx`). Any pre-existing file with the same name will be overwritten. You can also manually copy the file into this folder. You can have as many files (student lists and others) in this folder as you like. **When you generate the grade tracking sheet (see below), the most recently modified `.xlsx` file in this folder will be used.** Make sure this file is a valid student list. Ideally, remove all others. All other files will be ignored.
+
+During upload of a new student roster file, it will not be checked for correctness. **The only time this file is checked to ensure it follows the required format is during generation of the grade list, see below.**
+
 **Your filled spreadsheet needs to have content in all the columns that are shown in the template.** If you want to add further columns to this spreadsheet, you can do so. They should not interfere with the working of the app and will be ignored.
 
-Add it to the system by clicking the `Add studentlist` button in the UI or manually place it into the `/studentlist` folder. You should give it a new name. If you upload it through the UI, it will add the current date/time to the filename so you will have a track record of all versions. If you add manually into the folder, it's your choice how to name.
-__When you generate the grade tracking sheet (see below), the most recently modified `.xlsx` file in this folder will be used.__
-
-
+I recommend only using letters, numbers and underscore for filenames. Other names might work, but since the files are deployed to a remove server (that is likely running Unix/Linux), having file names that contain other characters (e.g. dashes or blank) might cause problems. You can try, it might work `r emo::ji('grin')`. I still recommend not to.
 
 
 ## Create your quizzes 
 
-To create quizzes, use the template that is provided.
-You can get the template by clicking `Get quiz template` in the `quizmanager` menu, or by manually going into the `complete_quiz_sheets` folder of your course.
+To create quizzes, use the template that is provided. You can get the template by clicking `Get quiz template` in the `quizmanager` menu, or by manually going into the `/templates` folder of your course.
 
-For each quiz you want to make, you need to create one file based on the template, they should all be structured as shown in the template. 
+For each quiz you want to make, you need to create a separate file based on the template, they should all be structured as shown in the template. 
 The name of the quiz files does not matter, though I recommend a systematic naming scheme, e.g. file names that agree with the quizID (see below). 
 
 
@@ -125,31 +154,32 @@ Each quiz needs to have the following columns
 
 #### QuizID
 
-A unique ID containing letters/numbers. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. Avoid blank spaces and special characters. They might work, but it's not guaranteed. I also recommend naming the quiz file in accordance with the unique ID (e.g. the ID is `mod1quiz1` and the file is `mod1quiz1.xlsx`) but that is not required.
-
-#### Duedate
-
-A date on which the quiz is due. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. It should be coded as a text (don't allow Excel to transform it into a date) and follow the ISO standard, i.e. be of the form YEAR-MO-DA (e.g. 2021-05-18). Specific due times are currently not implemented, thus students have until midnight of the due date to submit. If you very much want/need time, let me know and I can implement that. If quizzes can be submitted any time, just set a due date very far into the future.
-
-
-#### Attempts
-
-Number of submission attempts students can make.  Only the entry in the first row matters, anything else in further rows is ignored. It needs to be a positive integer. Note that currently, any new submission will overwrite previous ones (which means if a student did worse on a subsequent attempt, that lower score will be recorded). If you need unlimited submission attempts, set this to a very large number.
-
+A unique ID containing letters/numbers. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. Avoid blank spaces and special characters. They might work, but it's not guaranteed. I also recommend naming the quiz file in accordance with the unique ID (e.g. the ID is `quiz1` and the file is `quiz1.xlsx`) but that is not required.
 
 #### QuestionID
 
-A unique ID for each question. I recommend combining quiz ID with some additional question ID (e.g. `mod1quiz1q1`, `mod1quiz1q2`, etc). Needs to be different for each question.
+A unique ID for each question. I recommend combining quiz ID with some additional question ID (e.g. `quiz1q1`, `quiz1q2`, etc). Needs to be different for each question.
 
 
 #### Question
 
 The question text. You can use basic formatting, e.g. line breaks and such. Fancy formatting, e.g. equations or pictures or such is currently not supported (and unlikely will be). If you need to provide additional information, you can include a link to a URL into the question, or provide the quiz in the context of other materials which can contain anything else.
 
+#### Instruction
+
+Provide additional instructions to the students, e.g. instructions regarding rounding, entering an integer, etc.
+
+**The columns just described are those retained in the sheets that are generated for the students. An empty `Answer` column is also provided, all other columns described below exist only in your complete solution sheets and are not included in the sheets given to the students.**  
+
 
 #### Answer
 
-The correct answer to the question. Write it in exactly the way you want students to specify it. See the next section for more details.
+The correct answer to the question. Write it in exactly the way you want students to specify it. Make sure you don't have accidental white spaces after your answer. 
+See the next section for more details on what kinds of answers are implemented.
+
+#### Feedback
+
+This is optional feedback that will be provided to the student if their submission is found to not be correct. The feedback will not be shown for correct entries. Students will see the feedback after they submit their quiz, together with the `Correct`/`Not Correct` label. If you want to allow for more than one submission attempt, you should probably not provide the answer outright here. If there is only one submission and you want students to see the correct answers right away, you can copy the answers into this column.
 
 
 #### Type
@@ -158,33 +188,38 @@ Type of question/answer. Several types are currently allowed. Depending on the t
 
 **Character:** A single character is expected and only the first character is evaluated. Capitalization is ignored. This means if the answer is `A` and the student provides `A)` or anything that starts with either `A` or `a` it will be marked as `correct`, otherwise `not correct`. Good for multiple choice.
 
-**Text:** Matches text provided by student with answer text. Leading and trailing white spaces are trimmed in the submission and capitalization is ignored, but otherwise matching is strict. Thus, if the answer is `hello world` and the student submits `hello  world` (extra white space), it would be marked as `not correct`. So use this type of question/answer with care, as it is easy for there to be a non-match based on benign reasons, e.g. a simple typo.
+**Text:** Matches text provided by student with answer text. Leading and trailing white spaces are trimmed in the submission and capitalization is ignored, but otherwise matching is strict. Thus, if the answer is `hello world` and the student submits `hello  world` (extra white space), it would be marked as `not correct`. So use this type of question/answer with care, as it is easy for there to be a non-match based on benign reasons, e.g. a simple typo. Probably best for single words.
        
-**Logical:** The student is expected to write either `TRUE` or `FALSE`. Also allowed are `Yes` and `No` and `1` and `0`. Only the first character is evaluated and capitalization is ignored. Thus, if a student enters anything starting with `t`, `y` or `1` it will be interpreted to mean `TRUE`. Similarly, `f`, `n` and `0` are evaluated to mean `FALSE`.  Anything else is interpreted as an incorrect submission and labeled 'not correct'. 
+**Logical:** The student is expected to write either `TRUE` or `FALSE`. Also allowed are `Yes` and `No` and `1` and `0`. Only the first character is evaluated and capitalization is ignored. Thus, if a student enters anything starting with `t`, `y` or `1` it will be interpreted to mean `TRUE`. Similarly, `f`, `n` and `0` are evaluated to mean `FALSE`.  Anything else is automatically interpreted as an incorrect submission and labeled as wrong. 
 
-**Integer:** Whatever the student provides is rounded to the nearest integer, then compared with the answer. So if the answer is 42 and the student provides 41.5 or 42.4, that's evaluated as correct, 41.4 would be evaluated as wrong. So would `41` or `43`. Any submitted answer that can't be converted to numeric is labeled 'not correct'.
+**Integer:** Whatever the student provides is rounded to the nearest integer, then compared with the answer. So if the answer is 42 and the student provides 41.5 or 42.4, that's evaluated as correct, 41.4 would be evaluated as wrong. So would `41` or `43`. Any submitted answer that can't be converted to numeric is labeled as wrong.
 
 **Fuzzy_Integer:** As for `Integer`, whatever the student provides is rounded to the nearest integer, then compared with the answer. The difference is that this type also allows for a plus/minus 1 difference. This is done in case students don't know how to round and you don't want to penalize them for that. So if the answer is 42 and the non-rounded answer the student gets is 41.5 and they round it - wrongly - to 41, it would still be considered correct. Any submitted answer that can't be converted to numeric is labeled 'not correct'.
 
-When to  use `Fuzzy_Integer` or `Integer`: If you know the answer is an integer, e.g. if the question is `how many US states are there` and the right answer is `50`, you don't want to allow `49` or `51` to be considered correct, so you should use the `Integer` type. If on the other hand you ask students to do some calculation and the result is `41.50123` and you want them to round it to an integer, if you want to be strict and only allow proper rounding (i.e. `42`) you should use `Integer` type, if you are ok with them making rounding mistakes, you should use `Fuzzy_Integer` which would also accept `41` as correct (A submission of `40.567` would also be considered corret, since the number is first rounded to an integer, then checked if it is within plus/minus 1 of the correct answer). 
-**Numeric:** An exact numeric value. Submission is directly compared to answer. Any submitted answer that can't be converted to numeric is labeled 'not correct'.
+_When to  use `Fuzzy_Integer` or `Integer`:_ If you know the answer is an integer, e.g. if the question is `how many US states are there` and the right answer is `50`, you don't want to allow `49` or `51` to be considered correct, so you should use the `Integer` type. If on the other hand you ask students to do some calculation and the result is `41.50123` and you want them to round it to an integer, if you want to be strict and only allow proper rounding (i.e. `42`) you should use `Integer` type, if you are ok with them making rounding mistakes, you should use `Fuzzy_Integer` which would also accept `41` as correct. A submission of `40.567` would also be considered correct, since the number is first rounded to an integer, then checked if it is within plus/minus 1 of the correct answer.
 
-**Rounded_Numeric:** An numeric value rounded to some specified significant digits. Those digits need to match the provided answer. Thus if the answer is `42.42`, you should specify that students need to round to 2 significant digits. This again allows for non-proper rounding, e.g. if a student gets `42.4163` and mistakenly rounds it to `42.41` it will still be considered as correct. If you don't want that and want to be strict, use the **Numeric** type.
+**Numeric:** An exact numeric value. Submission is directly compared to answer, an exact match expected. This means if the answer is 42.34 and a student submits 42.343, it is labeled as wrong. Any submitted answer that can't be converted to numeric is labeled 'not correct'.
+
+**Rounded_Numeric:** A numeric value rounded to some specified significant digits. Those digits need to match the provided answer. Thus if the answer is `42.42`, you should specify that students need to round to 2 significant digits. This again allows for non-proper rounding, e.g. if a student gets `42.4163` and mistakenly rounds it to `42.41` it will still be considered as correct. If you don't want that and want to be strict, use the **Numeric** type.
 
 
 _A note on answer types: I implemented those that I use for my own teaching. If you have others that you want/need, please let me know. Most of them should not be too hard to implement and I'd be happy to do so (if reasonably easy to do)._
 
-#### Instruction
-
-Provide additional instructions to the students, e.g. instructions regarding rounding, entering an integer, etc.
 
 #### Comment
 
-These are any notes/comments you want to add, mostly for yourself.
+These are any notes/comments you want to add, mostly for yourself. These won't be copied to the student sheets/
 
-#### Feedback
 
-This is optional feedback that will be provided to the student together with the `Correct`/`Not Correct` label for each question.
+#### Duedate
+
+A date on which the quiz is due. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. It should be coded as a text (don't allow Excel to transform it into a date) and follow the ISO standard, i.e. be of the form YEAR-MO-DA (e.g. 2021-05-18). Specific due times are currently not implemented, thus students have until midnight of the due date to submit. If you very much want/need a due time, let me know and I can implement that. If you want to have a quiz that has no due date, just set a due date very far into the future.
+
+
+#### Attempts
+
+Number of submission attempts students can make. Only the entry in the first row matters, anything else in further rows is ignored. It needs to be a positive integer. Note that currently, any new submission will overwrite previous ones (which means if a student did worse on a subsequent attempt, that lower score will be recorded). If you need unlimited submission attempts, set this to a very large number.
+
 
 
 ### Notes for quiz creation
@@ -192,28 +227,47 @@ This is optional feedback that will be provided to the student together with the
 I assume you'll be making your quiz sheets using Excel or similar (e.g. LibreOffice). These programs are sometimes overly eager when it comes to formatting. The safest approach is to format all cells as text. When these quiz sheets are read in, each cell is read as text and then internally converted (to e.g. a date or a numeric value). If you allow the spreadsheet software to do formatting, things might go wrong (e.g. if you read in a date format from Excel as text, it often shows up wrong). Always test your quizzes before giving them to students.
 
 
-## Add your quizzes
+## Manage quizzes 
+
+### Add your quizzes
 
 Once you created your quizzes, including answers, you need to place them into the `complete_quizzes` folder.
-This can be done manually by just copying the files into the folder. Alternatively, you can press the `Add quizzes to course` button in the GUI.
+This can be done manually by just copying the files into the folder. Alternatively, you can press the `Add finished quiz to course` button in the Shiny app. With the shiny app, you need to add one quiz at a time.
 
+**When adding the quizzes to the course, they are not checked for correctness. Checks occur during creation of student sheets or the grade sheet.**
+
+### Modify quizzes
+
+If you want to make changes to any quiz, just edit, then re-upload through the UI. It will overwrite any previous quiz of the same name. Alternatively, you can directly edit the Excel files in the `completequizzes` folder.
+
+### Remove quizzes
+
+**Currently not working through GUI.**
+
+You can remove quizzes (or other files) that you don't want in the `completequizzes` folder by using the `Remove quiz` button in the UI. Alternatively, just go into the `complete_quizzes` folder and delete unwanted files.
+
+EVERYTHING ABOVE WORKING, NEED TO CONTINUE WITH THIS
 
 
 ## Creating student quiz sheets
 
-Now it's time to create quiz sheets that will be given to students. First, make sure that the only files in the `complete_quizzes` folder are your quizzes, any other files need to be removed. Once that's the case, you can press the `Create student quiz files` button in the GUI, or run:
+Once you are done creating quizzes, you should have a collection of properly formatted Excel files in the `completequizzes` folder. Remove any file from that folder that is not a quiz to be used. All your quizzes need to have `.xlsx` endings (all lower case). Now it's time to create quiz sheets that will be given to students. You can press the `Create student quiz files` button in the GUI, or run:
 
 ```{r, eval=FALSE, echo=TRUE}
-generate_student_sheets(coursename = "yourcoursename", courselocation = "path/to/location/for/course")
+create_student_quizzes(courselocation = "path/to/location/for/course")
 ```
 
-This generates for each quiz sheet in the `complete_quizzes` folder a matching sheet to be given to students. 
+This generates for each quiz sheet in the `completequizzes` folder a matching sheet to be given to students. 
 The student sheets will contain the columns `QuizID`, `QuestionID`, `Question`, `Instruction` and an empty `Answer` column.
 The remaining columns will not be included in the student sheets. 
 
-You can find all the student files in the `student_quizzes` folder. You can then distribute these files to the students by any means you like (e.g. email, Dropbox, posting to a course website, etc.). Students will fill out the quiz sheets by entering their answers into the `Answer` column, and then submit them through the online submission app.
+You can find all the student files in the `studentquizzes` folder. You can then distribute these files to the students by any means you like (e.g. email, Dropbox, posting to a course website, etc.). Students will fill out the quiz sheets by entering their answers into the `Answer` column, and then submit them through the online submission app.
 
-If you make new quizzes, you can keep adding them to the `complete_quizzes` folder and then re-generating the student quizzes. The files for the students are based on whatever the latest version of the quizzes are found in the `complete_quizzes` folder. Thus, if you find mistakes in your quizzes or want to make other adjustments, fix them in the main/complete quiz file, then re-generate the student versions and re-distribute.
+If you update/edit/add quizzes, make sure all updated (and no other) Excel files are in the `completequizzes` folder, then re-generate the student quizzes and re-distribute.
+
+**During the process of generating student quizzes, the code checks to make sure your complete quiz sheets are properly formatted. If anything is not right, you will get an error message. Fix, then re-run, until it works without errors. Also, in this process, the complete `studentquizzes` folder is deleted and newly created - so don't store anything in there!**
+
+
 
 
 ## Creating the main course tracking document

@@ -10,13 +10,13 @@ create_student_quizzes(courselocation)
 \item{courselocation}{Path to main course directory}
 }
 \value{
-errormsg Is null if quiz generation was successful,
+errormsg Null if quiz generation was successful,
 otherwise contains an error message
 }
 \description{
-This function takes the folder location
-that contains all complete quizzes.
-It strips some of the content and produces quiz sheets
+This function takes all complete quiz Excel sheets.
+It checks each quiz sheet for proper formatting.
+It then strips some of the content and produces quiz sheets
 to be given to students for filling out.
 It places those quiz sheets into the student_quiz_sheets folder
 }

@@ -1,9 +1,11 @@
 
 Get quiz deletion to work in quizmanager.
 
-After starting new course, currently not possible to switch to existing course.
 
-write code for quiz checking before making student quiz sheets
+Work on the part that creates student quizzes. See comment in vignette. continue with function create_student_quizzes
+
+
+Write code for quiz checking before making student quiz sheets
 
 Get course deployment to work.
 

@@ -28,16 +28,21 @@ make_gradelist <- function(courselocation)
 
   nstudent <- nrow(studentlist) #number of students
 
+  # start grade list by assigning the student list
+  gradelist <- studentlist
 
+  #now add information for all quizzes
 
-  # Pulls all of the xlsx files from the solution folder to get names for quizzes
-  # Each xlsx file will be the name of a quiz. The file needs to end in _complete.xlsx
-  quizfilenames <- list.files( ,pattern='*.xlsx')
+  # Get all xlsx files from the solution folder
+  quizfilenames <- list.files(file.path(courselocation,'complete_quiz_sheets'), pattern='*.xlsx')
 
   #for each quiz that is found, add these columns:
   #due date, submit date, submit attempt max, submit attempt actual and grade
   for (nn in 1:length(quizfilenames))
   {
+    #load quiz
+
+
     #Clean up the quiz names
     quizname <- quizfilenames[nn] %>% stringr::str_replace("_complete.xlsx*","")
 
@@ -46,7 +51,7 @@ make_gradelist <- function(courselocation)
     submitdate <- c(paste0(quizname,"_submitdate"))
     quizgrade  <- c(paste0(quizname,"_grade"))
 
-    columns<-c(columns, duedate, submitdate, quizgrade)
+    columns <- c(columns, duedate, submitdate, quizgrade)
   }
 
   #return data frame containing the course list
