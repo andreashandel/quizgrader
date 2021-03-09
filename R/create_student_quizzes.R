@@ -29,56 +29,68 @@ create_student_quizzes <- function(courselocation)
         "Answer"
     )
 
+    #path to complete quizzes
+    completequizpath = fs::path(courselocation,"completequizzes")
+    #get all file names for quiz files, with path
+    completequizfiles = fs::dir_ls(completequizpath, glob = "*.xlsx")
 
     #clean out any previous student quizzes by deleting and rebuilding the student quiz folder
     studentquizpath = fs::path(courselocation,"studentquizzes")
-    dir_delete(studentquizpath)
-    dir_create(studentquizpath)
+    fs::dir_delete(studentquizpath)
+    fs::dir_create(studentquizpath)
 
-    #path to complete quizzes
-    completequizpath = fs::path(courselocation,"completequizzes")
-    #get all file names
-    completequizfiles = fs::dir_ls(completequizpath, glob = "*.xlsx")
-
-
-    for (i in 1:length(allfiles))
+    #loop over all complete quizzes and generate student versions
+    for (i in 1:length(completequizfiles))
     {
         #load complete solution sheet
-        nowfile <- readxl::read_excel(allfiles[i], col_types = "text")
+        quizdf <- readxl::read_excel(completequizfiles[i], col_types = "text", col_names = TRUE)
+
+        if (!tibble::is_tibble(quizdf))
+        {
+            #something didn't go right
+            #read_excel should have returned an error message
+            #send that message to calling function
+            return(quizdf)
+        }
+
 
         ##############################
         # Check that file is a quiz sheet in the required format.
         ##############################
-        check_quiz(nowfile)
-
+        errormsg <- check_quiz(quizdf)
+        if (!is.null(errormsg))
+        {
+            return(paste0('File ',completequizfiles[i]," has this problem: ",errormsg))
+        }
 
         ##############################
         # Make a sheet for the students
         ##############################
 
-        #so we can supply column names that might or might not be in the sheets
-        #and only select them if they exist, otherwise we get an error message
-        actual_cols_to_keep = intersect(columns_to_keep, colnames(nowfile))
         #select columns to keep
-        nowfile <- nowfile[actual_cols_to_keep]
+        quizdf <- quizdf[columns_to_keep]
 
         #add empty answer column
-        nowfile$Answer = ""
+        quizdf$Answer = ""
 
         #save sheets for students
         #naming is original file name with _student appended
-        studentfilename = paste0("student_",allfilenames[i])
-        studentfile_fullname = file.path(studentquizpath,studentfilename)
-        writexl::write_xlsx(nowfile, studentfile_fullname)
+
+
+        studentfilename = paste0("student_",fs::path_file(completequizfiles[i]))
+        studentfile_fullname = fs::path(studentquizpath, studentfilename)
+        writexl::write_xlsx(quizdf, studentfile_fullname, col_names = TRUE, format_headers = TRUE)
     }
 
-    #finally, create zip file from all files
+    #finally, create zip file of all student quizzes
+    #place zip file in the same folder
     # create zip file
-    zipfilename = file.path(studentquizpath,"studentquizsheets.zip")
-    allstudentfiles = list.files(studentquizpath, full.names = TRUE)
+    zipfilename = fs::path(studentquizpath,"studentquizsheets.zip")
+    allstudentfiles = fs::dir_ls(studentquizpath)
     zip::zipr(zipfile = zipfilename, files = allstudentfiles, recurse = FALSE, include_directories = FALSE)
 
-    #currently no error checking implemented
+
+    #if things worked ok, return NULL
     return(errormsg)
 
 } #end function

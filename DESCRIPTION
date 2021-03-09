@@ -14,11 +14,13 @@ LazyData: TRUE
 Imports:
     dplyr,
     fs,
+    lubridate,
     readxl,
     rlang,
     shinyjs,
     stats,
     stringr,
+    tibble,
     tidyr,
     utils,
     writexl,
@@ -33,10 +35,10 @@ Suggests:
     pkgdown,
     rmarkdown,
     roxygen2,
-    testthat
+    testthat (>= 3.0.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 URL: https://andreashandel.github.io/quizgrader/, https://github.com/andreashandel/quizgrader/
 BugReports: https://github.com/ahgroup/DSAIDE/issues
-
+Config/testthat/edition: 3

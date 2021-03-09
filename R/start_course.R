@@ -10,9 +10,10 @@
 #' @param courselocation The location where the new course folder
 #' is to be created
 #'
-#' @return The script creates folders an files for the new course.
-#' If things went well, an error status of 0 is returned and a
-#' string specifying the location of the new course folder.
+#' @return The function creates folders an files for the new course.
+#' The function returns a list containing error or success information.
+#' If things went well, the list element status is 0 and a the list
+#' element message is a string specifying the location of the new course folder.
 #' Otherwise an error status of 1 and an error message is returned.
 #' @export
 

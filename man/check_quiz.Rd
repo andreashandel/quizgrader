@@ -2,19 +2,19 @@
 % Please edit documentation in R/check_quiz.R
 \name{check_quiz}
 \alias{check_quiz}
-\title{Check that a file sent to this function has a valid structure for a complete quiz}
+\title{Check that a data frame sent to this function has a valid structure for a complete quiz}
 \usage{
-check_quiz(quizfile)
+check_quiz(quizdf)
 }
 \arguments{
-\item{quizfile}{Path and name of file to be checked}
+\item{quizdf}{Data frame of quiz that needs to be checked}
 }
 \value{
-An error message if it's not a valid quiz,
+An error message if it's not a valid quiz data frame,
 otherwise NULL
 }
 \description{
-This function takes the name/location of a
-file and tries to load it and check that it has a valid
-structure and content for a quiz
+This function takes the data frame or tibble
+that is supposed to contain a valid completed quiz
+and checks that structure and content are valid
 }

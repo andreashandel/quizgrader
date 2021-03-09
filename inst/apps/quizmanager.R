@@ -193,6 +193,7 @@ server <- function(input, output, session) {
                 if (is.null(courselocation)) #not sure why integer, but that's how the example is
                 {
                         msg <- "Please set the course location"
+                        shinyjs::reset(id  = "removequiz")
                 } else {
                         volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
                         shinyFiles::shinyFileChoose(input, "removequiz", roots = volumes, session = session)
@@ -216,23 +217,29 @@ server <- function(input, output, session) {
         #######################################################
         observeEvent(input$createstudentquizzes,{
 
-                #run function to generate student versions of quizzes
-                #this takes all quizzes in the specified location
-                #strips columns not needed for students, and copies
-                #quizzes for students into the student_quiz_sheets folder
-                msg <- quizgrader::create_student_quizzes(courselocation)
-
-                if (is.null(msg)) #this means it worked
+                if (is.null(courselocation)) #not sure why integer, but that's how the example is
                 {
-                  msg <- paste0('All student quiz sheets have been created and copied to ', fs::path(courselocation,'studentquizzes'))
-                }
+                        msg <- "Please set the course location"
+                        shinyjs::reset(id  = "createstudentquizzes")
+                } else {
 
+
+                        #run function to generate student versions of quizzes
+                        #this takes all quizzes in the specified location
+                        #strips columns not needed for students, and copies
+                        #quizzes for students into the student_quiz_sheets folder
+                        msg <- quizgrader::create_student_quizzes(courselocation)
+
+                        if (is.null(msg)) #this means it worked
+                        {
+                                msg <- paste0('All student quiz sheets have been created and copied to ', fs::path(courselocation,'studentquizzes'))
+                        }
+
+                }
                 showModal(modalDialog(
                         msg,
                         easyClose = FALSE
                 ))
-
-
         })
 
         #######################################################
@@ -253,15 +260,22 @@ server <- function(input, output, session) {
         #start code block that takes student list
         #and adds info for all quizzes to the main grade tracking sheet
         #######################################################
-        observeEvent(input$makegradelist,{
+        observeEvent(input$creategradelist,{
 
-                #run function to generate main grade tracking sheet
-                msg <- quizgrader::create_courselist(courselocation)
-
-                if (is.null(msg)) #this means it worked
+                if (is.null(courselocation)) #not sure why integer, but that's how the example is
                 {
-                        msg <- paste0('The grade tracking sheet has been created and copied to ', file.path(courselocation,'gradelists'))
-                }
+                        msg <- "Please set the course location"
+                        shinyjs::reset(id  = "createstudentquizzes")
+                } else {
+
+                        #run function to generate main grade tracking sheet
+                        msg <- quizgrader::create_gradelist(courselocation)
+
+                        if (is.null(msg)) #this means it worked
+                        {
+                                msg <- paste0('The grade tracking sheet has been created and copied to ', file.path(courselocation,'gradelists'))
+                        }
+                } #end else statement
 
                 showModal(modalDialog(
                         msg,
@@ -314,14 +328,15 @@ ui <- fluidPage(
                             downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
                             h2('Add student list to course'),
                             fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
-                            h2('Manage quizzes'),
+                            h2('Manage complete quizzes'),
                             shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx'),
                             p('Any quiz with the same file name as the one being added will be overwritten.'),
                             shinyFiles::shinyFilesButton("removequiz", label = "Remove quiz", title = "Remove a quiz from the course", multiple = TRUE),
+                            h2('Make student quizzes'),
                             actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
                             downloadButton("getstudentquizzes", "Get zip file with all student quiz files", class = "actionbutton"),
                             h2('Make grade list'),
-                            actionButton("makegradelist", "Generate grade tracking list", class = "actionbutton"),
+                            actionButton("creategradelist", "Generate grade tracking list", class = "actionbutton"),
                             h2('Deploy course'),
                             actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
                             p(textOutput("warningtext")),
