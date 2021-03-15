@@ -161,11 +161,11 @@ Additional columns are optional and will be ignored.
 
 #### QuizID
 
-A unique ID containing **only** letters and/or numbers. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. I also recommend naming the quiz file in accordance with the unique ID (e.g. the ID is `quiz1` and the file is `quiz1.xlsx`) but that is not required.
+A unique ID. This can only contain letters, numbers and underscore. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. Quiz files need to have the name `QuizID_complete.xlsx` where `QuizID` is the entry in the column of that name.
 
 #### QuestionID
 
-A unique ID for each question containing **only** letters and/or numbers. I recommend combining quiz ID with some additional question ID (e.g. `quiz1q1`, `quiz1q2`, etc). Needs to be different for each question.
+A unique ID for each question. This can only contain letters, numbers and underscore. I recommend combining quiz ID with some additional question ID (e.g. `quiz1q1`, `quiz1q2`, etc). Needs to be different for each question. You can use the same Question IDs for different quizzes, but I suggest you use unique ones for easier question identification during analysis.
 
 
 #### Question
@@ -238,10 +238,13 @@ I assume you'll be making your quiz sheets using Excel or similar (e.g. LibreOff
 
 ### Add your quizzes
 
-Once you created your quizzes, including answers, you need to place them into the `complete_quizzes` folder.
-This can be done manually by just copying the files into the folder. Alternatively, you can press the `Add completed quiz to course` button in the Shiny app. With the shiny app, you need to add one quiz at a time.
+Once you created your quizzes, including answers, you need to place them into the `completequizzes` folder.
+To do so, use the `Add completed quiz to course` button in the Shiny app. You need to add one quiz at a time.
+The quiz will be checked for proper formatting/content and a file with the name of the quiz, appended by `_complete` will be placed in the `completequizzes` folder. 
 
-**When adding the quizzes to the course, they are not checked for correctness. Checks occur during creation of student sheets or the grade sheet.**
+You can also add completed quizzes manually to the `completequizzes` folder. If you do so, files are not checked for correctness. They will be checked during creation of student sheets and the grade sheet. You also need to ensure the files have the right names. **Complete quiz files need to be named `QuizID_complete.xlsx` where `QuizID` is the entry in the column of that name inside the quiz sheet.**
+
+
 
 ### Modify quizzes
 
@@ -275,13 +278,9 @@ If you update/edit/add quizzes, make sure all updated (and no other) Excel files
 As part of this process, there is a zip file created that contains all student quiz sheets. You can get this file by clicking the `Get zip file` button in the UI (or as always by going directly into the folder.)
 
 
+## Creating the main grade tracking document
 
-EVERYTHING ABOVE WORKING, NEED TO CONTINUE WITH THIS
-
-
-## Creating the main course tracking document
-
-At this stage, you should have a "final" filled student list in the `studentlists` folder and have all your quizzes done (and generated equivalent student quiz sheets).
+At this stage, you should have a filled student list in the `studentlists` folder and have all your quizzes done and stored in `completequizzes` (and generated equivalent student quiz sheets). I recommend removing all other files from the `studentlists` and `completequizzes` folder.
 
 In this step, you will generate the main sheet that will track all student grades. This sheet will essentially merge information from the student list and all quiz sheets.
 
@@ -291,26 +290,71 @@ To generate this main tracking file, click the `Make grade list` button or run t
 create_gradelist(courselocation = "path/to/location/for/course)
 ```
 
-The grade list will be placed into the `gradelists` folder. It will have the name `DATETIME_gradelist_COURSENAME`. 
+If you use the UI, this will also run the student quiz generation routine to ensure everything is in sync. If you use the command above, you need to ensure that your student sheets match the current version of the quizzes.
+
+At this stage, both the student list and each quiz will be checked for proper formatting/content. Fix any errors you might get. If everything works, the grade tracking list will be placed into the `gradelists` folder. It will have the name `DATETIME_gradelist_COURSENAME`. 
+Note that the quizzes are listed in this tracking document based on their file names and not their quiz names or due dates. If you want to have the quizzes show up in the order in which they are given in class (because you might want to manually look into the grade sheet), you need to make sure the file names of the quizzes follow that order. 
+
+If the student roster changes, or if you modify/add quizzes, you can always re-create a new tracking document. Make sure the updated student list and quiz sheets are in their right folders. Once students have started submitting grades, things get trickier (FIGURE OUT HOW TO DO THAT).
 
 
-**Note that if the student roster changes, or if you add further quizzes, you can always re-run the two commands that generate the student quiz sheets and the course list. Once the course has started and students are beginning to submit, things get trickier (FIGURE OUT HOW TO DO THAT).**
+## Using the grading system
+
+Now you are ready to deploy the grading system. Different options are described below. The basic steps are as follows. 
+
+1. You copy the grade tracking sheet, all complete quizzes, and a shiny app used for grading (called `quizgrader`) to a Shiny server.
+
+2. You give students the empty quiz sheets and tell them the deadlines and the number of attempts (if that's relevant).
+
+3. Students fill out the quiz sheets, the go to the URL where your app lives (e.g., 'https://shiny.mysite.com/quizgrader/'), enter their information and upload their quiz.
+
+4. The online system grades the submission by checking it against the solution. It provides immediate feedback to students on how they did, and records the grade in the main tracking sheet. Also, for safety and to allow detailed analytics, it deposits the file submitted by students into the `studentsubmissions` folder. 
+
+5. You occasionally retrieve the grade tracking sheet and the student submissions from the server and use the `Analyze Quizzes` tab in `quizmanager` to see how students are doing, and to check which questions are problematic and indicate students didn't fully understand that content (or you wrote a bad question).
+
+Next, you'll learn how this overall setup works depending on the type of Shiny server you use.
 
 
 
-## Deploying the student submission app on your own Shiny server
+## Using the grading system with your own Shiny server
 
-Students are given the quiz sheets, asked to fill them, and then submit them online. 
-The online submission system is powered by another Shiny app and functionality of the `quizgrader` package. 
+Using your own Shiny server is cheaper and you have more control. But it requires you knowing how to manage a Shiny server. 
+If you go that route, I assume you know how to manage a shiny server and deploy apps. [Here](https://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean/) is a good tutorial on setting up and running your own server. Your company/university might also be able to set one up for you and help manage it. The Rstudio website has information on how to do this.
 
-
-
-Almost the same setup as described above works if you host your own shiny server. That's how I implemented it in the past. You just have to manually place the submission app and the various folders on the server. If you know how to operate and administer a shiny server, I assume it will be clear how to run this. Just make sure the file and folder permissions are set ok, since students (the app) need to be able to write their files to the server. Every so often, I recommend pulling files from the server. If you are trying to run it on your own shiny server and get stuck, feel free to reach out so I can help.
+If you go that route, here is how quizgrader deployment and use works. 
 
 
+### Deploying everything to the server
+
+The components that you need to copy to the server are the folder with the tracking sheet(s), the folder with all complete quizzes, the Shiny app called `quizgrader.R` and the `quizgrader.css` file that goes with it. 
+
+The easiest way to collect all those for deployment is to click the `Make zip file for deployment` button. This will make a zip file containing almost all the files and folders you need. You'll get a message telling you where the file has been placed (the main folder of your quiz). 
+
+Once you have this file, connect to your shiny server. Go into the folder where you host shiny apps (usually `shiny-server`), make a folder called `quizgrader` and copy the zip file to that location. Unzip it. You should now have the `app.R` and `quizgrader.css` in the main directory, and 2 folders, namely `completequizzes` and `gradelists`. By hand, create another folder called `studentsubmissions`. **Change the permissions for all 3 folders such that it allows write access by the shiny server/app. Not having the right permissions is a common problem leading to weird error messages for students.** Start the shiny server and if everything works, students should no be able to go to the URL where your app lives (e.g., `https://shiny.mysite.com/quizgrader/`) and start submitting.
+
+**It goes without saying that you should test that everything works before telling students to start submitting. I suggest creating one or a few test users in the student tracking sheet, so you can test-submit quizzes to make sure things work as expected.**
 
 
-## Deploying on shinyapps.io
+### Retrieving and Analyzing student submissions
+
+Once students start submitting, their grades are recorded in (always time-stamped and not overwritten) `gradelist.xlsx` files, and all their submissions, including their user ID and timestamp, are placed into the `studentsubmissions` folder. you'll want to pull files from the server every so often. Currently, this needs to be done manually. To that end, log into the shiny server and copy everything in the `studentsubmissions` and `gradelists` folders to the local versions of your course. Once done, open `quizmanager`, load the course you want to look at, and use the `Analyze Submissions` tab to see the performance of students and how the different quiz questions are being answered.  
+
+### Updating materials
+
+If you need to make updates to either the main `gradelist.xlsx` file or the complete quizzes on the server, proceed as follows:
+
+1. Make any modifications to the quizzes you need to make. Generate and distribute updated student versions.
+
+2. During a time when students won't submit anything (e.g. right after a submission deadline or Saturday morning at 6am), download materials from the server as described above.
+
+3. FIND A WAY TO UPDATE GRADELIST.
+ 
+CONTINUE HERE AND MAKE SURE THE ONLINE SUBMISSION SYSTEM WORKS
+
+
+
+## Using the grading system with shinyapps.io
+
 
 The following assumes that you will be hosting the submission system on RStudio's `shinyapps.io` service. For alternatives, see the end of the document.
 
@@ -367,10 +411,21 @@ Overall, this approach still requires a lot of manual intervention, and I'm thus
 ## Further thoughts and comments for using the package
 
 
+### Limitations
+
+* Currently, each quiz is graded on a simple score with every question having the same weight. I.e. if you have 8 questions and a student got 6 right, they get a 0.75. Giving questions different weights is currently not possible (though could be implemented if you think you need that feature).
+
+* Similarly, currently each quiz is given the same weight. That means if you have one quiz with 5 questions and the student gets 1 correct, and another quiz with 50 questions and the student gets all 50 correct, their average score will be (1/5 + 50/50)/2 = 0.6. Weighting quizzes is currently not possible. The recommendation is to make each quiz approximately the same size/weight. If needed, split or combine quizzes. (There is not reason why you can only give one quiz a week, I often have multiple covering different aspects. For instance one quiz covering the readings and one covering the exercises.)  
+
+
 ### Privacy, Security and FERPA
 
 You might want to think about privacy and security as it applies to various laws (e.g. FERPA) when using this app. You will be placing a list with student names, IDs (e.g. emails) and their quiz submissions/grades into the cloud. There is no public access to any of this information, you (or TAs who have login privileges) are the only one who can access those documents. It thus seems ok to me. But if the server where you host the submission app gets compromised, this might compromise student information. I consider this a low and small risk, but it's something you might want to think about.
 
+
+### Excel is evil!
+
+I know the issues with using Excel for working with data. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most important students, are familiar with it. This means one needs to be careful about Excels over-eager auto-processing of data formats. Dates tend to be the biggest headache. Make sure that for all entries you generate, they are formatted as text. It shouldn't cause a problem when students fill out their spreadsheets.
 
 
 ### Manual submissions

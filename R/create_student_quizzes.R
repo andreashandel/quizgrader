@@ -76,8 +76,9 @@ create_student_quizzes <- function(courselocation)
         #save sheets for students
         #naming is original file name with _student appended
 
-
-        studentfilename = paste0("student_",fs::path_file(completequizfiles[i]))
+        quizname = fs::path_file(completequizfiles[i])
+        #replace complete in the title with _student
+        studentfilename = gsub("_complete","_student",quizname)
         studentfile_fullname = fs::path(studentquizpath, studentfilename)
         writexl::write_xlsx(quizdf, studentfile_fullname, col_names = TRUE, format_headers = TRUE)
     }

@@ -27,8 +27,8 @@ check_quiz <- function(quizdf)
   }
 
   #check that QuizID is ok
-  #only letters and numbers, can't be empty
-  pattern = "^[a-zA-Z0-9]*$"
+  #only letters and numbers and underscore, can't be empty
+  pattern = "^[a-zA-Z0-9_]*$"
   idtext = quizdf$QuizID[1]
   if (!grepl(pattern,idtext) | nchar(idtext)==0 )
   {
@@ -36,8 +36,8 @@ check_quiz <- function(quizdf)
   }
 
   #check that QuestionID is ok
-  #only letters and numbers, each entry unique, can't be empty
-  pattern = "^[a-zA-Z0-9]*$"
+  #only letters and numbers and underscore, each entry unique, can't be empty
+  pattern = "^[a-zA-Z0-9_]*$"
   idtext = quizdf$QuestionID
   if ( sum(!grepl(pattern,idtext))>0 | sum(duplicated(idtext))>0 | min(nchar(idtext))==0)
   {

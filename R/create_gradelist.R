@@ -19,12 +19,11 @@ create_gradelist <- function(courselocation)
 
   #load file containing student information
   #find the one with the newest time-stamp (as per modified date)
-  studentlistpath = file.path(courselocation,"studentlists")
+  studentlistpath = fs::path(courselocation,"studentlists")
   studentlistfiles = list.files(path = studentlistpath, recursive=FALSE, pattern = "\\.xlsx$", full.names = TRUE)
   filenr = which.max(file.info(studentlistfiles)$ctime) #find most recently changed file
   studentlistfile = studentlistfiles[filenr]
   studentdf <- readxl::read_excel(path = studentlistfile, col_types = "text")
-
 
   #check that courselist file is proper
   errormsg <- check_studentlist(studentdf)
@@ -33,7 +32,6 @@ create_gradelist <- function(courselocation)
     #something didn't go right, return error message to calling function
     return(errormsg)
   }
-
 
   nstudent <- nrow(studentdf) #number of students
 
@@ -75,6 +73,9 @@ create_gradelist <- function(courselocation)
 
     # Create names for columns for each quiz
     # those columns will track submissions
+    # DueDate comes from the complete quiz sheet
+    # The other columns will be filled at time of submission
+    # Note that attempt is the number of attempt for the student, not the max allowed
     dfcolnames = paste0(quizdf$QuizID[1],c("_DueDate","_SubmitDate","_Attempt","_Grade") )
 
     #make sure none of the new column names already exists
@@ -85,19 +86,28 @@ create_gradelist <- function(courselocation)
     }
 
     #create values for new columns
-    valvec = c(quizdf$DueDate[1],"",quizdf$Attempts[1],"")
+    #only the due date is copied from the quizzes to the tracking sheet
+    #all other quantities are filled during submission
+    valvec = c(quizdf$DueDate[1],"","","")
     allvals = matrix(valvec, nrow = nstudent, ncol = length(valvec), byrow=TRUE)
 
     # add new columns to gradelist
     gradelist[,dfcolnames] <- allvals
-    #fill columns with values
 
   }
 
-  browser()
+  #save grade list to the gradelists folder
+  #name contains date timestamp
+  gradelistpath = fs::path(courselocation,"gradelists")
 
-  #return data frame containing the course list
-  return(gradelist)
+  timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+  gradefilename = paste0("gradelist_",timestamp,".xlsx")
+  gradefile_fullname = fs::path(gradelistpath, gradefilename)
+  writexl::write_xlsx(gradelist, gradefile_fullname, col_names = TRUE, format_headers = TRUE)
+
+  #if things worked, return NULL
+  msg <- NULL
+  return(msg)
 
 } #end function
 

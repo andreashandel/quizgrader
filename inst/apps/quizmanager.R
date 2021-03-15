@@ -155,6 +155,7 @@ server <- function(input, output, session) {
 
         #######################################################
         #start code block that adds filled quizzes to course
+        #also checks quizzes
         #######################################################
         observeEvent(input$addquiz,{
 
@@ -166,16 +167,21 @@ server <- function(input, output, session) {
                         shinyjs::reset(id  = "addquiz")
                 }
 
-                if (is.null(msg)) #if no prior error, try to create course
+                if (is.null(msg)) #if no prior error, try to open quiz file, then copy
                 {
-                        #find path to course folder
-                        new_path = file.path(courselocation,"completequizzes",input$addquiz$name)
-
-                        #copy time-stamped file to student list folder
-                        fs::file_copy(path = input$addquiz$datapath,  new_path = new_path, overwrite = TRUE)
-
-                        msg <- paste0("quiz has been saved to ", new_path)
-                }
+                        # Load quiz and check that is in the required format
+                        quizdf <- readxl::read_excel(input$addquiz$datapath, col_types = "text", col_names = TRUE)
+                        msg <- check_quiz(quizdf)
+                        if (is.null(msg)) #if no problem occurred, try copying
+                        {
+                                #find path to course folder
+                                newname = paste0(quizdf$QuizID[1],'_complete.xlsx')
+                                new_path = file.path(courselocation,"completequizzes",newname)
+                                #copy renamed file to completequiz folder
+                                fs::file_copy(path = input$addquiz$datapath, new_path = new_path, overwrite = TRUE)
+                                msg <- paste0("quiz has been saved to ", new_path)
+                        } #if check worked, copy file
+                } #end if for
 
                 showModal(modalDialog(
                         msg,
@@ -262,20 +268,30 @@ server <- function(input, output, session) {
         #######################################################
         observeEvent(input$creategradelist,{
 
-                if (is.null(courselocation)) #not sure why integer, but that's how the example is
+                if (is.null(courselocation))
                 {
                         msg <- "Please set the course location"
                         shinyjs::reset(id  = "createstudentquizzes")
                 } else {
 
-                        #run function to generate main grade tracking sheet
-                        msg <- quizgrader::create_gradelist(courselocation)
+                        #first, generate student versions to make sure everything is in sync
+                        msg <- quizgrader::create_student_quizzes(courselocation)
 
-                        if (is.null(msg)) #this means it worked
+                        if (!is.null(msg)) #this means it didn't work
                         {
-                                msg <- paste0('The grade tracking sheet has been created and copied to ', file.path(courselocation,'gradelists'))
-                        }
-                } #end else statement
+                                msg <- paste0('Something went wrong creating the student quiz sheets, please run that process separately.')
+                        } else {
+
+                                #run function to generate main grade tracking sheet
+                                msg <- quizgrader::create_gradelist(courselocation)
+
+                                if (is.null(msg)) #this means it worked
+                                {
+                                        msg <- paste0('The grade tracking sheet has been created and copied to ', file.path(courselocation,'gradelists'))
+                                }
+
+                        } #end inner else statement
+                } #end outer else statement
 
                 showModal(modalDialog(
                         msg,
@@ -283,7 +299,38 @@ server <- function(input, output, session) {
                 ))
 
 
-        })
+        }) #end creategradelist code block
+
+
+
+        #######################################################
+        #start code block that combines and zips documents needed for deployment
+        #######################################################
+        observeEvent(input$makepackage,{
+
+                if (is.null(courselocation))
+                {
+                        msg <- "Please set the course location"
+                        shinyjs::reset(id  = "createstudentquizzes")
+                } else {
+
+                        #make zip file
+                        msg <- quizgrader:: make_package(courselocation)
+
+                        if (is.null(msg)) #this means it worked
+                        {
+                                msg <- paste0('The serverpackage.zip file for deployment has been created and copied to ', file.path(courselocation))
+                        }
+
+                }
+
+                showModal(modalDialog(
+                        msg,
+                        easyClose = FALSE
+                ))
+
+        }) #end code block that zips files/folders needed for deployment
+
 
 
 
@@ -308,7 +355,7 @@ server <- function(input, output, session) {
 ui <- fluidPage(
         shinyjs::useShinyjs(),  # Set up shinyjs
         #tags$head(includeHTML(("google-analytics.html"))), #this is only needed for Google analytics when deployed as app to the UGA server. Should not affect R package use.
-        includeCSS("packagestyle.css"),
+        includeCSS("quizgrader.css"),
         tags$div(id = "shinyheadertitle", "quizgrader - automated grading and analysis of quizzes"),
         tags$div(id = "infotext", paste0('This is ', packagename,  ' version ',utils::packageVersion(packagename),' last updated ', utils::packageDescription(packagename)$Date,'.')),
         tags$div(id = "infotext", "Written and maintained by", a("Andreas Handel", href="https://www.andreashandel.com", target="_blank"), "with many contributions from", a("others.",  href="https://github.com/andreashandel/quizgrader#contributors", target="_blank")),
@@ -338,7 +385,8 @@ ui <- fluidPage(
                             h2('Make grade list'),
                             actionButton("creategradelist", "Generate grade tracking list", class = "actionbutton"),
                             h2('Deploy course'),
-                            actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
+                            actionButton("makepackage", "Make zip file for deployment", class = "actionbutton"),
+                            #actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
                             p(textOutput("warningtext")),
 
                             fluidRow(
@@ -351,11 +399,11 @@ ui <- fluidPage(
 
                    ), #close "Manage" tab
 
-                   tabPanel("Analyze Quizzes",  value = "analyze",
+                   tabPanel("Analyze Submissions",  value = "analyze",
                             h2('Retrieve submissions'),
                             actionButton("retrieve", "Retrieve submissions from shiny server", class = "actionbutton"),
                             h2('Analyze submissions'),
-                            actionButton("analyze", "Analyze submissions from shiny server", class = "actionbutton"),
+                            actionButton("analyze", "Analyze submissions", class = "actionbutton"),
                    ) #close "Analyze" tab
         ), #close NavBarPage
         tagList( hr(),

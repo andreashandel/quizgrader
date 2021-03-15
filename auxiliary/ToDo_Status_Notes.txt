@@ -13,7 +13,10 @@ Continue implementing other features.
 https://shiny.rstudio.com/articles/persistent-data-storage.html
 
 
+Need to harmonize quizgrader and the solution files from DSAIDE and DSAIRM
+
 
 # Minor priority
 
-Allow adding multiple quizzes at a time through shiny app
+Allow adding multiple quizzes at a time through quizmanager shiny app
+
