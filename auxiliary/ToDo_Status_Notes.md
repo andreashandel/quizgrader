@@ -1,5 +1,4 @@
 
-Get quiz deletion to work in quizmanager.
 
 Work on create_gradelist code. See comment in vignette.
 
@@ -17,6 +16,8 @@ Need to harmonize quizgrader and the solution files from DSAIDE and DSAIRM
 
 
 # Minor priority
+
+Get quiz deletion to work in quizmanager.
 
 Allow adding multiple quizzes at a time through quizmanager shiny app
 

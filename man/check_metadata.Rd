@@ -7,7 +7,7 @@
 check_metadata(metadata, gradelist)
 }
 \arguments{
-\item{metadata}{Data frame containing StudentID and Password}
+\item{metadata}{list containing elements StudentID and Password}
 
 \item{gradelist}{Data frame containing the grade list}
 }

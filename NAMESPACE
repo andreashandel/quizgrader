@@ -3,6 +3,7 @@
 export(check_metadata)
 export(check_quiz)
 export(check_studentlist)
+export(check_submission)
 export(create_gradelist)
 export(create_student_quizzes)
 export(make_package)

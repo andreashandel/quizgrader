@@ -18,6 +18,9 @@ gradelists_folder = ('./gradelists')
 completequizzes_folder = ('./completequizzes')
 studentsubmissions_folder = ('./studentsubmissions')
 
+#names of all complete quizzes
+completequiz_names = list.files(path = completequizzes_folder, recursive=FALSE, pattern = "\\.xlsx$", full.names = FALSE)
+completequiz_ids = stringr::str_replace(completequiz_names,"_complete.xlsx","") #get only part that is name of quiz
 
 #######################################################
 #small functions not worth sticking into their own files
@@ -28,7 +31,6 @@ show_error <- function(errormsg)
   showModal(modalDialog(errormsg))
   shinyjs::reset(id  = "loadfile")
   shinyjs::disable(id = "submitbutton")
-
 }
 
 
@@ -75,28 +77,38 @@ server <- function(input, output) {
 
         #combine all inputs into list for checking
         #make all inputs lower case
+        #note that list entries need this specific capitalization
         metadata = list()
-        metadata$StudentID = tolower(input$userid)
-        metadata$Password = tolower(input$password)
+        metadata$StudentID = tolower(input$StudentID)
+        metadata$Password = tolower(input$Password)
 
         #read gradelist every time submit button is pressed to make sure it's the latest version
-        gradelist = read_gradelist(gradelists_folder)
+        gradelist = quizgrader::read_gradelist(gradelists_folder)
 
-        #check that student ID and password are correct and can be matched
+        #check that student ID and password are correct and can be matched with entry in gradelist
         #if student is found, check name and password
-        metaerror <- check_metadata(metadata, gradelist)
-        if (!is.null(metaerror)) #if errors occur, do not load file
+        metaerror <- quizgrader::check_metadata(metadata, gradelist)
+        if (!is.null(metaerror)) #if errors occur, stop the process with an error message
         {
           show_error(metaerror)
           return()
         }
 
+        #if student ID and password are a match,
+        #check that quizid part of file name of student submission
+        #matches one of the quizid file names of the complete solution files
+        quizid = stringr::str_replace(input$loadfile$name,"_student.xlsx","")
+        if( !(quizid %in% completequiz_ids))
+        {
+          errormsg = "Your submitted file has the wrong name, please do not rename the provided files."
+          show_error(errormsg)
+          return()
+        }
 
-        #if meta-data is correct, proceed by loading the file
-        #the student just submitted
-        #read each column as character, is safer for comparison
+        #if file names are ok, proceed by loading the submitted file
+        #read each column as character/text, this is safer for comparison
         submission_original <- try( readxl::read_excel(input$loadfile$datapath, col_types = "text"))
-        if (length(submission_original)==1) #if this is true, it means the file hasn't loaded and instead produced an error string
+        if (length(submission_original)==1) #if this is true, it means the read_excel failed and instead produced an error string
         {
             errormsg = "File could not be loaded, make sure it's a valid Excel file"
             show_error(errormsg)
@@ -104,32 +116,15 @@ server <- function(input, output) {
         }
 
         #if submitted file could be loaded, process a bit
+        #replace any potential NA with "" for consistency
         #also make a data frame instead of tibble
+        #this should work on any excel file (even if student submits a non-quiz)
+        #therefore do this before quiz format check
         submission <- submission_original %>%
-                    dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%
-                    data.frame()
+          dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%
+          data.frame()
 
-        #if all answers are blank, flag that and don't let a student submit
-        if (sum(submission$Answer=="") == nrow(submission))
-        {
-          errormsg = "All answers are missing. Please, make sure you submit your answers."
-          show_error(errormsg)
-          return()
-        }
 
-        #check quiz ID column of uploaded file
-        #needs to have a single entry and the right column name
-        #note that we don't know which quiz a student submits, this will be matched with a solution file
-        #an error is produced if the quizid does not correspond to a valid solution file
-        if ( colnames(submission)[1] != "QuizID" || length(unique(submission$QuizID))>1)
-        {
-            errormsg <- "First column name must be named QuizID and onle a single QuizID entry is allowed. Blank lines are not allowed."
-            show_error(errormsg)
-            return()
-        }
-
-        #save quiz ID
-        quizid = tolower(unique(submission$QuizID))
 
         # load the solution file for this quiz with the answers
         # test if it can be loaded
@@ -139,38 +134,44 @@ server <- function(input, output) {
         solution_raw <- try( readxl::read_excel(solutionname, col_types = "text"))
         if (length(solution_raw)==1) #if this is true, it means the file hasn't loaded and instead produced an error string
         {
-          errormsg = "Matching solution file could not be loaded, this could mean your QuizID is wrong."
-          showModal(modalDialog(errormsg))
-          shinyjs::reset(id  = "loadfile")
-          shinyjs::disable(id = "submitbutton")
+          errormsg = "Matching solution file could not be loaded. Please inform your instructor."
+          show_error(errormsg)
           return()
         }
+
         #if loading worked, do a bit of cleaning
+        #replace any potential NA with "" for consistency
+        #also make a data frame instead of tibble
+        #this should work on any excel file (even if student submits a non-quiz)
+        #therefore do this before quiz format check
         solution <- solution_raw %>%
-          dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%  #don't want NA, want empty string to be consistent with TSV files
+          dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%  #don't want NA, want empty string for consistentcy
           data.frame()
 
-        #check uploaded file for any other problems
-        docerrors <- check_submission(submission,solution,studentid,quizid,gradelist)
 
-        if (!is.null(docerrors)) #if errors occur, show them
+        #check submitted file against solution to make sure content is right
+        #if file is not right, check_submission will return an error message
+        #then display error message and stop the process
+        filecheck <- check_submission(submission, quizid)
+        #docerrors <- check_submission(submission,solution,studentid,quizid,gradelist)
+        if (!is.null(filecheck))
         {
-            showModal(modalDialog(docerrors))
-            shinyjs::reset(id  = "loadfile") #clear out the file upload field
-            shinyjs::disable(id = "submitbutton") #disable submission until new file is uploaded
-            return()
+          show_error(filecheck)
+          return()
         }
 
-        #grade things and show results
+
+
+        #if all seems  ok, we can go ahead and grade
         result_table <- grade_quiz(submission,solution)
         # if an error occurs during grading, result_table will contain the error message as a string
         if (is.character(result_table))
         {
-          showModal(modalDialog(result_table))
-          shinyjs::reset(id  = "loadfile") #clear out the file upload field
-          shinyjs::disable(id = "submitbutton") #disable submission until new file is uploaded
+          show_error(result_table)
           return()
         }
+
+
         #compute score for submission
         score = sum(result_table$Score == "Correct")/nrow(result_table)*100
 
@@ -234,8 +235,8 @@ ui <- fluidPage(
   shinyjs::useShinyjs(),
   includeCSS("quizgrader.css"), #use custom styling
   titlePanel("Quiz grader"),
-  textInput("userid","User ID"),
-  textInput("password","Password"),
+  textInput("StudentID","Student ID"),
+  textInput("Password","Password"),
   fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
   actionButton("submitbutton", "Submit file", class = "submitbutton"),
   br(),

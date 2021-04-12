@@ -34,6 +34,9 @@ I decided to write some R code to get the functionality I needed. It turned out 
 
 
 ## Installation
+
+**THE PACKAGE IS NOT YET ON CRAN, USE GITHUB INSTALL OPTION**
+
 After having installed and opened R/Rstudio, you can install the package from CRAN by typing the following into the R console (the bottom left window if you are using RStudio):
 
 ```{r, eval=FALSE, echo=TRUE}

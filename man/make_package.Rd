@@ -4,10 +4,12 @@
 \alias{make_package}
 \title{Create file and folder zip file for deployment}
 \usage{
-make_package(courselocation)
+make_package(courselocation, newpackage = TRUE)
 }
 \arguments{
 \item{courselocation}{Path to main course directory}
+
+\item{newpackage}{If true, all files needed for initial setup are copied, otherwise only those needed for updates}
 }
 \value{
 errormsg Null if quiz generation was successful,

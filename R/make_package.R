@@ -6,6 +6,7 @@
 #' and unzip them in the app directory.
 #'
 #' @param courselocation Path to main course directory
+#' @param newpackage If true, all files needed for initial setup are copied, otherwise only those needed for updates
 #' @return errormsg Null if quiz generation was successful,
 #' otherwise contains an error message
 #' @export
@@ -13,7 +14,7 @@
 
 #function that takes list of file names, keeps only indicated columns
 #saves them to indicated location
-make_package <- function(courselocation)
+make_package <- function(courselocation, newpackage = TRUE)
 {
 
     #error message if things don't work, otherwise will remain NULL
@@ -31,6 +32,14 @@ make_package <- function(courselocation)
     zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"gradelists"),
                     mode = "cherry-pick",
                     recurse = TRUE, include_directories = TRUE)
+
+    if (newpackage == TRUE)
+    {
+    #add empty folder for submissions
+    zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentsubmissions"),
+                    mode = "cherry-pick",
+                    recurse = TRUE, include_directories = TRUE)
+
     #add the grading app
     zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"app.R"),
                     mode = "cherry-pick",
@@ -39,6 +48,8 @@ make_package <- function(courselocation)
     zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"quizgrader.css"),
                     mode = "cherry-pick",
                     recurse = TRUE, include_directories = TRUE)
+
+    }
 
 
     #if things worked ok, return NULL

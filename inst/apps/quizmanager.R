@@ -69,11 +69,7 @@ server <- function(input, output, session) {
                         output$coursedir <- renderPrint(courselocation)
 
                 }
-
-                showModal(modalDialog(
-                        msg,
-                        easyClose = FALSE
-                ))
+                showModal(modalDialog(msg, easyClose = FALSE))
         })
 
 
@@ -145,11 +141,7 @@ server <- function(input, output, session) {
 
                         msg <- paste0("student list has been saved to ", new_path)
                 }
-
-                showModal(modalDialog(
-                        msg,
-                        easyClose = FALSE
-                ))
+                showModal(modalDialog(msg, easyClose = FALSE))
         })
 
 
@@ -182,11 +174,7 @@ server <- function(input, output, session) {
                                 msg <- paste0("quiz has been saved to ", new_path)
                         } #if check worked, copy file
                 } #end if for
-
-                showModal(modalDialog(
-                        msg,
-                        easyClose = FALSE
-                ))
+                showModal(modalDialog(msg, easyClose = FALSE))
         })
 
 
@@ -208,10 +196,7 @@ server <- function(input, output, session) {
                         browser()
                         msg <- paste0("this quiz has been removed:", deletefile)
                 }
-                showModal(modalDialog(
-                        msg,
-                        easyClose = FALSE
-                ))
+                showModal(modalDialog(msg, easyClose = FALSE))
         })
 
 
@@ -242,10 +227,7 @@ server <- function(input, output, session) {
                         }
 
                 }
-                showModal(modalDialog(
-                        msg,
-                        easyClose = FALSE
-                ))
+                showModal(modalDialog(msg, easyClose = FALSE))
         })
 
         #######################################################
@@ -292,19 +274,13 @@ server <- function(input, output, session) {
 
                         } #end inner else statement
                 } #end outer else statement
-
-                showModal(modalDialog(
-                        msg,
-                        easyClose = FALSE
-                ))
-
-
+                showModal(modalDialog(msg, easyClose = FALSE))
         }) #end creategradelist code block
 
 
 
         #######################################################
-        #start code block that combines and zips documents needed for deployment
+        #start code block that combines and zips documents needed for initial deployment
         #######################################################
         observeEvent(input$makepackage,{
 
@@ -313,26 +289,37 @@ server <- function(input, output, session) {
                         msg <- "Please set the course location"
                         shinyjs::reset(id  = "createstudentquizzes")
                 } else {
-
                         #make zip file
-                        msg <- quizgrader:: make_package(courselocation)
-
+                        msg <- quizgrader:: make_package(courselocation, newpackage = TRUE)
                         if (is.null(msg)) #this means it worked
                         {
                                 msg <- paste0('The serverpackage.zip file for deployment has been created and copied to ', file.path(courselocation))
                         }
-
                 }
-
-                showModal(modalDialog(
-                        msg,
-                        easyClose = FALSE
-                ))
-
-        }) #end code block that zips files/folders needed for deployment
+                showModal(modalDialog(msg, easyClose = FALSE))
+        }) #end code block that zips files/folders needed for initial deployment
 
 
 
+        #######################################################
+        #start code block that combines and zips documents needed for updates
+        #######################################################
+        observeEvent(input$updatepackage,{
+
+                if (is.null(courselocation))
+                {
+                        msg <- "Please set the course location"
+                        shinyjs::reset(id  = "createstudentquizzes")
+                } else {
+                        #make zip file
+                        msg <- quizgrader:: make_package(courselocation, newpackage = FALSE)
+                        if (is.null(msg)) #this means it worked
+                        {
+                                msg <- paste0('The serverpackage.zip file for updates has been created and copied to ', file.path(courselocation))
+                        }
+                }
+                showModal(modalDialog(msg, easyClose = FALSE))
+        }) #end code block that zips files/folders needed for updates
 
 
         #######################################################
@@ -385,7 +372,8 @@ ui <- fluidPage(
                             h2('Make grade list'),
                             actionButton("creategradelist", "Generate grade tracking list", class = "actionbutton"),
                             h2('Deploy course'),
-                            actionButton("makepackage", "Make zip file for deployment", class = "actionbutton"),
+                            actionButton("makepackage", "Make zip file for initial deployment", class = "actionbutton"),
+                            actionButton("updatepackage", "Make zip file for updates", class = "actionbutton"),
                             #actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
                             p(textOutput("warningtext")),
 
