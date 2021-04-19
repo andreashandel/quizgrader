@@ -4,10 +4,12 @@
 \alias{check_submission}
 \title{Check that a data frame sent to this function has a valid structure for student submitted quiz}
 \usage{
-check_submission(quizdf)
+check_submission(quizdf, quizid)
 }
 \arguments{
 \item{quizdf}{Data frame of quiz that needs to be checked}
+
+\item{quizid}{ID of quiz based on file name, needs to match quizid column entry in spreadsheet}
 }
 \value{
 An error message if it's not a valid quiz data frame,

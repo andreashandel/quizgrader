@@ -1,0 +1,132 @@
+---
+title: "quizgrader Overview"
+author: "<a href=https://www.andreashandel.com>Andreas Handel</a>"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{quizgrader Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7
+)
+
+# avoid check where vignette filename must equal the vignette title
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+```{r setup, include = FALSE}
+pkg = 'quizgrader' #so we can easily switch names
+library(pkg, character.only = TRUE)
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+#not able to use this in vignette of package unless i declare it in DESCRIPTION
+#Currently not a CRAN package, os can't use in DESCRIPTION
+#library('emo')
+```
+
+
+
+## Summary
+
+This document provides a quick introduction and big-picture overview of the `r pkg` package, which is a package for managing and administering auto-graded online quizzes.
+
+
+## Motivation
+
+I regularly teach online. In the past, I have used our university's learning management system (LMS), but I dislike it because it is not user-friendly and elements, such as quizzes and student submissions are locked up inside the LMS and one can only extract very rudimentary statistics. Because of this, I have over the last years slowly moved away from our LMS and tried to replace as much as possible with resources that are as open as possible.
+
+One feature I liked about the LMS is that it could administer auto-graded quizzes, so once the quiz was written, I didn't have much to do anymore, students just submitted and got graded automatically each week. I tend to give lots of small quizzes (generally 1-2 per week), so I needed this process automated.
+
+I decided to write some R code to get the functionality I needed. It turned out well enough that I figured it could be worth turning it into a full `R` package and making it available to others.
+
+
+## Installation
+
+**THE PACKAGE IS NOT YET ON CRAN, USE GITHUB INSTALL OPTION**
+
+After having installed and opened R/Rstudio, you can install the package from CRAN by typing the following into the R console (the bottom left window if you are using RStudio):
+
+```{r, eval=FALSE, echo=TRUE}
+install.packages('quizgrader')
+```
+
+
+
+Alternatively, you can install the latest development version (with usually both more features and more bugs) from github, using the `remotes` package. The following commands, typed into the `R` console, will get you up and running:
+
+```{r, eval=FALSE, echo=TRUE}
+install.packages('remotes') #if not already installed
+remotes::install_github('andreashandel/quizgrader')
+```
+
+
+The package depends on other packages, which will also be installed as needed. Package installation is a one-time process, unless you update or re-install R itself, or want to install a newer version of `quizgrader`. 
+
+
+## Package use overview
+
+You can make, deploy and analyze student quiz submissions entirely interactively through Shiny apps. Alternatively, you can do all quiz management processes without using the Shiny apps. The tutorials explain both approaches. Here are the steps in overview format.
+
+**Quiz Preparation**
+
+As a teacher, you will start by going through these steps:
+
+* Start a new course that will contain all your quizzes.
+* Create your quizzes (using a provided Excel file template).
+* Create a roster of students (also using a provided Excel template). 
+* Process complete quizzes to generate quiz sheets/files that are given to students for filling out.
+* Process everything else and deploy to some shiny server, tell students where to go for grading.
+
+**Quiz submission**
+
+Once the quizzes are deployed to a shiny server, you will tell students the website to which they need to upload their quizzes. Before each quiz deadline, students go to the website, upload their filled quiz sheet. The quiz is auto-graded, the grade is recorded and students are being given immediate feedback.
+
+
+**Quiz management**
+
+You can download the student submissions while the course is in action, analyze the results to investigate individual students or individual questions. You can also make some adjustments to the student roster and the quizzes (e.g. modify upcoming quizzes). At the end of the course, you can make final manual adjustments and compute the overall grade.
+
+
+## Next steps
+
+To learn more and see how to get started creating a course and a set of quizzes, see the [Creating Quizzes](./articles/AB_quiz_creation.html) tutorial.
+
+
+
+## Some general comments regarding `r pkg`
+
+
+### Privacy, Security and FERPA
+
+You might want to consider privacy and security as it applies to various laws (e.g. FERPA) when using this app. You will be placing a list with student names, IDs (e.g. emails) and their quiz submissions/grades into the cloud. There is no default public access to any of this information, you (or TAs who have login privileges) are the only one who can access those documents. It thus seems ok to me. But if the server where you host the submission app gets compromised, this might compromise student information. I consider this a low and small risk, but it's something you might want to think about.
+
+
+### Excel is evil
+
+I know the issues with using Excel for working with data. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most important students, are familiar with it. This means one needs to be careful about Excels over-eager auto-processing of data formats. Dates tend to be the biggest headache. Make sure that for all entries you generate, they are formatted as text. It shouldn't cause a problem when students fill out their spreadsheets.
+
+
+### Manual submissions
+
+It's not unlikely that a student misses a deadline, or you allow them to submit again, or some other circumstance occurs that needs special permission. You could go into the `courselist` file and adjust to allow for that (e.g. change the due date for that student, or manually adjust). This is possible but risky, as things might break. My approach is to tell those students to send (email) me their quiz sheet in question, and when I make final grades I will then manually grade their quiz and edit the `courselist` file to add their scores.
+
+WRITE grade_submissions() function such that it can autograde manual submissions?
+
+
+
+### Limitations
+
+* Currently, each quiz is graded on a simple score with every question having the same weight. I.e. if you have 8 questions and a student got 6 right, they get a 0.75. Giving questions different weights is currently not possible (though could be implemented if you think you need that feature).
+
+* Similarly, currently each quiz is given the same weight. That means if you have one quiz with 5 questions and the student gets 1 correct, and another quiz with 50 questions and the student gets all 50 correct, their average score will be (1/5 + 50/50)/2 = 0.6. Weighting quizzes is currently not possible. The recommendation is to make each quiz approximately the same size/weight. If needed, split or combine quizzes. (There is not reason why you can only give one quiz a week, I often have multiple covering different aspects. For instance one quiz covering the readings and one covering the exercises.)  
