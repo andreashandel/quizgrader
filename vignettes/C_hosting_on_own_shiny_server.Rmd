@@ -1,15 +1,29 @@
 ---
-title: "quizgrader Tutorial"
+title: "Hosting quizzes on your own Shiny server"
 author: "<a href=https://www.andreashandel.com>Andreas Handel</a>"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
     fig_caption: yes
 vignette: >
-  %\VignetteIndexEntry{quizgrader Tutorial}
+  %\VignetteIndexEntry{own_server}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7
+)
+
+# avoid check where vignette filename must equal the vignette title
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 
 ```{r, eval=TRUE, echo=FALSE}
 #not able to use this in vignette of package unless i declare it in DESCRIPTION

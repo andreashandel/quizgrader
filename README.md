@@ -33,8 +33,7 @@ know what you think.
 
 ## Citation and Contributors
 
-This R package was developed by [Andrew
-Tredennick](https://atredennick.github.io/) and [Andreas
+This R package was developed by []() and [Andreas
 Handel](https://www.andreashandel.com/). It is maintained Andreas
 Handel. A full list of contributors and a Bibtex entry for the citation
 [can be found

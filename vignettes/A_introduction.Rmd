@@ -1,12 +1,12 @@
 ---
-title: "quizgrader Overview"
+title: "quizgrader Introduction"
 author: "<a href=https://www.andreashandel.com>Andreas Handel</a>"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
     fig_caption: yes
 vignette: >
-  %\VignetteIndexEntry{quizgrader Overview}
+  %\VignetteIndexEntry{quizgrader Introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -37,7 +37,7 @@ library(pkg, character.only = TRUE)
 
 
 
-## Summary
+## Overview
 
 This document provides a quick introduction and big-picture overview of the `r pkg` package, which is a package for managing and administering auto-graded online quizzes.
 

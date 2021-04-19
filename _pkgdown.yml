@@ -19,7 +19,7 @@ navbar:
       href: index.html
     intro:
       text: Get started
-      href: articles/DSAIDE.html
+      href: articles/A_introduction.html
     reference:
       text: Reference
       href: reference/index.html
@@ -28,4 +28,4 @@ navbar:
       href: news/index.html
     github:
       icon: fab fa-github
-      href: https://github.com/andreashandel/quizgrader/
+      href: https://github.com/andreashandel/quizgrader

@@ -53,7 +53,7 @@ Additional packages are needed for development (but not use) of the package. Tho
 ### Github action integration
 To enable continuous checking and other GitHub actions, use the 'usethis' package as follows:
 * use_github_action_check_release()
-* 
+ 
 
 ### Package logo
 According to pkgdown, logo should be included as described here:
@@ -69,7 +69,7 @@ https://pkgdown.r-lib.org/reference/build_home.html#package-logo
 ### To build the package
 * in RStudio, use the functions in the 'build' tab to test and build the package.
 * Run clean and rebuild, then build and reload using menu, or devtools::load_all()
-* Run the check, fix any errors 
+* Run package check, fix any errors 
 
 
 ### To-do for CRAN release  
