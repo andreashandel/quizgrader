@@ -9,7 +9,7 @@
 [![Coverage
 status](https://codecov.io/gh/andreashandel/quizgrader/branch/master/graph/badge.svg?token=OGO3sVEcPD)](https://codecov.io/gh/andreashandel/quizgrader)
 [![test-coverage](https://github.com/andreashandel/quizgrader/workflows/test-coverage/badge.svg)](https://github.com/andreashandel/quizgrader/actions)
-[![R-CMD-check](https://github.com/andreashandel/modeldiagram/workflows/R-CMD-check/badge.svg)](https://github.com/andreashandel/modeldiagram/actions)
+[![R-CMD-check](https://github.com/andreashandel/quizgrader/workflows/R-CMD-check/badge.svg)](https://github.com/andreashandel/quizgrader/actions)
 <!-- badges: end -->
 
 ## Description
@@ -33,12 +33,12 @@ know what you think.
 
 ## Citation and Contributors
 
-This R package was developed by []() and [Andreas
-Handel](https://www.andreashandel.com/). It is maintained Andreas
-Handel. A full list of contributors and a Bibtex entry for the citation
-[can be found
-here](https://andreashandel.github.io/quizgrader/authors.html).
+This R package was developed by [Andreas
+Handel](https://www.andreashandel.com/) and [Cody
+Dailey](https://daileyco.github.io/). It is maintained Andreas Handel. A
+full list of contributors and a Bibtex entry for the citation [can be
+found here](https://andreashandel.github.io/quizgrader/authors.html).
 
-This project was/is partially supported by.
+This project was/is partially supported by NIH.
 
 ## Further information

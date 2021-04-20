@@ -30,8 +30,7 @@ library(pkg, character.only = TRUE)
 
 
 ```{r, eval=TRUE, echo=FALSE}
-#not able to use this in vignette of package unless i declare it in DESCRIPTION
-#Currently not a CRAN package, os can't use in DESCRIPTION
+#Currently not a CRAN package, thus can't include it in DESCRIPTION
 #library('emo')
 ```
 
@@ -39,8 +38,17 @@ library(pkg, character.only = TRUE)
 
 ## Overview
 
-This document provides a quick introduction and big-picture overview of the `r pkg` package, which is a package for managing and administering auto-graded online quizzes.
+This document provides a quick introduction and overview of the **`r pkg`** package, which is a package for managing and administering auto-graded online quizzes.
 
+Very briefly, here is how it works:
+
+1. You (= instructor) create quizzes as Excel files using a provided template, then deploy online.
+2. You give your students the Excel quiz files (minus the answers `r emo::ji('grin')`).
+3. Students fill out the quiz sheets and upload them using a simple web interface.
+3. Quizzes are auto-graded on upload, grades recorded, students receive immediate feedback.
+4. You retrieve submissions/grades, analyze them and compute final grades.
+
+**If this sounds potentially useful, read on.**
 
 ## Motivation
 
@@ -74,7 +82,7 @@ remotes::install_github('andreashandel/quizgrader')
 The package depends on other packages, which will also be installed as needed. Package installation is a one-time process, unless you update or re-install R itself, or want to install a newer version of `quizgrader`. 
 
 
-## Package use overview
+## Package use 
 
 You can make, deploy and analyze student quiz submissions entirely interactively through Shiny apps. Alternatively, you can do all quiz management processes without using the Shiny apps. The tutorials explain both approaches. Here are the steps in overview format.
 
@@ -86,21 +94,21 @@ As a teacher, you will start by going through these steps:
 * Create your quizzes (using a provided Excel file template).
 * Create a roster of students (also using a provided Excel template). 
 * Process complete quizzes to generate quiz sheets/files that are given to students for filling out.
-* Process everything else and deploy to some shiny server, tell students where to go for grading.
+* Process everything else and deploy to a Shiny server.
 
 **Quiz submission**
 
-Once the quizzes are deployed to a shiny server, you will tell students the website to which they need to upload their quizzes. Before each quiz deadline, students go to the website, upload their filled quiz sheet. The quiz is auto-graded, the grade is recorded and students are being given immediate feedback.
+Once the quizzes are deployed to a Shiny server, you tell students the submission website. Before each quiz deadline, students go to the website, upload their filled quiz sheet. The quiz is auto-graded, the grade is recorded and students are being given immediate feedback.
 
 
 **Quiz management**
 
-You can download the student submissions while the course is in action, analyze the results to investigate individual students or individual questions. You can also make some adjustments to the student roster and the quizzes (e.g. modify upcoming quizzes). At the end of the course, you can make final manual adjustments and compute the overall grade.
+You can download the student submissions while the course is running, analyze the results to investigate individual students or individual questions. You can also make adjustments to the student roster and the quizzes (e.g. modify upcoming quizzes). At the end of the course, you can make final manual adjustments and compute the overall grade.
 
 
 ## Next steps
 
-To learn more and see how to get started creating a course and a set of quizzes, see the [Creating Quizzes](./articles/AB_quiz_creation.html) tutorial.
+To learn more and see how to get started creating a course and a set of quizzes, see the [Creating Quizzes](./articles/B_quiz_creation.html) tutorial.
 
 
 
@@ -114,19 +122,10 @@ You might want to consider privacy and security as it applies to various laws (e
 
 ### Excel is evil
 
-I know the issues with using Excel for working with data. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most important students, are familiar with it. This means one needs to be careful about Excels over-eager auto-processing of data formats. Dates tend to be the biggest headache. Make sure that for all entries you generate, they are formatted as text. It shouldn't cause a problem when students fill out their spreadsheets.
-
-
-### Manual submissions
-
-It's not unlikely that a student misses a deadline, or you allow them to submit again, or some other circumstance occurs that needs special permission. You could go into the `courselist` file and adjust to allow for that (e.g. change the due date for that student, or manually adjust). This is possible but risky, as things might break. My approach is to tell those students to send (email) me their quiz sheet in question, and when I make final grades I will then manually grade their quiz and edit the `courselist` file to add their scores.
-
-WRITE grade_submissions() function such that it can autograde manual submissions?
+I know the potential problems that can occur when using Excel. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most importantly students, are familiar with it. This means you need to be careful about Excels over-eager auto-processing, especially of dates. Specific warnings are provided throughout the tutorials to alert you to potential issues. In my experience, if you were careful creating the documents, it shouldn't cause problems on the student side.
 
 
 
-### Limitations
 
-* Currently, each quiz is graded on a simple score with every question having the same weight. I.e. if you have 8 questions and a student got 6 right, they get a 0.75. Giving questions different weights is currently not possible (though could be implemented if you think you need that feature).
 
-* Similarly, currently each quiz is given the same weight. That means if you have one quiz with 5 questions and the student gets 1 correct, and another quiz with 50 questions and the student gets all 50 correct, their average score will be (1/5 + 50/50)/2 = 0.6. Weighting quizzes is currently not possible. The recommendation is to make each quiz approximately the same size/weight. If needed, split or combine quizzes. (There is not reason why you can only give one quiz a week, I often have multiple covering different aspects. For instance one quiz covering the readings and one covering the exercises.)  
+

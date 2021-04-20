@@ -1,16 +1,17 @@
 # Main importance
 
 
-Continue implementing features - currently working on course deployment and grading app working on self-hosted shiny server.
+* Add code that creates subfolders in studentsubmissions for each quiz. Should either happen when grade tracking list is created or during deployment package. Need to make sure this doesn't overwrite files once class is in session.
 
-Keep updating vignette.
+* Get grading app to work using the self-hosted shiny server setup.
 
+* Keep updating vignettes.
 
+* Figure out and implement setup for quiz/course maintenance while course is running.
+
+* Get quiz analysis functionality to work.
 
 # Medium importance
-
-Need to harmonize quizgrader and the solution files from DSAIDE and DSAIRM
-
 
 Get quiz deletion to work in quizmanager.
 
@@ -19,6 +20,8 @@ Get quiz deletion to work in quizmanager.
 # Minor priority
 
 Allow adding multiple quizzes at a time through quizmanager shiny app
+
+Need to harmonize quizgrader and the solution files from DSAIDE and DSAIRM
 
 
 # General Notes

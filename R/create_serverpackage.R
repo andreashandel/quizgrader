@@ -14,7 +14,7 @@
 
 #function that takes list of file names, keeps only indicated columns
 #saves them to indicated location
-make_package <- function(courselocation, newpackage = TRUE)
+create_serverpackage <- function(courselocation, newpackage = TRUE)
 {
 
     #error message if things don't work, otherwise will remain NULL
@@ -35,19 +35,19 @@ make_package <- function(courselocation, newpackage = TRUE)
 
     if (newpackage == TRUE)
     {
-    #add empty folder for submissions
-    zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentsubmissions"),
-                    mode = "cherry-pick",
-                    recurse = TRUE, include_directories = TRUE)
-
-    #add the grading app
-    zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"app.R"),
-                    mode = "cherry-pick",
-                    recurse = TRUE, include_directories = TRUE)
-    #add css file
-    zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"quizgrader.css"),
-                    mode = "cherry-pick",
-                    recurse = TRUE, include_directories = TRUE)
+        #add the grading app
+        zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"app.R"),
+                        mode = "cherry-pick",
+                        recurse = TRUE, include_directories = TRUE)
+        #add css file
+        zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"quizgrader.css"),
+                        mode = "cherry-pick",
+                        recurse = TRUE, include_directories = TRUE)
+        #add empty folder for submissions
+        #also adds empty sub-folders for student submissions for each quiz to keep things more organized
+        zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentsubmissions"),
+                        mode = "cherry-pick",
+                        recurse = TRUE, include_directories = TRUE)
 
     }
 

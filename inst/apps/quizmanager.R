@@ -41,7 +41,7 @@ server <- function(input, output, session) {
 
         #once user has entered course name and picked a folder location
         #a course can be started
-        observeEvent(input$startcourse, {
+        observeEvent(input$createcourse, {
 
                 msg <- NULL
                 if (input$coursename == "")
@@ -55,13 +55,13 @@ server <- function(input, output, session) {
 
                 if (is.null(msg)) #if no prior error, try to create course
                 {
-                        #format course path into a way that can be used by start_course
+                        #format course path into a way that can be used by create_course
                         newcoursedir = shinyFiles::parseDirPath(volumes, input$newcoursedir)
-                        #run start_course function to make new folders and populate with files for the course
-                        errorlist <- quizgrader::start_course(isolate(input$coursename), isolate(newcoursedir))
+                        #run create_course function to make new folders and populate with files for the course
+                        errorlist <- quizgrader::create_course(isolate(input$coursename), isolate(newcoursedir))
                         msg <- errorlist$message #message to display showing if things worked or not
                 }
-                if (errorlist$status == 0) #if start_course worked well, assign directory to global variable
+                if (errorlist$status == 0) #if things worked well, assign directory to global variable
                 {
                         #save course folder to global variable
                         courselocation <<- fs::path(isolate(newcoursedir), isolate(input$coursename))
@@ -290,7 +290,7 @@ server <- function(input, output, session) {
                         shinyjs::reset(id  = "createstudentquizzes")
                 } else {
                         #make zip file
-                        msg <- quizgrader:: make_package(courselocation, newpackage = TRUE)
+                        msg <- quizgrader:: create_serverpackage(courselocation, newpackage = TRUE)
                         if (is.null(msg)) #this means it worked
                         {
                                 msg <- paste0('The serverpackage.zip file for deployment has been created and copied to ', file.path(courselocation))
@@ -312,7 +312,7 @@ server <- function(input, output, session) {
                         shinyjs::reset(id  = "createstudentquizzes")
                 } else {
                         #make zip file
-                        msg <- quizgrader:: make_package(courselocation, newpackage = FALSE)
+                        msg <- quizgrader:: create_serverpackage(courselocation, newpackage = FALSE)
                         if (is.null(msg)) #this means it worked
                         {
                                 msg <- paste0('The serverpackage.zip file for updates has been created and copied to ', file.path(courselocation))
@@ -349,28 +349,26 @@ ui <- fluidPage(
         p('Happy teaching!', class='maintext'),
         navbarPage(title = "quizmanager", id = 'alltabs', selected = "manage",
                    tabPanel(title = "Manage quizzes", value = "manage",
-                            h2('Start a new Course'),
+                            h3('Start a new Course'),
                             textInput("coursename",label = "Course Name"),
                             shinyFiles::shinyDirButton("newcoursedir", "Set parent directory for new course", "Select a parent folder for new course"),
                             verbatimTextOutput("newcoursedir", placeholder = TRUE),  # added a placeholder
-                            actionButton("startcourse", "Start new course", class = "actionbutton"),
-                            h2('Load existing Course'),
+                            actionButton("createcourse", "Start new course", class = "actionbutton"),
+                            h3('Load existing Course'),
                             shinyFiles::shinyDirButton("coursedir", "Find existing course", "Select an existing course folder"),
                             verbatimTextOutput("coursedir", placeholder = TRUE),  # added a placeholder
-                            h2('Get template files'),
+                            h3('Manage student list'),
                             downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
-                            downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
-                            h2('Add student list to course'),
                             fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
-                            h2('Manage complete quizzes'),
+                            h3('Manage quizzes'),
+                            downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
                             shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx'),
                             p('Any quiz with the same file name as the one being added will be overwritten.'),
                             shinyFiles::shinyFilesButton("removequiz", label = "Remove quiz", title = "Remove a quiz from the course", multiple = TRUE),
-                            h2('Make student quizzes'),
                             actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
-                            downloadButton("getstudentquizzes", "Get zip file with all student quiz files", class = "actionbutton"),
+                            downloadButton("getstudentquizzes", "Get zip file with all student quizzes", class = "actionbutton"),
                             h2('Make grade list'),
-                            actionButton("creategradelist", "Generate grade tracking list", class = "actionbutton"),
+                            actionButton("creategradelist", "Create grade tracking list", class = "actionbutton"),
                             h2('Deploy course'),
                             actionButton("makepackage", "Make zip file for initial deployment", class = "actionbutton"),
                             actionButton("updatepackage", "Make zip file for updates", class = "actionbutton"),

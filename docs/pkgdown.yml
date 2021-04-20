@@ -6,8 +6,10 @@ articles:
   B_quiz_creation: B_quiz_creation.html
   C_hosting_on_own_shiny_server: C_hosting_on_own_shiny_server.html
   D_hosting_on_shinyappsio: D_hosting_on_shinyappsio.html
-  E_quiz_analysis: E_quiz_analysis.html
-last_built: 2021-04-19T17:46Z
+  E_local_hosting: E_local_hosting.html
+  F_quiz_administration: F_quiz_administration.html
+  G_quiz_analysis: G_quiz_analysis.html
+last_built: 2021-04-20T14:52Z
 urls:
   reference: https://andreashandel.github.io/quizgrader/index.html/reference
   article: https://andreashandel.github.io/quizgrader/index.html/articles

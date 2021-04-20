@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check the studentlist file — check_studentlist • quizgrader</title>
+<title>Create file and folder zip file for deployment — create_serverpackage • quizgrader</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,11 @@
 
 
 
-<meta property="og:title" content="Check the studentlist file — check_studentlist" />
-<meta property="og:description" content="This function checks a studentlist dataframe to ensure it is valid" />
+<meta property="og:title" content="Create file and folder zip file for deployment — create_serverpackage" />
+<meta property="og:description" content="This function takes all files and folders
+needed for the server and places it in a zip file.
+The user then needs to copy the files to the server
+and unzip them in the app directory." />
 <meta property="og:image" content="https://andreashandel.github.io/quizgrader/index.html/logo.png" />
 
 
@@ -152,30 +155,37 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check the studentlist file</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ahgroup/DSAIDE/blob/master/R/check_studentlist.R'><code>R/check_studentlist.R</code></a></small>
-    <div class="hidden name"><code>check_studentlist.Rd</code></div>
+    <h1>Create file and folder zip file for deployment</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ahgroup/DSAIDE/blob/master/R/create_serverpackage.R'><code>R/create_serverpackage.R</code></a></small>
+    <div class="hidden name"><code>create_serverpackage.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function checks a studentlist dataframe to ensure it is valid</p>
+    <p>This function takes all files and folders
+needed for the server and places it in a zip file.
+The user then needs to copy the files to the server
+and unzip them in the app directory.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>check_studentlist</span><span class='op'>(</span><span class='va'>studentdf</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>create_serverpackage</span><span class='op'>(</span><span class='va'>courselocation</span>, newpackage <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>studentdf</th>
-      <td><p>dataframe with student list information</p></td>
+      <th>courselocation</th>
+      <td><p>Path to main course directory</p></td>
+    </tr>
+    <tr>
+      <th>newpackage</th>
+      <td><p>If true, all files needed for initial setup are copied, otherwise only those needed for updates</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If everything is right, NULL is returned
-If anything is not right, an error message is returned</p>
+    <p>errormsg Null if quiz generation was successful,
+otherwise contains an error message</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

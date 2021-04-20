@@ -1,0 +1,59 @@
+---
+title: "Local use of the grading app"
+author: "<a href=https://www.andreashandel.com>Andreas Handel</a>"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{local_hosting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7
+)
+
+# avoid check where vignette filename must equal the vignette title
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+
+
+
+```{r setup, include = FALSE}
+pkg = 'quizgrader' #so we can easily switch names
+library(pkg, character.only = TRUE)
+```
+
+
+
+## Summary
+
+**`r pkg`** is designed to be deployed online and for students to submit through a website. 
+
+
+
+
+### Semi-automated
+
+If for some reason you do not want to use a web-based submission for students, you could instead ask students to send (email or otherwise) their solution files. 
+
+You will then need to place them into the submissions folder. You will also need to give each quiz a name that starts with the student ID and then some unique name (ideally the quiz ID, but that's not required since it's inside the file). So if e.g. Anna Jones (ajones@abc.edu) submits her module 3 quiz, you might want to name it (or ask them to) as `ajones@abc.edu_mod3quiz1.xlsx`. Starting with their student ID followed by `_` is required. 
+
+You can then run the function following command to grade all the submissions in a folder and add to the main grading sheet
+
+```{r, eval=FALSE, echo=TRUE}
+grade_submissions(submissionfolder = "path/to/location/for/submissions")
+```
+
+Note that with this approach, using automated due date and submission attempt checks makes little sense, thus you should set those to a far away date and many attempts in the quiz sheets and you'll need to manually keep track of when they sent the file to you.
+
+Overall, this approach still requires a lot of manual intervention, and I'm thus not sure it's a worthwhile approach, I would then probably stick with the LMS, try the web-based approach as described, or find some other way of doing it.
+

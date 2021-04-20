@@ -70,7 +70,7 @@
       <a href="../articles/A_introduction.html">quizgrader Introduction</a>
     </li>
     <li>
-      <a href="../articles/B_quiz_creation.html">Creating Quizzes</a>
+      <a href="../articles/B_quiz_creation.html">Creating a course and quizzes</a>
     </li>
     <li>
       <a href="../articles/C_hosting_on_own_shiny_server.html">Hosting quizzes on your own Shiny server</a>
@@ -79,7 +79,13 @@
       <a href="../articles/D_hosting_on_shinyappsio.html">Hosting quizzes on shinyapps.io</a>
     </li>
     <li>
-      <a href="../articles/E_quiz_analysis.html">Analyzing quiz grades</a>
+      <a href="../articles/E_local_hosting.html">Local use of the grading app</a>
+    </li>
+    <li>
+      <a href="../articles/F_quiz_administration.html">Ongoing quiz management</a>
+    </li>
+    <li>
+      <a href="../articles/G_quiz_analysis.html">Analyzing quiz grades</a>
     </li>
   </ul>
 </li>
@@ -107,7 +113,7 @@
       <h1 data-toc-skip>quizgrader Introduction</h1>
                         <h4 class="author"><a href="https://www.andreashandel.com">Andreas Handel</a></h4>
             
-            <h4 class="date">2021-04-19</h4>
+            <h4 class="date">2021-04-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/master/vignettes/A_introduction.Rmd"><code>vignettes/A_introduction.Rmd</code></a></small>
       <div class="hidden name"><code>A_introduction.Rmd</code></div>
@@ -119,7 +125,16 @@
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
-<p>This document provides a quick introduction and big-picture overview of the quizgrader package, which is a package for managing and administering auto-graded online quizzes.</p>
+<p>This document provides a quick introduction and overview of the <strong>quizgrader</strong> package, which is a package for managing and administering auto-graded online quizzes.</p>
+<p>Very briefly, here is how it works:</p>
+<ol style="list-style-type: decimal">
+<li>You (= instructor) create quizzes as Excel files using a provided template, then deploy online.</li>
+<li>You give your students the Excel quiz files (minus the answers 😁).</li>
+<li>Students fill out the quiz sheets and upload them using a simple web interface.</li>
+<li>Quizzes are auto-graded on upload, grades recorded, students receive immediate feedback.</li>
+<li>You retrieve submissions/grades, analyze them and compute final grades.</li>
+</ol>
+<p><strong>If this sounds potentially useful, read on.</strong></p>
 </div>
 <div id="motivation" class="section level2">
 <h2 class="hasAnchor">
@@ -141,9 +156,9 @@
 <span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">'andreashandel/quizgrader'</span><span class="op">)</span></code></pre></div>
 <p>The package depends on other packages, which will also be installed as needed. Package installation is a one-time process, unless you update or re-install R itself, or want to install a newer version of <code>quizgrader</code>.</p>
 </div>
-<div id="package-use-overview" class="section level2">
+<div id="package-use" class="section level2">
 <h2 class="hasAnchor">
-<a href="#package-use-overview" class="anchor"></a>Package use overview</h2>
+<a href="#package-use" class="anchor"></a>Package use</h2>
 <p>You can make, deploy and analyze student quiz submissions entirely interactively through Shiny apps. Alternatively, you can do all quiz management processes without using the Shiny apps. The tutorials explain both approaches. Here are the steps in overview format.</p>
 <p><strong>Quiz Preparation</strong></p>
 <p>As a teacher, you will start by going through these steps:</p>
@@ -152,17 +167,17 @@
 <li>Create your quizzes (using a provided Excel file template).</li>
 <li>Create a roster of students (also using a provided Excel template).</li>
 <li>Process complete quizzes to generate quiz sheets/files that are given to students for filling out.</li>
-<li>Process everything else and deploy to some shiny server, tell students where to go for grading.</li>
+<li>Process everything else and deploy to a Shiny server.</li>
 </ul>
 <p><strong>Quiz submission</strong></p>
-<p>Once the quizzes are deployed to a shiny server, you will tell students the website to which they need to upload their quizzes. Before each quiz deadline, students go to the website, upload their filled quiz sheet. The quiz is auto-graded, the grade is recorded and students are being given immediate feedback.</p>
+<p>Once the quizzes are deployed to a Shiny server, you tell students the submission website. Before each quiz deadline, students go to the website, upload their filled quiz sheet. The quiz is auto-graded, the grade is recorded and students are being given immediate feedback.</p>
 <p><strong>Quiz management</strong></p>
-<p>You can download the student submissions while the course is in action, analyze the results to investigate individual students or individual questions. You can also make some adjustments to the student roster and the quizzes (e.g. modify upcoming quizzes). At the end of the course, you can make final manual adjustments and compute the overall grade.</p>
+<p>You can download the student submissions while the course is running, analyze the results to investigate individual students or individual questions. You can also make adjustments to the student roster and the quizzes (e.g. modify upcoming quizzes). At the end of the course, you can make final manual adjustments and compute the overall grade.</p>
 </div>
 <div id="next-steps" class="section level2">
 <h2 class="hasAnchor">
 <a href="#next-steps" class="anchor"></a>Next steps</h2>
-<p>To learn more and see how to get started creating a course and a set of quizzes, see the <a href="./articles/AB_quiz_creation.html">Creating Quizzes</a> tutorial.</p>
+<p>To learn more and see how to get started creating a course and a set of quizzes, see the <a href="./articles/B_quiz_creation.html">Creating Quizzes</a> tutorial.</p>
 </div>
 <div id="some-general-comments-regarding-quizgrader" class="section level2">
 <h2 class="hasAnchor">
@@ -175,21 +190,7 @@
 <div id="excel-is-evil" class="section level3">
 <h3 class="hasAnchor">
 <a href="#excel-is-evil" class="anchor"></a>Excel is evil</h3>
-<p>I know the issues with using Excel for working with data. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most important students, are familiar with it. This means one needs to be careful about Excels over-eager auto-processing of data formats. Dates tend to be the biggest headache. Make sure that for all entries you generate, they are formatted as text. It shouldn’t cause a problem when students fill out their spreadsheets.</p>
-</div>
-<div id="manual-submissions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#manual-submissions" class="anchor"></a>Manual submissions</h3>
-<p>It’s not unlikely that a student misses a deadline, or you allow them to submit again, or some other circumstance occurs that needs special permission. You could go into the <code>courselist</code> file and adjust to allow for that (e.g. change the due date for that student, or manually adjust). This is possible but risky, as things might break. My approach is to tell those students to send (email) me their quiz sheet in question, and when I make final grades I will then manually grade their quiz and edit the <code>courselist</code> file to add their scores.</p>
-<p>WRITE grade_submissions() function such that it can autograde manual submissions?</p>
-</div>
-<div id="limitations" class="section level3">
-<h3 class="hasAnchor">
-<a href="#limitations" class="anchor"></a>Limitations</h3>
-<ul>
-<li><p>Currently, each quiz is graded on a simple score with every question having the same weight. I.e. if you have 8 questions and a student got 6 right, they get a 0.75. Giving questions different weights is currently not possible (though could be implemented if you think you need that feature).</p></li>
-<li><p>Similarly, currently each quiz is given the same weight. That means if you have one quiz with 5 questions and the student gets 1 correct, and another quiz with 50 questions and the student gets all 50 correct, their average score will be (1/5 + 50/50)/2 = 0.6. Weighting quizzes is currently not possible. The recommendation is to make each quiz approximately the same size/weight. If needed, split or combine quizzes. (There is not reason why you can only give one quiz a week, I often have multiple covering different aspects. For instance one quiz covering the readings and one covering the exercises.)</p></li>
-</ul>
+<p>I know the potential problems that can occur when using Excel. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most importantly students, are familiar with it. This means you need to be careful about Excels over-eager auto-processing, especially of dates. Specific warnings are provided throughout the tutorials to alert you to potential issues. In my experience, if you were careful creating the documents, it shouldn’t cause problems on the student side.</p>
 </div>
 </div>
   </div>

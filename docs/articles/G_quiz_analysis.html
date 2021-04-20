@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hosting quizzes on shinyapps.io • quizgrader</title>
+<title>Analyzing quiz grades • quizgrader</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Hosting quizzes on shinyapps.io">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Analyzing quiz grades">
 <meta property="og:description" content="quizgrader">
 <meta property="og:image" content="https://andreashandel.github.io/quizgrader/index.html/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -107,50 +107,31 @@
 
       
 
-      </header><script src="D_hosting_on_shinyappsio_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="G_quiz_analysis_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Hosting quizzes on shinyapps.io</h1>
+      <h1 data-toc-skip>Analyzing quiz grades</h1>
                         <h4 class="author"><a href="https://www.andreashandel.com">Andreas Handel</a></h4>
             
             <h4 class="date">2021-04-20</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/master/vignettes/D_hosting_on_shinyappsio.Rmd"><code>vignettes/D_hosting_on_shinyappsio.Rmd</code></a></small>
-      <div class="hidden name"><code>D_hosting_on_shinyappsio.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/master/vignettes/G_quiz_analysis.Rmd"><code>vignettes/G_quiz_analysis.Rmd</code></a></small>
+      <div class="hidden name"><code>G_quiz_analysis.Rmd</code></div>
 
     </div>
 
     
     
-<div id="overview" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
-<p>This document describes hosting the grading app on shinyapps.io.</p>
-<p>The following assumes that you will be hosting the submission system on RStudio’s <code>shinyapps.io</code> service. For alternatives, see the end of the document. One problem with <code>shinyapps.io</code> is the fact that you can’t easily store files.</p>
-<p>You can deploy everything with this command.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">deploy_quizgrader</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>This function takes the submission app file, the and places them to the Shiny server. Students should now be able to go to the website (e.g. shinyapps.io`) and, after entering their identifying information, upload their quiz.</p>
-</div>
-<div id="using-the-grading-system-with-shinyapps-io" class="section level2">
-<h2 class="hasAnchor">
-<a href="#using-the-grading-system-with-shinyapps-io" class="anchor"></a>Using the grading system with shinyapps.io</h2>
-<p>The submission will be checked to make sure it is not past the due date or the number of allowed submissions has been exceeded. Then the quiz is graded by comparing the student submissions with those in the complete quiz files, the grade is recorded in the form of a score, and students are provided with immediate feedback on which questions they did get right and which they didn’t. Anything entered into the <code>feedback</code> column is also displayed. In addition, students can see information about their cumulative performance so far.</p>
-<p>Note that as long as any password is missing from the student list, the app will display a <code>not ready for submission</code> message.</p>
-</div>
-<div id="storing-and-retrieving-submissions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#storing-and-retrieving-submissions" class="anchor"></a>Storing and retrieving submissions</h2>
-<p>One</p>
-<p><a href="https://shiny.rstudio.com/articles/persistent-data-storage.html" class="uri">https://shiny.rstudio.com/articles/persistent-data-storage.html</a></p>
+<div id="retrieving-and-analyzing-student-submissions" class="section level3">
+<h3 class="hasAnchor">
+<a href="#retrieving-and-analyzing-student-submissions" class="anchor"></a>Retrieving and Analyzing student submissions</h3>
+<p>Once students start submitting, their grades are recorded in (always time-stamped and not overwritten) <code>gradelist.xlsx</code> files, and all their submissions, including their user ID and timestamp, are placed into the <code>studentsubmissions</code> folder. you’ll want to pull files from the server every so often. Currently, this needs to be done manually. To that end, log into the shiny server and copy everything in the <code>studentsubmissions</code> and <code>gradelists</code> folders to the local versions of your course. Once done, open <code>quizmanager</code>, load the course you want to look at, and use the <code>Analyze Submissions</code> tab to see the performance of students and how the different quiz questions are being answered.</p>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 

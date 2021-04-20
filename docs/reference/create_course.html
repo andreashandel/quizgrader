@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check the studentlist file — check_studentlist • quizgrader</title>
+<title>Set up structure for a new course — create_course • quizgrader</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,10 @@
 
 
 
-<meta property="og:title" content="Check the studentlist file — check_studentlist" />
-<meta property="og:description" content="This function checks a studentlist dataframe to ensure it is valid" />
+<meta property="og:title" content="Set up structure for a new course — create_course" />
+<meta property="og:description" content="This function creates a new course/project
+and creates template folders and files for quizzes
+to be filled by the teacher" />
 <meta property="og:image" content="https://andreashandel.github.io/quizgrader/index.html/logo.png" />
 
 
@@ -152,30 +154,42 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check the studentlist file</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ahgroup/DSAIDE/blob/master/R/check_studentlist.R'><code>R/check_studentlist.R</code></a></small>
-    <div class="hidden name"><code>check_studentlist.Rd</code></div>
+    <h1>Set up structure for a new course</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ahgroup/DSAIDE/blob/master/R/create_course.R'><code>R/create_course.R</code></a></small>
+    <div class="hidden name"><code>create_course.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function checks a studentlist dataframe to ensure it is valid</p>
+    <p>This function creates a new course/project
+and creates template folders and files for quizzes
+to be filled by the teacher</p>
     </div>
 
-    <pre class="usage"><span class='fu'>check_studentlist</span><span class='op'>(</span><span class='va'>studentdf</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>create_course</span><span class='op'>(</span><span class='va'>coursename</span>, courselocation <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>studentdf</th>
-      <td><p>dataframe with student list information</p></td>
+      <th>coursename</th>
+      <td><p>Name of course to be created
+this will be the main folder name
+and will contain sub-folders for all the materials</p></td>
+    </tr>
+    <tr>
+      <th>courselocation</th>
+      <td><p>The location where the new course folder
+is to be created</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If everything is right, NULL is returned
-If anything is not right, an error message is returned</p>
+    <p>The function creates folders an files for the new course.
+The function returns a list containing error or success information.
+If things went well, the list element status is 0 and a the list
+element message is a string specifying the location of the new course folder.
+Otherwise an error status of 1 and an error message is returned.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

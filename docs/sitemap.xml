@@ -16,13 +16,16 @@
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/check_submission.html</loc>
   </url>
   <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_course.html</loc>
+  </url>
+  <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_gradelist.html</loc>
   </url>
   <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_student_quizzes.html</loc>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_serverpackage.html</loc>
   </url>
   <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/make_package.html</loc>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_student_quizzes.html</loc>
   </url>
   <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/quizmanager.html</loc>
@@ -32,9 +35,6 @@
   </url>
   <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/save_grade.html</loc>
-  </url>
-  <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/start_course.html</loc>
   </url>
   <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/articles/A_introduction.html</loc>
@@ -49,6 +49,12 @@
     <loc>https://andreashandel.github.io/quizgrader/index.html/articles/D_hosting_on_shinyappsio.html</loc>
   </url>
   <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/E_quiz_analysis.html</loc>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/E_local_hosting.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/F_quiz_administration.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/G_quiz_analysis.html</loc>
   </url>
 </urlset>

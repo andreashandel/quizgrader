@@ -1,7 +1,10 @@
 # Documentation for working on the package
 
+
 ## Package structure/use 
-See the vignettes for details.
+
+There are two Shiny apps which provide user interfaces for the instructor to create and manage the quizzes and for the students to submit quizzes. Those are in the `/inst/apps` folder. All instructor-facing tasks can be done without the UI through a number of functions described below. Those are in fact called by the UI. The vignettes provide a lot more detail on package use.
+
 
 ## Package organization
 
@@ -22,9 +25,18 @@ See the vignettes for details.
 ### Functions/files in the R folder
 
 The main functions that are exposed to a user are the following:
-* `start_course` - 
+* `create_course` - starts a new course, creates starting folders and files
+* `create_student_quizzes` - takes the completed quizzes, processes them to produce quizzes for students, also places them into a zip file
+* `create_gradelist` - combines the student list and all quizzes to generate the main grade tracking file
+* `create_serverpackage` - makes a file/folder bundle for either initial deployment or update that needs to be copied to server 
 
-The following are helper functions that are used internally but not exposed to the user:
+
+
+The following functions are used internally:
+* `check_quiz` - is being called at various stages during course management to check if an instructor-created quiz has valid content and structure
+
+
+NOT A COMPLETE LISTING YET
 
 
 ### Materials inside the /inst folder
@@ -53,7 +65,7 @@ Additional packages are needed for development (but not use) of the package. Tho
 ### Github action integration
 To enable continuous checking and other GitHub actions, use the 'usethis' package as follows:
 * use_github_action_check_release()
- 
+
 
 ### Package logo
 According to pkgdown, logo should be included as described here:

@@ -1,0 +1,40 @@
+---
+title: "Analyzing quiz grades"
+author: "<a href=https://www.andreashandel.com>Andreas Handel</a>"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{quiz_analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7
+)
+
+# avoid check where vignette filename must equal the vignette title
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+#not able to use this in vignette of package unless i declare it in DESCRIPTION
+#Currently not a CRAN package, os can't use in DESCRIPTION
+#library('emo')
+```
+
+
+
+
+### Retrieving and Analyzing student submissions
+
+Once students start submitting, their grades are recorded in (always time-stamped and not overwritten) `gradelist.xlsx` files, and all their submissions, including their user ID and timestamp, are placed into the `studentsubmissions` folder. you'll want to pull files from the server every so often. Currently, this needs to be done manually. To that end, log into the shiny server and copy everything in the `studentsubmissions` and `gradelists` folders to the local versions of your course. Once done, open `quizmanager`, load the course you want to look at, and use the `Analyze Submissions` tab to see the performance of students and how the different quiz questions are being answered.  
+

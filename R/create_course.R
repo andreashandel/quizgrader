@@ -19,7 +19,7 @@
 
 
 
-start_course <- function(coursename, courselocation = NULL)
+create_course <- function(coursename, courselocation = NULL)
 {
 
   #return error status/message

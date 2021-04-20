@@ -38,7 +38,9 @@ Suggests:
     pkgdown,
     rmarkdown,
     roxygen2,
-    testthat (>= 3.0.0)
+    testthat,
+    emo
+Additional_repositories: https://github.com/hadley/emo/    
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr

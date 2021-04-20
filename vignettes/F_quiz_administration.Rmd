@@ -1,0 +1,53 @@
+---
+title: "Ongoing quiz management"
+author: "<a href=https://www.andreashandel.com>Andreas Handel</a>"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{quiz_administration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7
+)
+
+# avoid check where vignette filename must equal the vignette title
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+
+```{r, eval=TRUE, echo=FALSE}
+#not able to use this in vignette of package unless i declare it in DESCRIPTION
+#Currently not a CRAN package, os can't use in DESCRIPTION
+#library('emo')
+```
+
+
+
+## Overview
+
+This describes ongoing administration of the class list and quizzes while the course is running.
+
+
+### Updating materials
+
+If you need to make updates to either the main `gradelist.xlsx` file or the complete quizzes on the server, proceed as follows:
+
+1. Make any modifications to the quizzes you need to make. Generate and distribute updated student versions.
+
+2. During a time when students won't submit anything (e.g. right after a submission deadline or Saturday morning at 6am), download materials from the server.
+
+3. FIND A WAY TO UPDATE GRADELIST.
+ 
+CONTINUE HERE AND MAKE SURE THE ONLINE SUBMISSION SYSTEM WORKS
+
+
