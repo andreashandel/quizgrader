@@ -11,10 +11,10 @@
 
 * Get quiz analysis functionality to work.
 
+
 # Medium importance
 
 Get quiz deletion to work in quizmanager.
-
 
 
 # Minor priority

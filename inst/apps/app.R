@@ -5,7 +5,7 @@
 ######################################################
 
 library('quizgrader')
-
+library('magrittr') #explicitly load package so we can use pipe without package reference
 
 #######################################################
 #general setup
@@ -129,7 +129,7 @@ server <- function(input, output) {
         # load the solution file for this quiz with the answers
         # test if it can be loaded
         # for it to work the quizid in the submitted sheet must have a name that matches a solution
-        solutionname = paste0(solution_folder,'/', quizid,'_complete.xlsx')
+        solutionname = paste0(completequizzes_folder,'/', quizid,'_complete.xlsx')
 
         solution_raw <- try( readxl::read_excel(solutionname, col_types = "text"))
         if (length(solution_raw)==1) #if this is true, it means the file hasn't loaded and instead produced an error string
@@ -152,7 +152,7 @@ server <- function(input, output) {
         #check submitted file against solution to make sure content is right
         #if file is not right, check_submission will return an error message
         #then display error message and stop the process
-        filecheck <- check_submission(submission, quizid)
+        filecheck <- quizgrader::check_submission(submission, quizid)
         #docerrors <- check_submission(submission,solution,studentid,quizid,gradelist)
         if (!is.null(filecheck))
         {
