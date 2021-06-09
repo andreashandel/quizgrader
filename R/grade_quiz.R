@@ -22,7 +22,7 @@ grade_quiz <-  function(submission, solution)
     #set up data frame that will hold both the question number and the correct/not correct evaluation
     #start by labeling answer as not correct
     #then based on checks below, overwrite by declaring it correct
-    grade_table = data.frame(RecordID = solution$RecordID, Score = "Not correct")
+    grade_table = data.frame(QuestionID = solution$QuestionID, Score = "Not correct")
 
     #run through each row of submitted sheet, compare answer with solution
     #for this to work, the submitted and solution file need to have exactly the same structure
@@ -38,7 +38,7 @@ grade_quiz <-  function(submission, solution)
       answertype = solution$Type[n]
 
       #these answer types are allowed. Throw an error message if it's not one of those.
-      allowed_types = c("Character", "Text", "Logical", "Integer", "Rounded_Numeric", "Numeric")
+      allowed_types = c("Character", "Text", "Logical", "Integer", "Fuzzy_Integer", "Numeric", "Rounded_Numeric")
 
 
       if (!(answertype %in% allowed_types))
@@ -85,7 +85,7 @@ grade_quiz <-  function(submission, solution)
         #this means the solution file contains a wrong entry, an error message is triggered
         if (answer_numeric == 99)
         {
-          grade_table <- paste0("The solution sheet contains a wrong entry for question ",solution$RecordID[n],". Please alert the instructor of this problem.")
+          grade_table <- paste0("The solution sheet contains a wrong entry for question ",solution$QuestionID[n],". Please alert the instructor of this problem.")
           return(grade_table)
         }
         submission_numeric = 99 #set to a 'wrong' value so if student enters neither y/t/1 or n/f/0 (as 1st letter) things evaluate to 'not correct'

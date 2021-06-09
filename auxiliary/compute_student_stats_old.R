@@ -4,7 +4,7 @@
 #'
 #' @param studentid id of student
 #' @param quizid id of quiz
-#' @param classlist classlist data frame
+#' @param gradelist gradelist data frame
 #'
 #' @return
 #' If things went well, a vector containing student stats.
@@ -18,12 +18,13 @@
 #compute student stats
 #for a given submission, look up student's previous submissions
 #and return average score and number of submitted quizzes
-compute_student_stats <- function(studentid, quizid, classlist)
+compute_student_stats <- function(studentid, quizid, gradelist)
 {
 
   #pull out all columns containing grades for this student
   #those must have 'grade' in their name
-  allquizgrades = classlist[studentid,grepl("grade", colnames(classlist))]
+  studentrow = which(gradelist[,"StudentID"] == studentid)
+  allquizgrades = gradelist[studentrow,grepl("grade", colnames(gradelist))]
 
   #figure out column of current quiz, remove all future quizzes
   thisquiz = which(names(allquizgrades) == paste0(quizid,'_grade'))

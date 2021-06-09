@@ -4,12 +4,16 @@
 \alias{save_grade}
 \title{Save the student grade to the gradelist file}
 \usage{
-save_grade(score, gradelist_folder)
+save_grade(score, studentid, quizid, gradelists_folder)
 }
 \arguments{
 \item{score}{student score}
 
-\item{gradelist_folder}{folder where gradelist is stored}
+\item{studentid}{student id from the classlist}
+
+\item{quizid}{quiz id}
+
+\item{gradelists_folder}{folder with gradelists}
 }
 \value{
 An error message if it's not a valid quiz data frame,

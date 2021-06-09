@@ -182,8 +182,8 @@ server <- function(input, output) {
         #this allows checking if things in the app go wrong
         #give each submission a time-stamp
         timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
-        filename = paste(input$lastname, input$email, timestamp, quizid, 'submission.tsv', sep='_')
-        filenamepath = paste0(submission_folder,"/",filename)
+        filename = paste(input$StudentID, timestamp, quizid, 'submission.tsv', sep='_')
+        filenamepath = paste0(studentsubmissions_folder,"/",filename)
         write.table(submission, file=filenamepath, sep = '\t', col.names = TRUE, row.names = FALSE )
 
         #####################################
@@ -194,7 +194,7 @@ server <- function(input, output) {
         #returns nothing
         #that extra if statement is to prevent recording for test submissions
         #otherwise one always has to go in manually to delete submission to prevent 'already submitted' message
-        save_grade(score, studentid, quizid, gradelist_folder)
+        save_grade(score, input$StudentID, quizid, gradelists_folder)
 
         #####################################
         #display results
@@ -208,9 +208,9 @@ server <- function(input, output) {
         #####################################
         #also compute submission stats for student and display
         #load the latest gradelist which contains the just submitted grade
-        gradelist = read_gradelist(gradelist_folder)
+        # gradelist = read_gradelist(gradelists_folder)
         #compute stats for that student
-        quizstats <- compute_student_stats(studentid, quizid, gradelist)
+        quizstats <- compute_student_stats(input$StudentID, quizid, gradelist)
         stats_text = paste0("You have submitted ", quizstats["gradesubmissions"], " out of ",quizstats["totalquizzes"], " quizzes and your average score is ",round(quizstats["gradeaverage"],2))
         output$statstext <- shiny::renderText(stats_text)
         #some text with a note about the displayed stats
