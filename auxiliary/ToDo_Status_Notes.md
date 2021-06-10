@@ -1,7 +1,8 @@
 # Main importance
 
 
-* Add code that creates subfolders in studentsubmissions for each quiz. Should either happen when grade tracking list is created or during deployment package. Need to make sure this doesn't overwrite files once class is in session.
+* Add code that creates subfolders in studentsubmissions for each quiz. Should either happen when grade tracking list is created or during deployment package. 
+  + Subfolders are created when grade tracking list is created. Also, submissions are placed into quizid subfolder when submitted. **Need to make sure this doesn't overwrite files once class is in session.**
 
 * Get grading app to work using the self-hosted shiny server setup.
 

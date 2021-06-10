@@ -5,9 +5,10 @@
 #' and checks that structure and content are valid
 #'
 #' @param score student score
-#' @param studentid student id from the classlist
+#' @param studentid student id
 #' @param quizid quiz id
-#' @param gradelists_folder folder with gradelists
+#' @param gradelist gradelist data frame
+#' @param gradelists_folder folder to save gradelists
 #'
 #' @return An error message if it's not a valid quiz data frame,
 #' otherwise NULL
@@ -20,9 +21,8 @@
 #######################################################
 #write grade to gradelist file
 #append date, such that files don't overwrite each other
-save_grade <- function(score, studentid, quizid, gradelists_folder)
+save_grade <- function(score, studentid, quizid, gradelist, gradelists_folder)
 {
-  gradelist = read_gradelist(gradelists_folder)
   studentrow = which(gradelist[,"StudentID"] == studentid)
   gradecol = which(colnames(gradelist) == paste0(quizid,"_Grade"))
 
@@ -30,6 +30,14 @@ save_grade <- function(score, studentid, quizid, gradelists_folder)
 
   submitcol = which(colnames(gradelist) == paste0(quizid,"_SubmitDate"))
   gradelist[studentrow,submitcol] <- as.character(Sys.time())
+
+  attemptcol = which(colnames(gradelist) == paste0(quizid, "_Attempt"))
+
+  if(is.na(gradelist[studentrow, attemptcol])){
+    gradelist[studentrow, attemptcol] <- "1"
+  }else{
+    gradelist[studentrow, attemptcol] <- as.character(as.numeric(gradelist[studentrow, attemptcol])+1)
+  }
 
   timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
   filename = paste0("gradelist_",timestamp,".xlsx")

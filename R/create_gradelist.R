@@ -94,6 +94,10 @@ create_gradelist <- function(courselocation)
     # add new columns to gradelist
     gradelist[,dfcolnames] <- allvals
 
+
+    # create sub-directory in student submissions
+    fs::dir_create(fs::path(courselocation,"studentsubmissions", quizdf$QuizID[1]))
+
   }
 
   #save grade list to the gradelists folder
