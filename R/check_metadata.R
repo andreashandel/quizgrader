@@ -16,12 +16,12 @@
 #######################################################
 #check that metadata students are entering are correct
 #######################################################
-check_metadata <- function(metadata, gradelist)
+check_metadata <- function(metadata, studentlist)
 {
   metaerror = NULL
 
   #look for the provided user ID
-  studentnr = which(metadata$StudentID == gradelist$StudentID)
+  studentnr = which(metadata$StudentID == studentlist$StudentID)
   if ( length(studentnr) == 0)  #student could not be found
   {
     metaerror <- "The provided Student ID could not be found"
@@ -29,7 +29,7 @@ check_metadata <- function(metadata, gradelist)
   }
 
   #find the row for this user, check that they have a Password set
-  if ( nchar(gradelist$Password[studentnr])==0)
+  if ( nchar(studentlist$Password[studentnr])==0)
   {
     metaerror <- "It seems like you have not provided a Password, please do so."
     return(metaerror)
@@ -38,7 +38,7 @@ check_metadata <- function(metadata, gradelist)
   #check that Password matches
   #this can prevent anyone submitting for someone else (unless that person shared their Password)
   #ignore capitalization for Password
-  if ( metadata$Password != tolower(gradelist$Password[studentnr]))
+  if ( metadata$Password != tolower(studentlist$Password[studentnr]))
   {
     metaerror <- "Password does not match"
     return(metaerror)

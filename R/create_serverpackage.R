@@ -28,8 +28,13 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     zip::zip(zipfile = zipfilename, files = fs::path(courselocation,"completequizzes"),
                                     mode = "cherry-pick",
                                     recurse = TRUE, include_directories = TRUE)
-    #add gradelists folder and contents
-    zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"gradelists"),
+    # #add gradelists folder and contents
+    # zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"gradelists"),
+    #                 mode = "cherry-pick",
+    #                 recurse = TRUE, include_directories = TRUE)
+
+    #add studentlists folder and contents
+    zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentlists"),
                     mode = "cherry-pick",
                     recurse = TRUE, include_directories = TRUE)
 

@@ -4,7 +4,7 @@
 \alias{check_metadata}
 \title{Check that information submitted by students through UI is correct}
 \usage{
-check_metadata(metadata, gradelist)
+check_metadata(metadata, studentlist)
 }
 \arguments{
 \item{metadata}{list containing elements StudentID and Password}

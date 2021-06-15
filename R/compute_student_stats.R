@@ -21,6 +21,21 @@
 compute_student_stats <- function(studentid, quizid, gradelist)
 {
 
+  log_files <- list.files(path = studentsubmissions_folder,
+                          pattern = paste0("log_", studentid, ".*?[.]txt"),
+                          recursive = TRUE,
+                          full.names = TRUE
+                          )
+
+  log_keys <- strsplit(gsub(".*?log_(.*?)[.]txt", "\\1", log_files), split = "_")
+
+
+  log_df <- dplyr::bind_cols(setNames(data.frame(t(sapply(log_keys, c)))[-3], nm = c("StudentID", "QuizID", "Attempt")),
+                             file = log_files)
+
+
+
+
   #pull out all columns containing grades for this student
   #those must have 'grade' in their name
   studentrow = which(gradelist[,"StudentID"] == studentid)

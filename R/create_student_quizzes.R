@@ -81,6 +81,10 @@ create_student_quizzes <- function(courselocation)
         studentfilename = gsub("_complete","_student",quizname)
         studentfile_fullname = fs::path(studentquizpath, studentfilename)
         writexl::write_xlsx(quizdf, studentfile_fullname, col_names = TRUE, format_headers = TRUE)
+
+
+        # create sub-directory in student submissions
+        fs::dir_create(fs::path(courselocation,"studentsubmissions", quizdf$QuizID[1]))
     }
 
     #finally, create zip file of all student quizzes

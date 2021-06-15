@@ -23,9 +23,16 @@ courselocation <<- NULL
 server <- function(input, output, session) {
 
 
-  #######################################################
-  #start code block that creates a new course
-  #######################################################
+
+
+#---------------------------------------------------------------
+# Course Creation
+#---------------------------------------------------------------
+
+
+  ##############################################################
+  #start code block that chooses directory for new course
+  ##############################################################
 
   #server functionality that lets user choose a folder for the new course
   #this is taken from the shinyFilesExample() examples
@@ -38,6 +45,25 @@ server <- function(input, output, session) {
     output$newcoursedir <- renderText(courselocation)
     output$coursedir <- renderText(courselocation)
   })
+
+
+
+  ##############################################################
+  #start code block that selects an existing course folder
+  ##############################################################
+
+  #this is used for working on an existing course
+  observeEvent(input$coursedir, {
+    shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
+    courselocation <<- shinyFiles::parseDirPath(volumes, input$coursedir)
+    output$coursedir <- renderText(courselocation)
+  })
+
+
+
+  ##############################################################
+  #start code block that creates directory skeleton structure
+  ##############################################################
 
   #once user has entered course name and picked a folder location
   #a course can be started
@@ -66,30 +92,35 @@ server <- function(input, output, session) {
       #save course folder to global variable
       courselocation <<- fs::path(isolate(newcoursedir), isolate(input$coursename))
       #show the directory to the new course
-      output$coursedir <- renderPrint(as.character(courselocation))
+      output$coursedir <- renderText(as.character(courselocation))
 
     }
     showModal(modalDialog(msg, easyClose = FALSE))
   })
 
 
-  #######################################################
-  #start code block that selects an existing course folder
-  #this is used for working on an existing course
-  #######################################################
-  observeEvent(input$coursedir, {
-    shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
-    courselocation <<- shinyFiles::parseDirPath(volumes, input$coursedir)
-    output$coursedir <- renderPrint(courselocation)
-  })
 
 
 
-  #######################################################
+
+
+
+
+
+
+
+
+#---------------------------------------------------------------
+# Roster Creation
+#---------------------------------------------------------------
+
+
+  ##############################################################
   #start code block that gives users the student list template
+  ##############################################################
+
   #this file is pulled out of the package, it's not the file copied over into the course
   #this prevents/minimizes accidental editing of the template
-  #######################################################
   output$getstudentlist <- downloadHandler(
     filename <- function() {
       "studentlist_template.xlsx"
@@ -100,23 +131,11 @@ server <- function(input, output, session) {
     contentType = "application/xlsx"
   )
 
-  #######################################################
-  #start code block that gives users the quiz template
-  #######################################################
-  output$getquiztemplate <- downloadHandler(
-    filename <- function() {
-      "quiz_template.xlsx"
-    },
-    content <- function(file) {
-      file.copy(quiztemplatefile, file)
-    },
-    contentType = "application/xlsx"
-  )
 
 
-  #######################################################
+  ##############################################################
   #start code block that adds filled student list to course
-  #######################################################
+  ##############################################################
   observeEvent(input$addstudentlist,{
 
     #check that a course folder has been selected
@@ -130,11 +149,10 @@ server <- function(input, output, session) {
     if (is.null(msg)) #if no prior error, try to create course
     {
       #add time stamp to filename
-      #timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
-      #find path to course folder
-      #filename = paste0("studentlist","_",timestamp,'.xlsx')
+      timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+      filename = paste0(input$addstudentlist$name,"_",timestamp,'.xlsx')
 
-      new_path = fs::path(courselocation, 'studentlists', input$addstudentlist$name)
+      new_path = fs::path(courselocation, 'studentlists', filename)
 
       #copy time-stamped file to student list folder
       fs::file_copy(path = input$addstudentlist$datapath,  new_path = new_path)
@@ -145,10 +163,36 @@ server <- function(input, output, session) {
   })
 
 
-  #######################################################
+
+
+
+#---------------------------------------------------------------
+# Quiz Creation
+#---------------------------------------------------------------
+
+
+  ##############################################################
+  #start code block that gives users the quiz template
+  ##############################################################
+
+  #this file is pulled out of the package, it's not the file copied over into the course
+  #this prevents/minimizes accidental editing of the template
+  output$getquiztemplate <- downloadHandler(
+    filename <- function() {
+      "quiz_template.xlsx"
+    },
+    content <- function(file) {
+      file.copy(quiztemplatefile, file)
+    },
+    contentType = "application/xlsx"
+  )
+
+
+
+  ##############################################################
   #start code block that adds filled quizzes to course
-  #also checks quizzes
-  #######################################################
+  ##############################################################
+
   observeEvent(input$addquiz,{
 
     #check that a course folder has been selected
@@ -178,34 +222,23 @@ server <- function(input, output, session) {
   })
 
 
-  #######################################################
-  #start code block that removes quizzes from course
-  #######################################################
-
-  observeEvent(input$removequiz,{
-
-    if (is.null(courselocation)) #not sure why integer, but that's how the example is
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "removequiz")
-    } else {
-      volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
-      shinyFiles::shinyFileChoose(input, "removequiz", roots = volumes, session = session)
-      deletefile <- shinyFiles::parseFilePaths(volumes, input$removequiz) #save course folder to global variable
-      #file.remove(deletefile)
-      browser()
-      msg <- paste0("this quiz has been removed:", deletefile)
-    }
-    showModal(modalDialog(msg, easyClose = FALSE))
-  })
 
 
 
 
-  #######################################################
-  #start code block that turns filled quizzes
-  #into student quizzes
-  #######################################################
+
+
+
+
+#---------------------------------------------------------------
+# Initial Course Deployment
+#---------------------------------------------------------------
+
+
+  ##############################################################
+  #start code block that turns filled quizzes into student quizzes
+  ##############################################################
+
   observeEvent(input$createstudentquizzes,{
 
     if (is.null(courselocation)) #not sure why integer, but that's how the example is
@@ -230,9 +263,11 @@ server <- function(input, output, session) {
     showModal(modalDialog(msg, easyClose = FALSE))
   })
 
-  #######################################################
+
+
+  ##############################################################
   #start code block that returns zip file of student quizzes
-  #######################################################
+  ##############################################################
   output$getstudentquizzes <- downloadHandler(
     filename <- function() {
       "studentquizsheets.zip"
@@ -242,6 +277,94 @@ server <- function(input, output, session) {
     },
     contentType = "application/zip"
   )
+
+
+
+  ##############################################################
+  #start code block that combines and zips documents needed for initial deployment
+  ##############################################################
+  observeEvent(input$makepackage,{
+
+    if (is.null(courselocation))
+    {
+      msg <- "Please set the course location"
+      shinyjs::reset(id  = "createstudentquizzes")
+    } else {
+      #make zip file
+      msg <- quizgrader:: create_serverpackage(courselocation, newpackage = TRUE)
+      if (is.null(msg)) #this means it worked
+      {
+        msg <- paste0('The serverpackage.zip file for deployment has been created and copied to ', file.path(courselocation))
+      }
+    }
+    showModal(modalDialog(msg, easyClose = FALSE))
+  }) #end code block that zips files/folders needed for initial deployment
+
+
+
+
+
+
+
+#------------------------------------------------------
+# Course Modification
+#------------------------------------------------------
+
+  #######################################################
+  #start code block that removes quizzes from course
+  #######################################################
+
+  observeEvent(input$removequiz,{
+
+    if (is.null(courselocation)) #not sure why integer, but that's how the example is
+    {
+      msg <- "Please set the course location"
+      shinyjs::reset(id  = "removequiz")
+    } else {
+      volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
+      shinyFiles::shinyFileChoose(input, "removequiz", roots = volumes, session = session)
+      deletefile <- shinyFiles::parseFilePaths(volumes, input$removequiz) #save course folder to global variable
+      #file.remove(deletefile)
+      browser()
+      msg <- paste0("this quiz has been removed:", deletefile)
+    }
+    showModal(modalDialog(msg, easyClose = FALSE))
+  })
+
+
+
+
+
+
+
+  #######################################################
+  #start code block that combines and zips documents needed for updates
+  #######################################################
+  observeEvent(input$updatepackage,{
+
+    if (is.null(courselocation))
+    {
+      msg <- "Please set the course location"
+      shinyjs::reset(id  = "createstudentquizzes")
+    } else {
+      #make zip file
+      msg <- quizgrader:: create_serverpackage(courselocation, newpackage = FALSE)
+      if (is.null(msg)) #this means it worked
+      {
+        msg <- paste0('The serverpackage.zip file for updates has been created and copied to ', file.path(courselocation))
+      }
+    }
+    showModal(modalDialog(msg, easyClose = FALSE))
+  }) #end code block that zips files/folders needed for updates
+
+
+
+
+
+
+#------------------------------------------------------
+# Gradelist
+#------------------------------------------------------
 
 
   #######################################################
@@ -279,78 +402,43 @@ server <- function(input, output, session) {
 
 
 
-  #######################################################
-  #start code block that combines and zips documents needed for initial deployment
-  #######################################################
-  observeEvent(input$makepackage,{
-
-    if (is.null(courselocation))
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "createstudentquizzes")
-    } else {
-      #make zip file
-      msg <- quizgrader:: create_serverpackage(courselocation, newpackage = TRUE)
-      if (is.null(msg)) #this means it worked
-      {
-        msg <- paste0('The serverpackage.zip file for deployment has been created and copied to ', file.path(courselocation))
-      }
-    }
-    showModal(modalDialog(msg, easyClose = FALSE))
-  }) #end code block that zips files/folders needed for initial deployment
 
 
 
-  #######################################################
-  #start code block that combines and zips documents needed for updates
-  #######################################################
-  observeEvent(input$updatepackage,{
-
-    if (is.null(courselocation))
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "createstudentquizzes")
-    } else {
-      #make zip file
-      msg <- quizgrader:: create_serverpackage(courselocation, newpackage = FALSE)
-      if (is.null(msg)) #this means it worked
-      {
-        msg <- paste0('The serverpackage.zip file for updates has been created and copied to ', file.path(courselocation))
-      }
-    }
-    showModal(modalDialog(msg, easyClose = FALSE))
-  }) #end code block that zips files/folders needed for updates
 
 
+#------------------------------------------------------
+# App Layout Functionality
+#------------------------------------------------------
 
   #######################################################
   #start code block that transitions between tabs
   #######################################################
 
-  observeEvent(input$gotogettingstarted, {
-    updateTabsetPanel(session, "man_sub",
+  observeEvent(input$gobackto_gettingstarted, {
+    updateTabsetPanel(inputId = "man_sub",
                       selected = "gettingstarted")
   })
 
-  observeEvent(input$gotoroster, {
-    updateNavlistPanel(session, "man_sub",
+  observeEvent(input$goto_roster | input$gobackto_roster, {
+    updateNavlistPanel(inputId = "man_sub",
                       selected = "roster")
-  })
+  }, ignoreInit = TRUE)
 
-  observeEvent(input$gotoquizzes, {
-    updateTabsetPanel(session, "man_sub",
+  observeEvent(input$goto_quizzes | input$gobackto_quizzes, {
+    updateTabsetPanel(inputId = "man_sub",
                       selected = "quizzes")
-  })
+  }, ignoreInit = TRUE)
 
-  observeEvent(input$gotogradelist, {
-    updateTabsetPanel(session, "man_sub",
+  observeEvent(input$goto_gradelist | input$gobackto_gradelist, {
+    updateTabsetPanel(inputId = "man_sub",
                       selected = "gradelist")
-  })
+  }, ignoreInit = TRUE)
 
-  observeEvent(input$gotodeploy, {
-    updateTabsetPanel(session, "man_sub",
+  observeEvent(input$goto_deploy | input$gobackto_deploy, {
+    updateTabsetPanel(inputId = "man_sub",
                       selected = "deploy")
-  })
+  }, ignoreInit = TRUE)
 
 
 
@@ -402,7 +490,7 @@ ui <- fluidPage(
                                            br(),
                                            br(),
                                            fluidRow(column(6, ""),
-                                                    column(6, align = "center", actionButton(inputId = 'gotoroster', label = div('Advance to Roster Setup', icon('angle-double-right'))))
+                                                    column(6, align = "center", actionButton(inputId = 'goto_roster', label = div('Advance to Roster Setup', icon('angle-double-right'))))
                                                     ),
                                            br(),
                                            br()
@@ -416,8 +504,8 @@ ui <- fluidPage(
                                            br(),
                                            br(),
                                            br(),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gotogettingstarted', label = 'Return to Directory Setup', icon = icon('angle-double-left'))),
-                                                    column(6, align = "center", actionButton(inputId = 'gotoquizzes', label = div('Advance to Quizzes Setup', icon('angle-double-right'))))
+                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_gettingstarted', label = 'Return to Directory Setup', icon = icon('angle-double-left'))),
+                                                    column(6, align = "center", actionButton(inputId = 'goto_quizzes', label = div('Advance to Quizzes Setup', icon('angle-double-right'))))
                                            ),
 
                                            br(),
@@ -438,8 +526,8 @@ ui <- fluidPage(
                                            br(),
                                            br(),
                                            h4("Next"),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gotoroster', label = 'Return to Roster Setup', icon = icon('angle-double-left'))),
-                                                    column(6, align = "center", actionButton(inputId = 'gotogradelist', label = div('Advance to Gradelist Setup', icon('angle-double-right'))))
+                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_roster', label = 'Return to Roster Setup', icon = icon('angle-double-left'))),
+                                                    column(6, align = "center", actionButton(inputId = 'goto_gradelist', label = div('Advance to Gradelist Setup', icon('angle-double-right'))))
                                            ),
 
 
@@ -454,8 +542,8 @@ ui <- fluidPage(
                                            br(),
                                            br(),
                                            br(),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gotoquizzes', label = 'Return to Quizzes Setup', icon = icon('angle-double-left'))),
-                                                    column(6, align = "center", actionButton(inputId = 'gotodeploy', label = div('Advance to Deployment', icon('angle-double-right'))))
+                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_quizzes', label = 'Return to Quizzes Setup', icon = icon('angle-double-left'))),
+                                                    column(6, align = "center", actionButton(inputId = 'goto_deploy', label = div('Advance to Deployment', icon('angle-double-right'))))
                                            ),
 
                                            br(),
@@ -473,7 +561,7 @@ ui <- fluidPage(
                                            br(),
                                            br(),
                                            br(),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gotogradelist', label = 'Return to Gradelist Setup', icon = icon('angle-double-left'))),
+                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_gradelist', label = 'Return to Gradelist Setup', icon = icon('angle-double-left'))),
                                                     column(6, align = "center", "")
                                            ),
 
