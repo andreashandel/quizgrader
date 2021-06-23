@@ -48,6 +48,26 @@ create_course <- function(coursename, courselocation = NULL)
 
     fs::dir_create(fs::path(newfolder,'studentsubmissions')) #will contain all student submissions
 
+
+
+    fs::dir_create(fs::path(newfolder,'studentsubmissions', 'logs')) #will contain student submissions log file
+
+    submissions_log <- data.frame(StudentID = NA,
+                                  QuizID = NA,
+                                  Attempt = NA,
+                                  Score = NA,
+                                  n_Questions = NA,
+                                  n_Correct = NA,
+                                  Submit_Date = NA
+                                  )
+
+    timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+
+    submissions_log_filename = paste0("submissions_log_", timestamp, ".xlsx")
+    submissions_log_filenamepath = fs::path(newfolder, "studentsubmissions", "logs", submissions_log_filename)
+    writexl::write_xlsx(submissions_log, submissions_log_filenamepath, col_names = TRUE, format_headers = TRUE)
+
+
     # fs::dir_create(fs::path(newfolder,'gradelists')) #for file(s) that tracks all grades
   }
 

@@ -50,9 +50,8 @@ https://shiny.rstudio.com/articles/persistent-data-storage.html
 
 Keeping a temporary "archive" of old scripts within auxilliary.
 
-## Newest functionality
 
-### 14 June 2021
+## 14 June 2021
 
 New function read_studentlist.R; pretty much same as read_gradelist.R was.
 
@@ -67,3 +66,30 @@ Without the gradelist, the largest speedbump (so far) is the functionality of co
 Due date and attempts road blocks in place. Reading solution file before submission file allows both. Due date checked first comparing system date to due date within solution file. Attempts then checked comparing attempt number in solution file to a count of "studentid-quizid-.xlsx" files saved in the submissions folder.
 
 quizmanager.R app is paginated. Buttons work, but need better placement.
+
+
+## 16 June 2021
+
+Adapt to a single log file; 
+generate shell during course creation and package with deployment; 
+portion of log file can be printed during submission in the grading app;
+
+public vs private functions: decide which (if any) should be private;
+
+singly-directional flow of files (schematic?);
+
+
+## 23 June 2021
+
+course summary with final rechecking and status checklist just before deployment
+play with workflow on server
+- alternative to hadley/emo package?
+
+remove the quizstats from app.R, just show table and let them calculate themselves
+add time to the submissions log
+
+look for implementation of check_studentlist.R
+
+update docs for developers file with structure, descriptions, ...
+
+useful to have packaging on server side?

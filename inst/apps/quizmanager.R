@@ -5,6 +5,9 @@
 ######################################################
 
 
+library('magrittr') #explicitly load package so we can use pipe without package reference
+
+
 ##############################################
 #Set up some variables, define all as global (the <<- notation)
 #name of R package
@@ -213,7 +216,7 @@ server <- function(input, output, session) {
       {
         #find path to course folder
         newname = paste0(quizdf$QuizID[1],'_complete.xlsx')
-        new_path = file.path(courselocation,"completequizzes",newname)
+        new_path = fs::path(courselocation,"completequizzes",newname)
         #copy renamed file to completequiz folder
         fs::file_copy(path = input$addquiz$datapath, new_path = new_path, overwrite = TRUE)
         msg <- paste0("quiz has been saved to ", new_path)
@@ -360,6 +363,52 @@ server <- function(input, output, session) {
 
 
 
+#------------------------------------------------------
+# Course Summary
+#------------------------------------------------------
+
+
+  #######################################################
+  #start code block that generates course summary of all quizzes
+  #######################################################
+  observeEvent(input$generate_course_summary,{
+
+    msg <- NULL
+
+    if (is.null(courselocation))
+    {
+      msg <- "Please set the course location"
+    } else {
+
+      msg <- quizgrader::summarize_course(fs::path(courselocation, "completequizzes"))
+
+      if (!is.null(msg)) #this means it didn't work
+      {
+
+
+        output$course_summary <- renderTable(temp)
+      } else {
+
+      }
+
+
+    } #end outer else statement
+
+    showModal(modalDialog(msg, easyClose = FALSE))
+  }) #end generate_course_summary code block
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -416,29 +465,29 @@ server <- function(input, output, session) {
   #start code block that transitions between tabs
   #######################################################
 
-  observeEvent(input$gobackto_gettingstarted, {
-    updateNavlistPanel(inputId = "man_sub",
-                       selected = "gettingstarted")
+  observeEvent(input$gobackto_setup_directory, {
+    updateNavlistPanel(inputId = "initial_setup_submenu",
+                       selected = "setup_directory")
   })
 
-  observeEvent(input$goto_roster | input$gobackto_roster, {
-    updateNavlistPanel(inputId = "man_sub",
-                       selected = "roster")
+  observeEvent(input$goto_setup_roster | input$gobackto_setup_roster, {
+    updateNavlistPanel(inputId = "initial_setup_submenu",
+                       selected = "setup_roster")
   }, ignoreInit = TRUE)
 
-  observeEvent(input$goto_quizzes | input$gobackto_quizzes, {
-    updateNavlistPanel(inputId = "man_sub",
-                       selected = "quizzes")
+  observeEvent(input$goto_setup_quizzes | input$gobackto_setup_quizzes, {
+    updateNavlistPanel(inputId = "initial_setup_submenu",
+                       selected = "setup_quizzes")
   }, ignoreInit = TRUE)
 
-  observeEvent(input$goto_gradelist | input$gobackto_gradelist, {
-    updateNavlistPanel(inputId = "man_sub",
-                       selected = "gradelist")
+  observeEvent(input$goto_setup_overview | input$gobackto_setup_overview, {
+    updateNavlistPanel(inputId = "initial_setup_submenu",
+                       selected = "setup_overview")
   }, ignoreInit = TRUE)
 
-  observeEvent(input$goto_deploy | input$gobackto_deploy, {
-    updateNavlistPanel(inputId = "man_sub",
-                       selected = "deploy")
+  observeEvent(input$goto_setup_deployment, {
+    updateNavlistPanel(inputId = "initial_setup_submenu",
+                       selected = "setup_deployment")
   }, ignoreInit = TRUE)
 
 
@@ -471,130 +520,198 @@ ui <- fluidPage(
   tags$div(id = "infotext", paste0('This is ', packagename,  ' version ',utils::packageVersion(packagename),' last updated ', utils::packageDescription(packagename)$Date,'.')),
   tags$div(id = "infotext", "Written and maintained by", a("Andreas Handel", href="https://www.andreashandel.com", target="_blank"), "with many contributions from", a("others.",  href="https://github.com/andreashandel/quizgrader#contributors", target="_blank")),
   p('Happy teaching!', class='maintext'),
-  navbarPage(title = "quizmanager", id = 'alltabs', selected = "manage",
-             tabPanel(title = "Manage Course", value = "manage",
-                      navlistPanel(id = "man_sub", selected = "gettingstarted",
-                                  tabPanel(title = "Getting Started", value = "gettingstarted",
-                                           h3('Start a new Course'),
-                                           textInput("coursename",label = "Course Name"),
-                                           shinyFiles::shinyDirButton("newcoursedir", "Set parent directory for new course", "Select a parent folder for new course"),
-                                           verbatimTextOutput("newcoursedir", placeholder = TRUE),  # added a placeholder
 
 
-                                           actionButton("createcourse", "Start new course", class = "actionbutton"),
 
-                                           h3('Load existing Course'),
-                                           shinyFiles::shinyDirButton("coursedir", "Find existing course", "Select an existing course folder"),
-                                           verbatimTextOutput("coursedir", placeholder = TRUE),  # added a placeholder
+  navbarPage(title = "quizmanager", id = "topmenu", selected = "gettingstarted",
 
-                                           br(),
-                                           br(),
-                                           br(),
-                                           fluidRow(column(6, ""),
-                                                    column(6, align = "center", actionButton(inputId = 'goto_roster', label = div('Advance to Roster Setup', icon('angle-double-right'))))
-                                                    ),
-                                           br(),
-                                           br()
-
-                                          ),
-                                  tabPanel(title = "Roster", value = "roster",
-                                           h3('Manage student list'),
-                                           downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
-                                           fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
-
-                                           br(),
-                                           br(),
-                                           br(),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_gettingstarted', label = 'Return to Directory Setup', icon = icon('angle-double-left'))),
-                                                    column(6, align = "center", actionButton(inputId = 'goto_quizzes', label = div('Advance to Quizzes Setup', icon('angle-double-right'))))
-                                           ),
-
-                                           br(),
-                                           br()
-
-                                          ),
-                                  tabPanel(title = "Quizzes", value = "quizzes",
-                                           h3('Manage quizzes'),
-                                           downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
-                                           shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx'),
-                                           p('Any quiz with the same file name as the one being added will be overwritten.'),
-                                           shinyFiles::shinyFilesButton("removequiz", label = "Remove quiz", title = "Remove a quiz from the course", multiple = TRUE),
-                                           actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
-                                           downloadButton("getstudentquizzes", "Get zip file with all student quizzes", class = "actionbutton"),
-
-
-                                           br(),
-                                           br(),
-                                           br(),
-                                           h4("Next"),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_roster', label = 'Return to Roster Setup', icon = icon('angle-double-left'))),
-                                                    column(6, align = "center", actionButton(inputId = 'goto_gradelist', label = div('Advance to Gradelist Setup', icon('angle-double-right'))))
-                                           ),
-
-
-                                           br(),
-                                           br()
-
-                                          ),
-                                  tabPanel(title = "Gradelist", value = "gradelist",
-                                           h2('Make grade list'),
-                                           actionButton("creategradelist", "Create grade tracking list", class = "actionbutton"),
-
-                                           br(),
-                                           br(),
-                                           br(),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_quizzes', label = 'Return to Quizzes Setup', icon = icon('angle-double-left'))),
-                                                    column(6, align = "center", actionButton(inputId = 'goto_deploy', label = div('Advance to Deployment', icon('angle-double-right'))))
-                                           ),
-
-                                           br(),
-                                           br()
-
-                                          ),
-                                  tabPanel(title = "Deployment", value = "deploy",
-                                           h2('Deploy course'),
-                                           actionButton("makepackage", "Make zip file for initial deployment", class = "actionbutton"),
-                                           actionButton("updatepackage", "Make zip file for updates", class = "actionbutton"),
-                                           #actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
-
-                                           p(textOutput("warningtext")),
-
-                                           br(),
-                                           br(),
-                                           br(),
-                                           fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_gradelist', label = 'Return to Gradelist Setup', icon = icon('angle-double-left'))),
-                                                    column(6, align = "center", "")
-                                           ),
-
-                                           br(),
-                                           br()
-                                          )
+             tabPanel(title = "Getting Started", value = "gettingstarted",
+                      fluidRow(column(12,
+                                      h2("Basic Information"),
+                                      align = "center"
+                                      )
+                               ),
+                      "quizgrader aims to offer teachers a simple, interactive application to manage a course outside of traditional learning management systems. The main feature are centered around quizzes extending from course set-up, server-based collection of student submissions with automated grading, and summarization / analysis of quiz results (including generation of a gradebook).",
+                      "Keep reading for more information about how to use the quizgrader package or visit the online help documentation @...",
+                      h2("How To"),
+                      h3("Create a New Course"),
+                      " ",
+                      h3("Modify an Existing Course"),
+                      " ",
+                      h3("Deploy the Course to a Server"),
+                      " ",
+                      h3("Analyze the Quiz Results"),
+                      " ",
+                      h3("Other FAQ"),
+                      " "
                       ),
 
 
+             tabPanel(title = "Create New Course", value = "initial_setup",
+                      navlistPanel(id = "initial_setup_submenu", selected = "setup_directory",
+                                   tabPanel(title = "Directory Setup", value = "setup_directory",
+
+                                            h3('Start a new Course'),
+                                            textInput("coursename",label = "Course Name"),
+
+                                            shinyFiles::shinyDirButton("newcoursedir", "Set parent directory for new course", "Select a parent folder for new course"),
+
+                                            verbatimTextOutput("newcoursedir", placeholder = TRUE),  # added a placeholder
+
+
+                                            actionButton("createcourse", "Start new course", class = "actionbutton"),
+
+                                            br(),
+                                            br(),
+                                            br(),
+                                            fluidRow(column(6, ""),
+                                                     column(6, align = "center", actionButton(inputId = 'goto_setup_roster', label = div('Advance to Roster Setup', icon('angle-double-right'))))
+                                            ),
+                                            br(),
+                                            br()
+                                            ), # end setup directory panel
+                                   tabPanel(title = "Roster Setup", value = "setup_roster",
+                                            h3('Manage student list'),
+                                            downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
+                                            fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
+
+                                            br(),
+                                            br(),
+                                            br(),
+                                            fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_setup_directory', label = 'Return to Directory Setup', icon = icon('angle-double-left'))),
+                                                     column(6, align = "center", actionButton(inputId = 'goto_setup_quizzes', label = div('Advance to Quizzes Setup', icon('angle-double-right'))))
+                                            ),
+
+                                            br(),
+                                            br()
+                                            ), # end setup roster panel
+                                   tabPanel(title = "Quizzes Setup", value = "setup_quizzes",
+                                            h3('Manage quizzes'),
+                                            downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
+
+                                            shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx'),
+                                            p('Any quiz with the same file name as the one being added will be overwritten.'),
+
+                                            actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
+                                            downloadButton("getstudentquizzes", "Get zip file with all student quizzes", class = "actionbutton"),
+
+
+                                            br(),
+                                            br(),
+                                            br(),
+                                            h4("Next"),
+                                            fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_setup_roster', label = 'Return to Roster Setup', icon = icon('angle-double-left'))),
+                                                     column(6, align = "center", actionButton(inputId = 'goto_setup_overview', label = div('Advance to Setup Overview', icon('angle-double-right'))))
+                                            ),
+
+
+                                            br(),
+                                            br()
+                                            ), # end setup quizzes panel
+                                   tabPanel(title = "Setup Overview", value = "setup_overview",
+                                            h2('Review Course Structure'),
+                                            actionButton("generate_course_summary", "Generate Course Summary", class = "actionbutton"),
+                                            br(),
+                                            tableOutput("course_summary"),
+
+                                            br(),
+                                            br(),
+                                            br(),
+                                            fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_setup_quizzes', label = 'Return to Quizzes Setup', icon = icon('angle-double-left'))),
+                                                     column(6, align = "center", actionButton(inputId = 'goto_setup_deployment', label = div('Advance to Deployment Setup', icon('angle-double-right'))))
+                                            ),
+
+                                            br(),
+                                            br()
+                                            ), # end setup overview panel
+                                   tabPanel(title = "Deployment", value = "setup_deployment",
+                                            h2('Deploy course'),
+                                            actionButton("makepackage", "Make zip file for initial deployment", class = "actionbutton"),
+
+                                            #actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
+
+                                            p(textOutput("warningtext")),
+
+                                            br(),
+                                            br(),
+                                            br(),
+                                            fluidRow(column(6, align = "center", actionButton(inputId = 'gobackto_setup_overview', label = 'Return to Setup Overview', icon = icon('angle-double-left'))),
+                                                     column(6, align = "center", "")
+                                            ),
+
+                                            br(),
+                                            br()
+                                            ) # end setup deployment panel
+                                   ) # end initial setup nav list
+                      ), # end initial setup panel
 
 
 
+             tabPanel(title = "Manage Existing Course", value = "manage",
+                      navlistPanel(id = "manage_submenu", selected = "specify_directory",
+                                  tabPanel(title = "Directory Setup", value = "specify_directory",
+                                           h3('Load existing Course'),
+                                           # shinyFiles::shinyDirButton("coursedir", "Find existing course", "Select an existing course folder"),
+                                           # verbatimTextOutput("coursedir", placeholder = TRUE)  # added a placeholder
+
+
+                                          ), # end directory specification panel
+
+                                  tabPanel(title = "Roster", value = "roster",
+                                           # h3('Manage student list'),
+                                           # downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
+                                           # fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx')
+
+
+                                          ), # end roster management panel
+
+                                  tabPanel(title = "Quizzes", value = "quizzes",
+                                           # h3('Manage quizzes'),
+                                           # downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
+                                           # shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx'),
+                                           # p('Any quiz with the same file name as the one being added will be overwritten.'),
+                                           # shinyFiles::shinyFilesButton("removequiz", label = "Remove quiz", title = "Remove a quiz from the course", multiple = TRUE),
+                                           # actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
+                                           # downloadButton("getstudentquizzes", "Get zip file with all student quizzes", class = "actionbutton")
 
 
 
-                      fluidRow(
+                                          ), # end quizzes management panel
 
-                        column(12,
-                               actionButton("Exit", "Exit", class="exitbutton")
-                        ),
-                        class = "mainmenurow"
-                      ) #close fluidRow structure for input
+                                  tabPanel(title = "Gradelist", value = "gradelist",
+                                           # h2('Make grade list'),
+                                           # actionButton("creategradelist", "Create grade tracking list", class = "actionbutton")
 
-             ), #close "Manage" tab
+                                          ), # end gradelist panel
+
+                                  tabPanel(title = "Deployment", value = "deploy",
+                                           # h2('Deploy course'),
+                                           # actionButton("makepackage", "Make zip file for initial deployment", class = "actionbutton"),
+                                           # actionButton("updatepackage", "Make zip file for updates", class = "actionbutton"),
+                                           # #actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
+                                           #
+                                           # p(textOutput("warningtext"))
+                                          ) # end deployment panel
+                                  ) # end course management navlist
+                      ), # end course management panel
+
 
              tabPanel("Analyze Submissions",  value = "analyze",
                       h2('Retrieve submissions'),
                       actionButton("retrieve", "Retrieve submissions from shiny server", class = "actionbutton"),
                       h2('Analyze submissions'),
-                      actionButton("analyze", "Analyze submissions", class = "actionbutton"),
-             ) #close "Analyze" tab
-  ), #close NavBarPage
+                      actionButton("analyze", "Analyze submissions", class = "actionbutton")
+                      ), #close "Analyze" tab
+
+            fluidRow(column(12,
+                            actionButton("Exit", "Exit", class="exitbutton")
+                            ),
+                     class = "mainmenurow"
+                     ) #close fluidRow structure for input
+            ), #close NavBarPage
+
+
+
   tagList( hr(),
            p('All text and figures are licensed under a ',
              a("Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.", href="http://creativecommons.org/licenses/by-nc-sa/4.0/", target="_blank"),

@@ -24,6 +24,7 @@ summarize_course <- function(completequizzes_folder)
                                   recursive=FALSE,
                                   full.names = TRUE
                                   )
+  completequiz_files = completequiz_files[-which(grepl("course_summary.*?[.]xlsx$", completequiz_files))]
 
   # read each one and extract quizid, number of questions, due date, number of attempts
   # then, put all summaries into a dataframe
@@ -39,8 +40,20 @@ summarize_course <- function(completequizzes_folder)
                          return(.quiz_summary)
                          }
                        ) %>%
-                bind_rows() %>%
+                dplyr::bind_rows() %>%
                 data.frame()
 
-  return(summary_df)
+
+
+  if(nrow(summary_df)==0){
+    return(paste("Currently, there are no quizzes associated with this course."))
+  }else{
+    return(summary_df)
+  }
+
+
+  writexl::write_xlsx(summary_df, fs::path(completequizzes_folder, "course_summary.xlsx"), col_names = TRUE, format_headers = TRUE)
+
+
+
 }

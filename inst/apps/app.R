@@ -65,6 +65,7 @@ server <- function(input, output) {
             output$statstext <- NULL
             #and table
             output$resulttable <- NULL
+            output$logtable <- NULL
 
     })
 
@@ -80,6 +81,7 @@ server <- function(input, output) {
         output$statstext <- NULL
         #and table
         output$resulttable <- NULL
+        output$logtable <- NULL
 
         #combine all inputs into list for checking
         #make all inputs lower case
@@ -237,16 +239,30 @@ server <- function(input, output) {
         writexl::write_xlsx(submission, submission_filenamepath, col_names = TRUE, format_headers = TRUE)
 
 
-        submission_log <- dplyr::bind_cols(StudentID = input$StudentID,
-                                           QuizID = quizid,
-                                           Attempt = this_attempt,
-                                           Score = score,
-                                           tidyr::pivot_wider(result_table, names_from = "QuestionID", values_from = "Score")
-                                           )
+        new_submission_log <- dplyr::bind_cols(StudentID = input$StudentID,
+                                               QuizID = quizid,
+                                               Attempt = this_attempt,
+                                               Score = score,
+                                               n_Questions = nrow(result_table),
+                                               n_Correct = sum(result_table$Score == "Correct"),
+                                               Submit_Date = Sys.Date()#,
+                                               #tidyr::pivot_wider(result_table, names_from = "QuestionID", values_from = "Score")
+                                               )
 
-        log_filename <- paste("log", input$StudentID, quizid, "attempt", paste0(this_attempt, ".txt"), sep = "_")
-        log_filenamepath = fs::path(studentsubmissions_folder, quizid, log_filename)
-        write.table(submission_log, file = log_filenamepath, sep = '\t', col.names = TRUE, row.names = FALSE, quote = FALSE)
+        new_submission_log <- dplyr::mutate_all(new_submission_log, as.character)
+
+        submissions_log <- quizgrader::read_submissions_log(studentsubmissions_folder)
+
+        submissions_log <- dplyr::bind_rows(submissions_log, new_submission_log)
+
+        submissions_log_filename = paste0("submissions_log_", timestamp, ".xlsx")
+        submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", submissions_log_filename)
+        writexl::write_xlsx(submissions_log, submissions_log_filenamepath, col_names = TRUE, format_headers = TRUE)
+
+
+        # log_filename <- paste("log", input$StudentID, quizid, "attempt", paste0(this_attempt, ".txt"), sep = "_")
+        # log_filenamepath = fs::path(studentsubmissions_folder, quizid, log_filename)
+        # write.table(submission_log, file = log_filenamepath, sep = '\t', col.names = TRUE, row.names = FALSE, quote = FALSE)
 
 
         #####################################
@@ -262,7 +278,7 @@ server <- function(input, output) {
         #####################################
         #display results
         #if no errors occurred during grading, show and record results
-        # output$resulttable <- shiny::renderTable(result_table)
+        output$resulttable <- shiny::renderTable(result_table)
 
         #show a success text
         success_text = paste0("Your submission for quiz ",quizid," has been successfully graded and recorded.")
@@ -275,8 +291,18 @@ server <- function(input, output) {
         #####################################
         #also compute submission stats for student and display
 
-        all_submission_logs <- quizgrader::compile_submission_logs(input$StudentID, studentsubmissions_folder, df_format = "condensed")
-        output$resulttable <- shiny::renderTable(all_submission_logs)
+        log_table <- dplyr::filter(submissions_log, StudentID == input$StudentID)
+        output$logtable <- shiny::renderTable(log_table)
+
+        quiz_stats <- dplyr::filter(dplyr::group_by(log_table, QuizID), Attempt == which.max(Attempt))
+
+        quiz_stats <- dplyr::summarise(dplyr::ungroup(quiz_stats), n_Quizzes = dplyr::n(), Average_Score = mean(as.numeric(Score)))
+
+        stats_text = paste0("You have submitted ", quiz_stats$n_Quizzes, " out of ", length(dir(studentsubmissions_folder))-1, " quizzes and your average score is ",round(quiz_stats$Average_Score,2))
+        output$statstext <- shiny::renderText(stats_text)
+
+        # all_submission_logs <- quizgrader::compile_submission_logs(input$StudentID, studentsubmissions_folder, df_format = "condensed")
+        # output$logtable <- shiny::renderTable(all_submission_logs)
 
 
         #load the latest gradelist which contains the just submitted grade
@@ -315,6 +341,8 @@ ui <- fluidPage(
   tableOutput("resulttable"),
   br(),
   h2(textOutput("resulttext")),
+  br(),
+  tableOutput("logtable"),
   br(),
   h3(textOutput("statstext")),
   br(),
