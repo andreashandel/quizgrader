@@ -29,13 +29,6 @@ library(pkg, character.only = TRUE)
 ```
 
 
-```{r, eval=TRUE, echo=FALSE}
-#Currently not a CRAN package, thus can't include it in DESCRIPTION
-#library('emo')
-```
-
-
-
 ## Overview
 
 This document provides a quick introduction and overview of the **`r pkg`** package, which is a package for managing and administering auto-graded online quizzes.
@@ -43,7 +36,7 @@ This document provides a quick introduction and overview of the **`r pkg`** pack
 Very briefly, here is how it works:
 
 1. You (= instructor) create quizzes as Excel files using a provided template, then deploy online.
-2. You give your students the Excel quiz files (minus the answers `r emo::ji('grin')`).
+2. You give your students the Excel quiz files - minus the answers :).
 3. Students fill out the quiz sheets and upload them using a simple web interface.
 3. Quizzes are auto-graded on upload, grades recorded, students receive immediate feedback.
 4. You retrieve submissions/grades, analyze them and compute final grades.

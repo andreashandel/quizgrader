@@ -9,7 +9,7 @@ check_metadata(metadata, studentlist)
 \arguments{
 \item{metadata}{list containing elements StudentID and Password}
 
-\item{gradelist}{Data frame containing the grade list}
+\item{studentlist}{Data frame containing the student list}
 }
 \value{
 An error message if user input is not valid

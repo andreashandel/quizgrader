@@ -6,7 +6,7 @@
 #' and the submitted information valid
 #'
 #' @param metadata list containing elements StudentID and Password
-#' @param gradelist Data frame containing the grade list
+#' @param studentlist Data frame containing the student list
 #'
 #' @return An error message if user input is not valid
 #' otherwise NULL
