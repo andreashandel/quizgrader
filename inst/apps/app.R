@@ -335,6 +335,7 @@ ui <- fluidPage(
   titlePanel("Quiz grader"),
   textInput("StudentID","Student ID"),
   textInput("Password","Password"),
+  #h3('Quiz submission not yet enabled.'),
   fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
   actionButton("submitbutton", "Submit file", class = "submitbutton"),
   br(),
