@@ -67,26 +67,34 @@ discussions.summary <- discussions %>% group_by(email) %>% summarise(discussions
 
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 
+
+course.summary <- readxl::read_xlsx(fs::path(courselocation, "course_summary.xlsx"))
+studentlist <- quizgrader::read_studentlist(fs::path(courselocation, "studentlists"))
+
+grades.scaffold <- expand.grid(QuizID = course.summary$QuizID, StudentID = studentlist$StudentID)
+
+grades <- full_join(studentlist, full_join(course.summary, grades.scaffold, by = "QuizID"), by = "StudentID")
+
+
 simple.grades <- submissions[, which(
-  names(submissions)%in%c("lastname", "firstname", "email") | 
-    grepl("grade", names(submissions)) | 
-    grepl("\\.n\\.", names(submissions)) | 
-    grepl("_duedate", names(submissions)))]
+  names(submissions)%in%c("Lastname", "Firstname") | 
+    grepl("\\.n\\.", names(submissions)) |
+    grepl("DueDate", names(submissions)))]
 
-quizIDs <- gsub("_grade", "", names(simple.grades)[which(grepl("grade", names(simple.grades)))])
-
+# quizIDs <- gsub("[.]n[.]questions", "", names(simple.grades)[which(grepl("[.]n[.]questions", names(simple.grades)))])
+quizIDs <- course.summary$QuizID
 
 long.data <- list()
 
 for(i in 1:length(quizIDs)){
-  temp <- simple.grades[,c(1:3, which(grepl(quizIDs[i], names(simple.grades))))]
+  temp <- simple.grades[,c(1:2, which(grepl(quizIDs[i], names(simple.grades))))]
   
-  if(ncol(temp)==5){
-    temp[,6] <- c(NA)
-    #temp[,7] <- c(NA)
+  names(temp) <- gsub(paste0(quizIDs[i], "[.]"), "", names(temp))
+  
+  if(ncol(temp)>2){
+    temp$grade <- as.numeric(temp$n.correct) / as.numeric(temp$n.questions) * 100
   }
   
-  names(temp)[4:6] <- c("grade", "n.questions", "n.correct")#"duedate", 
   temp$QuizID <- quizIDs[i]
   
   long.data[[i]] <- temp
@@ -97,14 +105,19 @@ for(i in 1:length(quizIDs)){
 
 
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
-simple.grades <- bind_rows(long.data) #%>% filter(duedate<=Sys.Date())
+simple.grades <- bind_rows(long.data) #%>% filter(DueDate<=Sys.Date())
 
-grades.summary <- simple.grades %>% group_by(lastname, firstname, email) %>% 
+
+
+
+grades.summary <- left_join(grades, simple.grades, by = c("Lastname", "Firstname", "QuizID")) %>% 
   mutate(
-    grade.zeros = ifelse(is.na(grade), 0, grade),
-    n.questions = as.numeric(n.questions), 
-    n.correct = as.numeric(n.correct)
+    grade.zeros = ifelse(is.na(grade), 0, as.numeric(grade)),
+    n.questions = as.numeric(n_Questions), 
+    n.correct = ifelse(is.na(n.correct), 0, as.numeric(n.correct))
     ) %>% 
+  
+  group_by(Lastname, Firstname) %>% 
   
   summarise(
     n.quizzes = n(), 
@@ -119,29 +132,19 @@ grades.summary <- simple.grades %>% group_by(lastname, firstname, email) %>%
   
   mutate(
     n.questions = paste0("TOTQs = ", max(as.numeric(gsub("[^0-9]{1-3}", "", n.questions)), na.rm=TRUE)),
-    by.q.avg = round(100*as.numeric(gsub("[^0-9]{1-3}", "", n.correct))/as.numeric(gsub("[^0-9]{1-3}", "", n.questions)), 2)
-    ) %>%
-  
-  left_join(discussions.summary, by = "email")
+    by.question.avg = round(100*as.numeric(gsub("[^0-9]{1-3}", "", n.correct))/as.numeric(gsub("[^0-9]{1-3}", "", n.questions)), 2)
+    )
 
 
 
 
-simple.grades <- simple.grades %>% mutate(grade = round(grade, 2)) %>% lapply(as.character) %>% bind_rows(grades.summary)
-simple.grades <- simple.grades[order(simple.grades$lastname, simple.grades$firstname),]
-
-# simple.grades[,1:13] <- lapply(simple.grades[,1:13], as.character)
-simple.grades[,1:12] <- lapply(simple.grades[,1:12], as.character)
-
-# simple.grades[nrow(simple.grades)+1,] <- list("LASTNAME", "FIRSTNAME", "EMAIL", "DUEDATE", "GRADE", "N.QUESTIONS", "N.CORRECT", "QUIZID", "N.QUIZZES", "N.SUBMITTED", "N.MISSING", "BY.Q.AVG", "DISCUSSIONS.GRADE")
-
-simple.grades[nrow(simple.grades)+1,] <- list("LASTNAME", "FIRSTNAME", "EMAIL", "GRADE", "N.QUESTIONS", "N.CORRECT", "QUIZID", "N.QUIZZES", "N.SUBMITTED", "N.MISSING", "BY.Q.AVG", "DISCUSSIONS.GRADE")#"DUEDATE", 
+simple.grades <- simple.grades %>% mutate(grade = round(grade, 2)) %>% lapply(as.character) %>% bind_rows(grades.summary) %>% arrange(Lastname, Firstname) %>% mutate_all(~as.character(.))
 
 ```
 
 
 
-## Grades From Classlist
+## Grades
 
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 
@@ -157,7 +160,7 @@ ui <- shinyUI(
 
 server <- shinyServer(function(input, output, session) {
   output$`Class Summary by classlist` <- DT::renderDataTable({
-    return(DT::datatable(grades.summary[,names(grades.summary)[c(1:7, 11)]], class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+    return(DT::datatable(grades.summary, class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
   })
 } 
 )
@@ -166,31 +169,6 @@ shinyApp(ui = ui, server = server, options = list(height = 1500) )
 
 
 ```
-
-## Grades From Submissions (Regraded by Question)
-
-```{r}
-
-
-ui <- shinyUI(
-  fluidPage(
-    verbatimTextOutput("Class Summary from Submissions"),
-    DT::dataTableOutput("Class Summary by submissions")
-  )
-)
-
-server <- shinyServer(function(input, output, session) {
-    output$`Class Summary by submissions` <- DT::renderDataTable({
-    return(DT::datatable(grades.summary[,names(grades.summary)[c(1:6,8:10)]], class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-  })
-} 
-)
-
-
-shinyApp(ui = ui, server = server, options = list(height = 1500) )
-
-```
-
 
 
 
@@ -199,12 +177,14 @@ shinyApp(ui = ui, server = server, options = list(height = 1500) )
 
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
 
+simple.grades <- simple.grades %>% add_row(.before = 1)
+simple.grades[1,] <- as.list(toupper(names(simple.grades)))
 
 ui <- shinyUI(
   fluidPage(
-    selectInput("Student Email","Choose a student email to view grades.",
-                choices = unique(simple.grades$email),
-                selected = "EMAIL"),
+    selectInput("Student Name","Choose a student to view grades.",
+                choices = unique(paste0(simple.grades$Lastname, ", ", simple.grades$Firstname)),
+                selected = "LASTNAME, FIRSTNAME"),
     DT::dataTableOutput("Student Grades")
   )
 )
@@ -214,7 +194,7 @@ server <- shinyServer(function(input, output, session) {
   #   return(simple.grades %>% filter(email == input$`Student Email`) %>% select(lastname, firstname, QuizID, duedate, grade, n.questions, n.correct, by.q.avg, n.quizzes, n.submitted, n.missing))  
   #   })
   reactiveData <- reactive({
-    return(simple.grades %>% filter(email == input$`Student Email`) %>% select(lastname, firstname, QuizID, grade, n.questions, n.correct, by.q.avg, n.quizzes, n.submitted, n.missing))  
+    return(simple.grades %>% filter(paste0(Lastname, ", ", Firstname) == input$`Student Name`) %>% select(Lastname, Firstname, QuizID, grade, n.questions, n.correct, by.q.avg, n.quizzes, n.submitted, n.missing))  
     })
   output$`Student Grades` <- DT::renderDataTable({
     return(DT::datatable(reactiveData(), class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
@@ -226,44 +206,11 @@ shinyApp(ui = ui, server = server, options = list(height = 1500) )
 
 ```
 
-## Discussion Posts
-
-
-
-
-```{r}
-
-ui <- shinyUI(
-  fluidPage(
-    DT::dataTableOutput("Discussion Statistics")
-  )
-)
-
-server <- shinyServer(function(input, output, session) {
-  output$`Discussion Statistics` <- DT::renderDataTable({
-    return(DT::datatable(discussions, class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-  })
-} 
-)
-
-shinyApp(ui = ui, server = server, options = list(height = 1500) )
-
-
-
-```
-
-
-
-
-
-
-
-
 
 # Question Statistics
 
 ```{r, message=FALSE, warning=FALSE, error=FALSE}
-questions <- submissions[,which(grepl("T[0-9]{1,2}R[0-9]{1,2}", names(submissions)) | grepl("TH[0-9]{1,2}M[0-9]{1,2}R[0-9]{1,2}", names(submissions)))]
+questions <- submissions[,which(grepl("q[0-9]{1,2}", names(submissions)))]
 
 questions.summary <- lapply(questions, function(x){return(list(Number.Correct = sum(x=="Correct", na.rm = TRUE), Number.Responses = sum(!is.na(x)),Percentage.Correct = round(sum(x=="Correct", na.rm = TRUE)/sum(!is.na(x))*100, 2)))})
 

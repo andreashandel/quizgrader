@@ -468,6 +468,41 @@ server <- function(input, output, session) {
 
 
 
+#------------------------------------------------------
+# Analysis
+#------------------------------------------------------
+
+
+  #######################################################
+  #start code block that generates analysis summary stats
+  #######################################################
+  observeEvent(input$analyze,{
+
+    msg <- NULL
+    output$summarystats <- NULL
+    if (is.null(courselocation))
+    {
+      msg <- "Please set the course location"
+    } else {
+
+      grades <- quizgrader::calculate_grades(courselocation, input$grades_type, ifelse(input$duedate_filter=="Yes", TRUE, FALSE))
+
+      output$summarystats <- DT::renderDataTable({
+            return(DT::datatable(grades, class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+          })
+
+    }# end outer else statement
+
+    if(!is.null(msg))
+    {
+      showModal(modalDialog(msg, easyClose = FALSE))
+    }
+  }) #end generate_course_summary code block
+
+
+
+
+
 
 
 
@@ -782,7 +817,10 @@ ui <- fluidPage(
                       h2('Retrieve submissions'),
                       actionButton("retrieve", "Retrieve submissions from shiny server", class = "actionbutton"),
                       h2('Analyze submissions'),
-                      actionButton("analyze", "Analyze submissions", class = "actionbutton")
+                      selectInput("grades_type", "Select which analysis to generate", choices = c("overview", "student", "question")),
+                      selectInput("duedate_filter", "Do you want to include only past quizzes?", choices = c("Yes", "No")),
+                      actionButton("analyze", "Analyze submissions", class = "actionbutton"),
+                      DT::dataTableOutput("summarystats")
                       ), #close "Analyze" tab
 
             fluidRow(column(12,

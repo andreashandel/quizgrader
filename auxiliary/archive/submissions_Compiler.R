@@ -59,9 +59,9 @@ submissions <- as_tibble(submissions)
 
 submissions$Submission <- lapply(submissions$Full.Filename, readxl::read_xlsx, col_types = "text", col_names = TRUE)
 
-submissions <- submissions %>% arrange(`Submission Time`) %>% group_by(QuizID) %>% mutate(Attempt = row_number())
+submissions <- submissions %>% arrange(`Submission Time`) %>% group_by(StudentID, QuizID) %>% mutate(Attempt = row_number())
 
-
+submissions <- submissions %>% group_by(StudentID, QuizID) %>% filter(Attempt == max(Attempt))
 
 ## Set-up for grading each submission
 
@@ -74,14 +74,14 @@ collect.Grades <- function(.record){
     dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%
     data.frame()
   .solution <- readxl::read_xlsx(fs::path(courselocation, "completequizzes", paste0(.record$QuizID, "_complete.xlsx")))
-  return(quizgrader::grade_quiz(.submission, .solution))
+  return(list(quizgrader::grade_quiz(.submission, .solution), .solution$DueDate[1]))
 }
 
 
 ## Add grade tables to tibble
 
-submissions$Grade.table <- apply(submissions, 1, collect.Grades)
-
+submissions$Grade.table <- apply(submissions, 1, FUN = function(x){return(collect.Grades(x)[[1]])})
+submissions$DueDate <- apply(submissions, 1, FUN = function(x){return(collect.Grades(x)[[2]])})
 
 
 
@@ -105,11 +105,15 @@ widen.Grades <- function(.single.record){
   return(gt)
 }
 
+
+
+
+
 #### Wrap previous function to apply to all records of same quizID, prepare for join
 wrapper.Widen.Grades <- function(.records){
   temp <- apply(.records, 1, widen.Grades)
   .records <- bind_cols(.records, bind_rows(temp))
-  names(.records)[which(!names(.records)%in%"Email")] <- paste(.records$QuizID[1], names(.records)[which(!names(.records)%in%"Email")], sep = ".")
+  names(.records)[which(!names(.records)%in%"StudentID")] <- paste(.records$QuizID[1], names(.records)[which(!names(.records)%in%"StudentID")], sep = ".")
   return(.records)
 }
 
@@ -117,26 +121,17 @@ wrapper.Widen.Grades <- function(.records){
 submissions.list.by.quiz <- lapply(submissions.list.by.quiz, wrapper.Widen.Grades)
 
 
-### Read in classlist
+### Read in studentlist
 
-# classlist <- read.delim(file.path("classlist", "definite_classlist.tsv"))
-# classlist <- read.csv(file.path("classlist", "studentroster.csv"))
-classlist.file <- list.files(file.path("classlist"), pattern = "classlist", full.names = TRUE)[which.max(file.info(list.files(file.path("classlist"), pattern = "classlist", full.names = TRUE))$ctime)]
-classlist <- read.delim(classlist.file)
-classlist$Email <- classlist$email
+studentlist <- quizgrader::read_studentlist(fs::path(courselocation, "studentlists"))
 
 
 ### Join class list with graded submissions
 for(i in 1:length(submissions.list.by.quiz)){
-  classlist <- full_join(classlist, mutate(submissions.list.by.quiz[[i]], Email = tolower(Email)), by="Email")
+  studentlist <- full_join(studentlist, submissions.list.by.quiz[[i]], by="StudentID")
 }
 
 
-submissions <- classlist %>% filter(!lastname%in%c("dailey1", "dailey2", "handel1", "handel2"))
-
-save(submissions, file = "submissions.rdata")
-
-rm("classlist", "classlist.file", "collect.Grades", "decompose.Filename", "filenames.decomposed", "filenames.decomposed2", "grade_file", "i", "submissions", "submissions.files", "submissions.folder", "submissions.list.by.quiz", "widen.Grades", "wrapper.Widen.Grades")
 
 
 
