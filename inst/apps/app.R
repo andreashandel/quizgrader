@@ -278,7 +278,7 @@ server <- function(input, output) {
         #####################################
         #display results
         #if no errors occurred during grading, show and record results
-        output$resulttable <- shiny::renderTable(result_table)
+        output$resulttable <- shiny::renderTable(cbind(result_table, Feedback = solution$Feedback))
 
         #show a success text
         success_text = paste0("Your submission for quiz ",quizid," has been successfully graded and recorded.")
