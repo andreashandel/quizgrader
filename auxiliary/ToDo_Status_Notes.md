@@ -1,21 +1,20 @@
 # Main importance
 
-* Continue transitioning structure away from gradelist.
-  + Most (if not all) dependent functions are redirected to studentlist. Need to verify.
-  + Incorporate summarize_course.R into quizmanager.R app.
-  + Use generated course summary (not incorporated) and compile_submission_logs.R (incorporated) to compute_student_stats.R upon submission in app.R
-
-* Trial compile_submission_logs.R for course analysis purposes in quizmanager.R app.
+* Analysis functionality
+  + adapt old code for compiling gradelists (now logs) and re-grading all submissions
+    - how to have a list of included students / quizzes (students via latest student list; figure out quiz deletion to solve quiz analysis)
 
 * Get grading app to work using the self-hosted shiny server setup.
+  + currently (01 July 2021) works (make note that permissions needed to be changed after initial deployment to allow write (maybe more) for app)
+  + investigate ShinyApps server deployment
 
 * Figure out and implement setup for quiz/course maintenance while course is running.
+  + establish *idealized* workflow scenario (feeds into next)
 
 * Keep updating vignettes.
 
-* UI alterations
-  + Friendlier UI with built-in walkthrough. May play with CSS for navbarPage().
-  + Separation of "Creating Course", "Modifying Course", "Analysis"?
+* check_studentlist()
+  + find where used / incorporate it in workflow
 
 
 
@@ -23,11 +22,14 @@
 # Medium importance
 
 * Get quiz deletion to work in quizmanager.
+  + ignore.txt utility? or reference completequizzes directory? for to-date quiz list
 
 * Add code that creates subfolders in studentsubmissions for each quiz. Should either happen when grade tracking list is created or during deployment package. 
   + Subfolders are created when grade tracking list is created. Also, submissions are placed into quizid subfolder when submitted. **Need to make sure this doesn't overwrite files once class is in session.**
 
-
+* UI alterations
+  + Friendlier UI with built-in walkthrough. May play with CSS for navbarPage().
+  + Separation of "Creating Course", "Modifying Course", "Analysis"?
 
 
 
@@ -38,8 +40,10 @@
 * Need to harmonize quizgrader and the solution files from DSAIDE and DSAIRM
 
 * Regrade functionality?
+  + could just be built into the quiz analysis section of quizmanager.R rather than updating log file (would be a pain)
 
-
+* Course summaries (studentlist, quizlist, overview?)
+  + print / download schedule document?
 
 
 
@@ -93,3 +97,10 @@ look for implementation of check_studentlist.R
 update docs for developers file with structure, descriptions, ...
 
 useful to have packaging on server side?
+
+
+## 30 June 2021
+
+Delete quiz functionality during initial set-up versus post-doc
+
+Update notes / documentation to be able to pick back up quickly

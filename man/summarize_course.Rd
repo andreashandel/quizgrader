@@ -4,10 +4,10 @@
 \alias{summarize_course}
 \title{Generate a summary of all quizzes in the course}
 \usage{
-summarize_course(completequizzes_folder)
+summarize_course(courselocation)
 }
 \arguments{
-\item{completequizzes_folder}{folder where complete quizzes are saved}
+\item{courselocation}{parent folder for all course directories}
 }
 \value{
 If things went well, a dataframe containing a summary of all quizzes.

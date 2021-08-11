@@ -89,15 +89,21 @@ server <- function(input, output, session) {
       #run create_course function to make new folders and populate with files for the course
       errorlist <- quizgrader::create_course(isolate(input$coursename), isolate(newcoursedir))
       msg <- errorlist$message #message to display showing if things worked or not
-    }
-    if (errorlist$status == 0) #if things worked well, assign directory to global variable
-    {
+
+      if (errorlist$status == 0) #if things worked well, assign directory to global variable
+      {
       #save course folder to global variable
       courselocation <<- fs::path(isolate(newcoursedir), isolate(input$coursename))
       #show the directory to the new course
       output$coursedir <- renderText(as.character(courselocation))
-
+      }
     }
+
+    # if (exists(errorlist))
+    # {
+    #
+    # }
+
     showModal(modalDialog(msg, easyClose = FALSE))
   })
 
@@ -147,6 +153,12 @@ server <- function(input, output, session) {
     {
       msg <- "Please set the course location"
       shinyjs::reset(id  = "addstudentlist")
+    }
+
+    if (is.null(msg))
+    {
+      studentdf <- readxl::read_xlsx(input$addstudentlist$datapath, col_types = "text", col_names = TRUE)
+      msg <- quizgrader::check_studentlist(studentdf)
     }
 
     if (is.null(msg)) #if no prior error, try to create course
@@ -209,20 +221,61 @@ server <- function(input, output, session) {
 
     if (is.null(msg)) #if no prior error, try to open quiz file, then copy
     {
-      # Load quiz and check that is in the required format
-      quizdf <- readxl::read_excel(input$addquiz$datapath, col_types = "text", col_names = TRUE)
-      msg <- check_quiz(quizdf)
-      if (is.null(msg)) #if no problem occurred, try copying
+
+      successfully_added <- c()
+      unsuccessfully_added <- c()
+
+      # Loop over quizzes to add
+      for(quiz_i in seq_along(input$addquiz$name)){
+
+        # Load quiz and check that is in the required format
+        quizdf <- readxl::read_excel(input$addquiz$datapath[quiz_i], col_types = "text", col_names = TRUE)
+        msg <- check_quiz(quizdf)
+
+        if (!is.null(msg)) # if returned error message, log it as description list: filename = term, error message = description
+        {
+          unsuccessfully_added <- c(unsuccessfully_added, paste0("<dt>", input$addquiz$name[quiz_i], "</dt><dd>- ", msg, "</dd>"))
+        } # end if logging error message
+
+        if (is.null(msg)) #if no problem occurred, try copying
+        {
+          #find path to course folder
+          newname = paste0(quizdf$QuizID[1],'_complete.xlsx')
+          new_path = fs::path(courselocation,"completequizzes",newname)
+          #copy renamed file to completequiz folder
+          fs::file_copy(path = input$addquiz$datapath[quiz_i], new_path = new_path, overwrite = TRUE)
+          # msg <- paste0("quiz has been saved to ", new_path)
+          successfully_added <- c(successfully_added, input$addquiz$name[quiz_i])
+        }# end if check worked, copy file
+
+
+
+      } # end loop for adding quizzes
+
+
+      # Aggregate messages with HTML unordered lists, description lists for error messages with unsuccessfully loaded quizzes
+      if (is.null(unsuccessfully_added))
       {
-        #find path to course folder
-        newname = paste0(quizdf$QuizID[1],'_complete.xlsx')
-        new_path = fs::path(courselocation,"completequizzes",newname)
-        #copy renamed file to completequiz folder
-        fs::file_copy(path = input$addquiz$datapath, new_path = new_path, overwrite = TRUE)
-        msg <- paste0("quiz has been saved to ", new_path)
-      } #if check worked, copy file
-    } #end if for
-    showModal(modalDialog(msg, easyClose = FALSE))
+        msg <- paste0("Quizzes successfully added:<br><ul><li>", paste(successfully_added, collapse = "</li><li>"), "</li></ul>")
+      } else
+      {
+        if (is.null(successfully_added))
+        {
+          msg <- paste0("Quizzes unsuccessfully added:<br><dl><ul><li>", paste(unsuccessfully_added, collapse = "</li><li>"), "</li></ul></dl>")
+        } else
+        {
+          msg <- paste0("Quizzes successfully added:<br><ul><li>", paste(successfully_added, collapse = "</li><li>"), "</li></ul>",
+                        "<br>",
+                        "Quizzes unsuccessfully added:<br><dl><ul><li>", paste(unsuccessfully_added, collapse = "</li><li>"), "</li></ul></dl>")
+        }
+      }
+
+
+
+    } #end if for attempting quiz add
+
+    # result message, wrapped in HTML for lists
+    showModal(modalDialog(HTML(msg), easyClose = FALSE))
   })
 
 
@@ -318,24 +371,39 @@ server <- function(input, output, session) {
   #start code block that removes quizzes from course
   #######################################################
 
-  observeEvent(input$removequiz,{
+
+
+
+  observeEvent(input$deletequiz,{
+
+    msg <- NULL
 
     if (is.null(courselocation)) #not sure why integer, but that's how the example is
     {
       msg <- "Please set the course location"
-      shinyjs::reset(id  = "removequiz")
-    } else {
-      volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
-      shinyFiles::shinyFileChoose(input, "removequiz", roots = volumes, session = session)
-      deletefile <- shinyFiles::parseFilePaths(volumes, input$removequiz) #save course folder to global variable
-      #file.remove(deletefile)
-      browser()
-      msg <- paste0("this quiz has been removed:", deletefile)
+      shinyjs::reset(id  = "deletequiz")
+
+      showModal(modalDialog(HTML(msg), easyClose = FALSE))
     }
-    showModal(modalDialog(msg, easyClose = FALSE))
+    if (is.null(msg))
+    {
+      volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
+
+      shinyFiles::shinyFileChoose(input, 'deletequiz', roots=c(Coursefolder=fs::path(courselocation, "completequizzes")), filetypes=c('', 'xlsx'),
+                                  defaultPath='', defaultRoot='Coursefolder')
+
+      deletefile <- shinyFiles::parseFilePaths(volumes, input$deletequiz) #save course folder to global variable
+      file.remove(deletefile$datapath)
+      msg <- paste0("Removed:<br><ul><li>", paste0(deletefile$name, collapse = "</li><li>"), "</li></ul>")
+
+
+      if(nrow(deletefile)!=0){
+        showModal(modalDialog(HTML(msg), easyClose = FALSE))
+      }
+
+    }
+
   })
-
-
 
 
 
@@ -380,21 +448,19 @@ server <- function(input, output, session) {
       msg <- "Please set the course location"
     } else {
 
-      msg <- quizgrader::summarize_course(fs::path(courselocation, "completequizzes"))
+      msg <- quizgrader::summarize_course(courselocation)
 
-      if (!is.null(msg)) #this means it didn't work
+      if (is.null(msg))
       {
-
-
-        output$course_summary <- renderTable(temp)
-      } else {
-
+        output$studentlist_summary <- renderText(paste0("There are currently ", nrow(quizgrader::read_studentlist(fs::path(courselocation, "studentlists"))), " students enrolled in your course."))
+        output$quiz_summary <- renderTable(readxl::read_xlsx(fs::path(courselocation, "course_summary.xlsx")))
       }
-
-
     } #end outer else statement
 
-    showModal(modalDialog(msg, easyClose = FALSE))
+    if(!is.null(msg))
+    {
+      showModal(modalDialog(msg, easyClose = FALSE))
+    }
   }) #end generate_course_summary code block
 
 
@@ -547,7 +613,7 @@ ui <- fluidPage(
                       ),
 
 
-             tabPanel(title = "Create New Course", value = "initial_setup",
+             tabPanel(title = "Course Setup", value = "initial_setup",
                       navlistPanel(id = "initial_setup_submenu", selected = "setup_directory",
                                    tabPanel(title = "Directory Setup", value = "setup_directory",
 
@@ -560,6 +626,11 @@ ui <- fluidPage(
 
 
                                             actionButton("createcourse", "Start new course", class = "actionbutton"),
+
+
+                                            h3('Load existing Course'),
+                                            shinyFiles::shinyDirButton("coursedir", "Find existing course", "Select an existing course folder"),
+                                            verbatimTextOutput("coursedir", placeholder = TRUE),  # added a placeholder
 
                                             br(),
                                             br(),
@@ -589,8 +660,18 @@ ui <- fluidPage(
                                             h3('Manage quizzes'),
                                             downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
 
-                                            shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx'),
-                                            p('Any quiz with the same file name as the one being added will be overwritten.'),
+                                            shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx', multiple = TRUE),
+
+
+                                            'Any quiz with the same file name as the one being added will be overwritten.',
+
+
+                                            # shiny::fileInput("deletequiz", label = "", buttonLabel = "Remove a quiz from the course", accept = '.xlsx', multiple = TRUE),
+
+
+                                            shinyFiles::shinyFilesButton("deletequiz", label = "Remove quiz", title = "Remove a quiz from the course", multiple = TRUE),
+                                            # actionButton("deletequiz", "Delete a quiz", class = "actionbutton"),
+                                            br(),
 
                                             actionButton("createstudentquizzes", "Create student quiz files", class = "actionbutton"),
                                             downloadButton("getstudentquizzes", "Get zip file with all student quizzes", class = "actionbutton"),
@@ -612,7 +693,8 @@ ui <- fluidPage(
                                             h2('Review Course Structure'),
                                             actionButton("generate_course_summary", "Generate Course Summary", class = "actionbutton"),
                                             br(),
-                                            tableOutput("course_summary"),
+                                            textOutput("studentlist_summary"),
+                                            tableOutput("quiz_summary"),
 
                                             br(),
                                             br(),
