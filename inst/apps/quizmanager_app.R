@@ -153,8 +153,9 @@ server <- function(input, output, session) {
       studentdf <- dplyr::mutate_all(studentdf, .funs=trimws)
 
       #add time stamp to filename
-      timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
-      filename = paste0("studentlist_",timestamp,'.xlsx')
+      #timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+      #filename = paste0("studentlist_",timestamp,'.xlsx')
+      filename = "studentlist.xlsx"
 
       new_path = fs::path(courselocation, 'studentlists', filename)
 
@@ -236,9 +237,6 @@ server <- function(input, output, session) {
           # msg <- paste0("quiz has been saved to ", new_path)
           successfully_added <- c(successfully_added, input$addquiz$name[quiz_i])
         }# end if check worked, copy file
-
-
-
       } # end loop for adding quizzes
 
 
@@ -280,32 +278,27 @@ server <- function(input, output, session) {
   #######################################################
   observeEvent(input$generate_course_summary,{
 
-    msg <- NULL
+    ret <- NULL
 
     if (is.null(courselocation))
     {
-      msg <- "Please set the course location"
+      ret <- "Please set the course location"
     } else {
 
-      msg <- quizgrader::summarize_course(courselocation)
+      ret <- quizgrader::summarize_course(courselocation)
 
-      if (is.null(msg))
+      # this means it should have worked
+      if (is.list(ret))
       {
-        #load student list
-        listfiles <- fs::dir_info(fs::path(courselocation,"studentlists"))
-        #load the most recent one, which is the one to be used
-        filenr = which.max(listfiles$modification_time) #find most recently changed file
-        studentdf <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
-        nstudents = nrow(studentdf)
 
-        output$studentlist_summary <- shiny::renderText(paste0("There are currently ", nstudents, " students enrolled in your course."))
-        output$quiz_summary <- shiny::renderTable(readxl::read_xlsx(fs::path(courselocation, "course_summary.xlsx")), digits = 0)
+        output$studentlist_summary <- shiny::renderText(paste0("There are currently ", ret$nstudents, " students enrolled in your course."))
+        output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
       }
-    } #end outer else statement
+    } #end else statement
 
-    if(!is.null(msg))
+    if(!is.list(ret)) #if no list returned, it means it's an error message
     {
-      showModal(modalDialog(msg, easyClose = FALSE))
+      showModal(modalDialog(ret, easyClose = FALSE))
     }
   }) #end generate_course_summary code block
 

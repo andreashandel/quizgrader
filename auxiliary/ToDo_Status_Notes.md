@@ -2,6 +2,9 @@
 
 * Do the "advance" buttons at the bottom do anything the sidebar doesn't do?
 
+* Make it such that one can only use the buttons below directory setup if a new course is created or a valid course has been loaded.
+
+
 * "Generate course summary" throws an error message if only a quiz and no roster is added. (should work, just indicate that no roster has been added yet.)
 
 * Deploy course works even if no student roster is present. That should not be the case. When clicking deploy course, everything should be checked again and zip file only created if everything is ok. I started adding code to create_serverpackage.R for that.

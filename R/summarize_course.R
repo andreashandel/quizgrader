@@ -4,8 +4,8 @@
 #'
 #' @param courselocation parent folder for all course directories
 #'
-#' @return
-#' If things went well, a dataframe containing a summary of all quizzes.
+#' @return ret a list
+#' If things went well, a list containing a summary of all quizzes.
 #' Otherwise an error message is returned.
 #' @export
 
@@ -17,37 +17,43 @@
 
 summarize_course <- function(courselocation)
 {
-
-  # identify quiz files
-  completequiz_files = list.files(path = fs::path(courselocation, "completequizzes"),
-                                  pattern = "\\.xlsx$",
-                                  recursive=FALSE,
-                                  full.names = TRUE
-                                  )
-  completequiz_files = completequiz_files[which(!grepl("course_summary.*?[.]xlsx$", completequiz_files))]
-
-  # read each one and extract quizid, number of questions, due date, number of attempts
-  # then, put all summaries into a dataframe
-  summary_df <- lapply(completequiz_files,
-                       function(.file)
-                         {
-                         .quiz <- readxl::read_xlsx(.file, col_types = "text")
-                         .quiz_summary <- data.frame(QuizID = .quiz$QuizID[1],
-                                                     n_Questions = round(nrow(.quiz),0),
-                                                     DueDate = .quiz$DueDate[1],
-                                                     Attempts = .quiz$Attempts[1]
-                                                     )
-                         return(.quiz_summary)
-                         }
-                       )
-
-  summary_df <- data.frame(dplyr::arrange(dplyr::bind_rows(summary_df), DueDate))
-
-  if(nrow(summary_df)==0){
-    return(paste("Currently, there are no quizzes associated with this course."))
-  }else{
-    writexl::write_xlsx(summary_df, fs::path(courselocation, "course_summary.xlsx"), col_names = TRUE, format_headers = TRUE)
-    return(NULL)
+  #load student list
+  studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlists"))
+  if (length(studentlistfile)>0)
+  {
+    studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
+    nstudents = nrow(studentdf)
+  } else {
+    nstudents = 0
   }
+
+
+  # get names of all complete quiz files
+  completequiz_files = fs::dir_ls(path = fs::path(courselocation, "completequizzes"), glob = "*.xlsx")
+  if (length(completequiz_files)>0)
+  {
+    # read each one and extract quizid, number of questions, due date, number of attempts
+    # then, put all summaries into a dataframe
+    summary_df <- lapply(completequiz_files,
+                         function(.file)
+                           {
+                           .quiz <- readxl::read_xlsx(.file, col_types = "text")
+                           .quiz_summary <- data.frame(QuizID = .quiz$QuizID[1],
+                                                       n_Questions = round(nrow(.quiz),0),
+                                                       DueDate = .quiz$DueDate[1],
+                                                       Attempts = .quiz$Attempts[1]
+                                                       )
+                           return(.quiz_summary)
+                           }
+                         )
+
+    quizdf <- data.frame(dplyr::arrange(dplyr::bind_rows(summary_df), DueDate))
+  } else {
+    quizdf = "No quizzes exist"
+  }
+
+  ret = list(nstudents = nstudents, quizdf = quizdf)
+
+  return(ret)
 
 }

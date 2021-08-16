@@ -85,12 +85,11 @@ server <- function(input, output) {
       output$historytable <- NULL
 
         #combine all inputs into list for checking
-        #make all inputs lower case
+        #make all inputs lower case and trim any white space
         #note that list entries need this specific capitalization
         metadata = list()
-        metadata$StudentID = tolower(input$StudentID)
-        metadata$Password = tolower(input$Password)
-
+        metadata$StudentID = trimws(tolower(input$StudentID))
+        metadata$Password = trimws(tolower(input$Password))
 
         #read gradelist every time submit button is pressed to make sure it's the latest version
         # gradelist = quizgrader::read_gradelist(gradelists_folder)

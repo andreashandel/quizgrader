@@ -10,7 +10,8 @@ summarize_course(courselocation)
 \item{courselocation}{parent folder for all course directories}
 }
 \value{
-If things went well, a dataframe containing a summary of all quizzes.
+ret a list
+If things went well, a list containing a summary of all quizzes.
 Otherwise an error message is returned.
 }
 \description{

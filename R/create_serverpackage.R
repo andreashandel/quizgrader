@@ -32,12 +32,8 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     #first, check that all documents are correct
     ############################################
     # check roster
-    #get all student list files
-    listfiles <- fs::dir_info(fs::path(courselocation,"studentlists"))
-    #load the most recent one, which is the one to be used
-
-    filenr = which.max(listfiles$modification_time) #find most recently changed file
-    studentdf <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
+    studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlists"))
+    studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
     msg <- quizgrader::check_studentlist(studentdf)
     if (!is.null(msg))
     {
@@ -64,6 +60,8 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     }
 
 
+
+
     ######################################################################
     #if all the checks above run ok, continue to make the server package
     ######################################################################
@@ -77,7 +75,8 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
                                     mode = "cherry-pick",
                                     recurse = TRUE, include_directories = TRUE)
 
-    #add studentlists folder and contents
+    #add studentlist folder and contents
+    #also adds empty sub-folders for student submissions for each quiz to keep things more organized
     zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentlists"),
                     mode = "cherry-pick",
                     recurse = TRUE, include_directories = TRUE)
