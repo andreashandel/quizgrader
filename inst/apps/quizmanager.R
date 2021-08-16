@@ -4,9 +4,8 @@
 # It helps both in preparing the quizzes and analyzing student submissions
 ######################################################
 
-
-library('magrittr') #explicitly load package so we can use pipe without package reference
-
+#for debugging/manual fiddling
+#courselocation <- ("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 
 ##############################################
 #Set up some variables, define all as global (the <<- notation)
@@ -98,11 +97,6 @@ server <- function(input, output, session) {
       output$coursedir <- renderText(as.character(courselocation))
       }
     }
-
-    # if (exists(errorlist))
-    # {
-    #
-    # }
 
     showModal(modalDialog(msg, easyClose = FALSE))
   })
@@ -484,17 +478,6 @@ server <- function(input, output, session) {
       showModal(modalDialog(msg, easyClose = FALSE))
     }
   }) #end generate_course_summary code block
-
-
-
-
-
-
-
-
-
-
-
 
 
 

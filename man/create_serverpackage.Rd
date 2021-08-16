@@ -12,7 +12,7 @@ create_serverpackage(courselocation, newpackage = TRUE)
 \item{newpackage}{If true, all files needed for initial setup are copied, otherwise only those needed for updates}
 }
 \value{
-errormsg Null if quiz generation was successful,
+msg Null if quiz generation was successful,
 otherwise contains an error message
 }
 \description{

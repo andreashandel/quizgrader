@@ -5,7 +5,6 @@
 ######################################################
 
 library('quizgrader')
-library('magrittr') #explicitly load package so we can use pipe without package reference
 
 #######################################################
 #general setup
@@ -61,11 +60,12 @@ server <- function(input, output) {
     observeEvent(input$loadfile, {
             shinyjs::enable(id = "submitbutton")
             #remove any previous submission text
-            output$resulttext <- NULL
-            output$statstext <- NULL
+            output$currenttext <- NULL
+            output$historytext <- NULL
+            output$warningtext <- NULL
             #and table
-            output$resulttable <- NULL
-            output$logtable <- NULL
+            output$currenttable <- NULL
+            output$historytable <- NULL
 
     })
 
@@ -76,12 +76,13 @@ server <- function(input, output) {
     #######################################################
     observeEvent(input$submitbutton, {
 
-        #remove any previous submission text
-        output$resulttext <- NULL
-        output$statstext <- NULL
-        #and table
-        output$resulttable <- NULL
-        output$logtable <- NULL
+      #remove any previous submission text
+      output$currenttext <- NULL
+      output$historytext <- NULL
+      output$warningtext <- NULL
+      #and table
+      output$currenttable <- NULL
+      output$historytable <- NULL
 
         #combine all inputs into list for checking
         #make all inputs lower case
@@ -89,6 +90,7 @@ server <- function(input, output) {
         metadata = list()
         metadata$StudentID = tolower(input$StudentID)
         metadata$Password = tolower(input$Password)
+
 
         #read gradelist every time submit button is pressed to make sure it's the latest version
         # gradelist = quizgrader::read_gradelist(gradelists_folder)
@@ -134,15 +136,11 @@ server <- function(input, output) {
         #also make a data frame instead of tibble
         #this should work on any excel file (even if student submits a non-quiz)
         #therefore do this before quiz format check
-        solution <- solution_raw %>%
-          dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%  #don't want NA, want empty string for consistentcy
-          data.frame()
-
+        #don't want NA, want empty string for consistentcy
+        solution <- data.frame(dplyr::mutate_all(solution_raw, ~ tidyr::replace_na(.x, "")))
 
 
         #check due date and check attempts
-
-
 
         if (Sys.Date() > solution$DueDate[1]) #if this is true, it means the due date has passed
         {
@@ -151,20 +149,21 @@ server <- function(input, output) {
           return()
         }
 
+        n_attempts <- length(list.files(path = fs::path(studentsubmissions_folder, quizid),
+                                      pattern = paste0(input$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
+                                     )
+                          )
 
-
-        n_attempts <- length(
-                                list.files(path = fs::path(studentsubmissions_folder, quizid),
-                                           pattern = paste0(input$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
-                                           )
-                                )
-
-
-        if (n_attempts >= solution$Attempts[1]) #if this is true, it means the due date has passed
+        #a bit of extra code to allow some users (teacher/testers) to submit as many times as they want
+        #if not wanted, disable/uncomment
+        if ( !(metadata$StudentID %in% c("ahandel@uga.edu","daileyco@uga.edu")))
         {
-          errormsg = "You have already submitted the maximum number of attempts."
-          show_error(errormsg)
-          return()
+          if (n_attempts >= solution$Attempts[1]) #if this is true, it means the due date has passed
+          {
+            errormsg = "You have already submitted the maximum number of attempts."
+            show_error(errormsg)
+            return()
+          }
         }
 
         this_attempt <- n_attempts + 1
@@ -188,12 +187,10 @@ server <- function(input, output) {
         #also make a data frame instead of tibble
         #this should work on any excel file (even if student submits a non-quiz)
         #therefore do this before quiz format check
-        submission <- submission_original %>%
-          dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%
-          data.frame()
-
-
-
+        #submission <- submission_original %>%
+        #  dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%
+        #  data.frame()
+        submission <- data.frame(dplyr::mutate_all(submission_original, ~ tidyr::replace_na(.x, "")))
 
 
 
@@ -207,8 +204,6 @@ server <- function(input, output) {
           show_error(filecheck)
           return()
         }
-
-
 
 
 
@@ -278,31 +273,26 @@ server <- function(input, output) {
         #####################################
         #display results
         #if no errors occurred during grading, show and record results
-        output$resulttable <- shiny::renderTable(cbind(result_table, Feedback = solution$Feedback))
+        output$currenttable <- shiny::renderTable(cbind(result_table, Feedback = solution$Feedback))
 
         #show a success text
-        success_text = paste0("Your submission for quiz ",quizid," has been successfully graded and recorded.")
-        output$resulttext <- renderText(success_text)
-
-
-
+        success_text = paste0("Your submission for quiz ",quizid," has been successfully graded and recorded. \n The table below shows detailed feedback for each question.")
+        output$currenttext <- renderText(success_text)
 
 
         #####################################
         #also compute submission stats for student and display
 
         log_table <- dplyr::filter(submissions_log, StudentID == input$StudentID)
-        output$logtable <- shiny::renderTable(log_table)
+        output$historytable <- shiny::renderTable(log_table, digits = 1)
 
         quiz_stats <- dplyr::filter(dplyr::group_by(log_table, QuizID), Attempt == which.max(Attempt))
 
         quiz_stats <- dplyr::summarise(dplyr::ungroup(quiz_stats), n_Quizzes = dplyr::n(), Average_Score = mean(as.numeric(Score)))
 
-        stats_text = paste0("You have submitted ", quiz_stats$n_Quizzes, " out of ", length(dir(studentsubmissions_folder))-1, " quizzes and your average score is ",round(quiz_stats$Average_Score,2))
-        output$statstext <- shiny::renderText(stats_text)
+        historytext = "The table below shows your complete quiz submission history."
+        output$historytext <- shiny::renderText(historytext)
 
-        # all_submission_logs <- quizgrader::compile_submission_logs(input$StudentID, studentsubmissions_folder, df_format = "condensed")
-        # output$logtable <- shiny::renderTable(all_submission_logs)
 
 
         #load the latest gradelist which contains the just submitted grade
@@ -339,15 +329,15 @@ ui <- fluidPage(
   fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
   actionButton("submitbutton", "Submit file", class = "submitbutton"),
   br(),
-  tableOutput("resulttable"),
+  h3(textOutput("currenttext")),
   br(),
-  h2(textOutput("resulttext")),
+  tableOutput("currenttable"),
   br(),
-  tableOutput("logtable"),
+  h3(textOutput("historytext")),
   br(),
-  h3(textOutput("statstext")),
+  tableOutput("historytable"),
   br(),
-  p(textOutput("warningtext"))
+  h3(textOutput("warningtext"))
 )
 
 

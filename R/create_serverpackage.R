@@ -7,7 +7,7 @@
 #'
 #' @param courselocation Path to main course directory
 #' @param newpackage If true, all files needed for initial setup are copied, otherwise only those needed for updates
-#' @return errormsg Null if quiz generation was successful,
+#' @return msg Null if quiz generation was successful,
 #' otherwise contains an error message
 #' @export
 
@@ -18,7 +18,55 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
 {
 
     #error message if things don't work, otherwise will remain NULL
-    errormsg <- NULL
+    msg <- NULL
+
+    #check that course location exits is performed in calling function quizmanager.R
+    #but we do it again here for those times when a user doesn't go through the shiny interface
+    if (is.null(courselocation))
+    {
+        msg <- "Please set the course location"
+        return(msg)
+    }
+
+    ###########################################
+    #first, check that all documents are correct
+    ############################################
+    # check roster
+    #get all student list files
+    listfiles <- fs::dir_info(fs::path(courselocation,"studentlists"))
+    #load the most recent one, which is the one to be used
+
+    filenr = which.max(listfiles$modification_time) #find most recently changed file
+    studentdf <- readxl::read_xlsx(listfiles[filenr]$path, col_types = "text", col_names = TRUE)
+    msg <- quizgrader::check_studentlist(studentdf)
+    if (!is.null(msg))
+    {
+        return(msg) #something didn't go right when checking student list/roster, return with error message
+    }
+    #check all quizzes
+    listfiles <- fs::dir_ls(fs::path(courselocation,"completequizzes"))
+    for (nn in 1:length(listfiles))
+    {
+        # Load each quiz and check that is in the required format
+        quizdf <- readxl::read_excel(listfiles[nn], col_types = "text", col_names = TRUE)
+        msg <- check_quiz(quizdf)
+        if (!is.null(msg))
+        {
+            return(msg) #something didn't go right when checking a quiz, return with error message
+        }
+    }
+
+    #also, recreate fresh student quiz docs
+    msg <- quizgrader::create_student_quizzes(courselocation)
+    if (!is.null(msg))
+    {
+        return(msg) #something didn't go right when checking quizzes
+    }
+
+
+    ######################################################################
+    #if all the checks above run ok, continue to make the server package
+    ######################################################################
 
     #create zip file of all files and folders for deployment
     #place zip file in top directory of course
@@ -28,10 +76,6 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     zip::zip(zipfile = zipfilename, files = fs::path(courselocation,"completequizzes"),
                                     mode = "cherry-pick",
                                     recurse = TRUE, include_directories = TRUE)
-    # #add gradelists folder and contents
-    # zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"gradelists"),
-    #                 mode = "cherry-pick",
-    #                 recurse = TRUE, include_directories = TRUE)
 
     #add studentlists folder and contents
     zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentlists"),
@@ -58,7 +102,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
 
 
     #if things worked ok, return NULL
-    return(errormsg)
+    return(msg)
 
 } #end function
 
