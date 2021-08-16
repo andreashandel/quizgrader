@@ -101,7 +101,12 @@ Disabling the password feature is currently not possible. If you think a setup w
 
 ### Adding the filled template
 
-Once you are done filling the student list, add it to the course by clicking the `Add studentlist` button in the UI or manually place it into the `studentlists` folder. **Each student needs to have a `StudentID` and `Password` entry.** Name information is recommended but optional. **The only time the `studentlist` file is checked to ensure it follows the required format is during generation of the grade list, see below.** 
+Once you are done filling the student list, add it to the course by clicking the `Add studentlist` button in the UI or manually place it into the `studentlists` folder. **Each student needs to have a `StudentID` and `Password` entry.** Name information is recommended but optional.
+
+During this process, all entries are converted to lowercase and any leading or trailing blank spaces stripped. This is also done to the information students provide when uploading their submissions, thus hopefully minimizing mismatches for silly reasons.
+
+**The only time the `studentlist` file is checked to ensure it follows the required format is during generation of the servery deploy package.** 
+
 
 If you want to keep track of changes, give the file a new name (e.g. `studentlist_new.xlsx`). Any pre-existing file with the same name will be overwritten. You can also manually copy the file into this folder. I recommend only using letters, numbers and underscore for file names. Other names might work, but since the files are deployed to a server (which is likely running Unix/Linux), having file names that contain other characters (e.g. dashes or blank) might cause problems. You can have as many versions of the student list file in the `/studentlists` folder as you like. **When you generate the grade tracking sheet (see below), the most recently modified `.xlsx` file in this folder will be used.** All other files will be ignored. Make sure this file is a valid student list. Ideally, at this stage when you are ready to make the `gradelist` file, remove all but the current studentlist file. 
 

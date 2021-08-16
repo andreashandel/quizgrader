@@ -37,7 +37,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     #load the most recent one, which is the one to be used
 
     filenr = which.max(listfiles$modification_time) #find most recently changed file
-    studentdf <- readxl::read_xlsx(listfiles[filenr]$path, col_types = "text", col_names = TRUE)
+    studentdf <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
     msg <- quizgrader::check_studentlist(studentdf)
     if (!is.null(msg))
     {

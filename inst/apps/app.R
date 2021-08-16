@@ -95,7 +95,6 @@ server <- function(input, output) {
         #read gradelist every time submit button is pressed to make sure it's the latest version
         # gradelist = quizgrader::read_gradelist(gradelists_folder)
         studentlist = quizgrader::read_studentlist(studentlists_folder)
-
         #check that student ID and password are correct and can be matched with entry in gradelist
         #if student is found, check name and password
         metaerror <- quizgrader::check_metadata(metadata, studentlist)
@@ -156,7 +155,7 @@ server <- function(input, output) {
 
         #a bit of extra code to allow some users (teacher/testers) to submit as many times as they want
         #if not wanted, disable/uncomment
-        if ( !(metadata$StudentID %in% c("ahandel@uga.edu","daileyco@uga.edu")))
+        if ( !(metadata$StudentID %in% c("ahandel@uga.edu","daileyco@uga.edu","wesley.billings@uga.edu")))
         {
           if (n_attempts >= solution$Attempts[1]) #if this is true, it means the due date has passed
           {

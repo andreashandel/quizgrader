@@ -12,10 +12,8 @@
 
 quizmanager <- function() {
 
-
     appDir <- system.file( "apps", package = "quizgrader") #get directory for main menu app
-    appFile <- shinyAppFile(file.path(appDir,"quizmanager.R"))
-    #shiny::runApp(appDir = appFile, launch.browser = TRUE) #run quizmanager app
+    appFile <- shinyAppFile(file.path(appDir,"quizmanager_app.R"))
     shiny::runApp(appDir = appFile) #run quizmanager app
 
     print('*************************************************')
