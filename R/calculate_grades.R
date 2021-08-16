@@ -36,10 +36,7 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
 
     grades.scaffold <- expand.grid(QuizID = course.summary$QuizID, StudentID = studentlist$StudentID)
 
-
-    require(dplyr)
-
-    grades <- full_join(studentlist, full_join(course.summary, grades.scaffold, by = "QuizID"), by = "StudentID")
+    grades <- dplyr::full_join(studentlist, full_join(course.summary, grades.scaffold, by = "QuizID"), by = "StudentID")
 
 
 
@@ -86,8 +83,8 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
     # generate an overall grade taking simple average of each quiz grade
 
 
-    grades.summary <- left_join(grades, simple.grades, by = c("Lastname", "Firstname", "QuizID")) %>%
-      mutate(
+    grades.summary <- dplyr::left_join(grades, simple.grades, by = c("Lastname", "Firstname", "QuizID")) %>%
+      dplyr::mutate(
         grade.zeros = ifelse(is.na(grade), 0, as.numeric(grade)),
         n.questions = as.numeric(n_Questions),
         n.correct = ifelse(is.na(n.correct), 0, as.numeric(n.correct))
@@ -95,7 +92,7 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
 
       group_by(Lastname, Firstname) %>%
 
-      summarise(
+      dplyr::summarise(
         n.quizzes = n(),
         n.submitted = sum(!is.na(grade)),
         n.missing = sum(is.na(grade)),
@@ -104,9 +101,9 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
         n.correct = paste0("TOTcorrect = ", sum(n.correct, na.rm = TRUE))
       ) %>%
 
-      ungroup() %>%
+      dplyr::ungroup() %>%
 
-      mutate(
+      dplyr::mutate(
         n.questions = paste0("TOTQs = ", max(as.numeric(gsub("[^0-9]{1-3}", "", n.questions)), na.rm=TRUE)),
         by.question.avg = round(100*as.numeric(gsub("[^0-9]{1-3}", "", n.correct))/as.numeric(gsub("[^0-9]{1-3}", "", n.questions)), 2)
       )

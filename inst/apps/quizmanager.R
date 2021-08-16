@@ -110,15 +110,6 @@ server <- function(input, output, session) {
 
 
 
-
-
-
-
-
-
-
-
-
 #---------------------------------------------------------------
 # Roster Creation
 #---------------------------------------------------------------
@@ -277,11 +268,6 @@ server <- function(input, output, session) {
     # result message, wrapped in HTML for lists
     showModal(modalDialog(HTML(msg), easyClose = FALSE))
   })
-
-
-
-
-
 
 
 

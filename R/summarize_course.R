@@ -33,7 +33,7 @@ summarize_course <- function(courselocation)
                          {
                          .quiz <- readxl::read_xlsx(.file, col_types = "text")
                          .quiz_summary <- data.frame(QuizID = .quiz$QuizID[1],
-                                                     n_Questions = nrow(.quiz),
+                                                     n_Questions = round(nrow(.quiz),0),
                                                      DueDate = .quiz$DueDate[1],
                                                      Attempts = .quiz$Attempts[1]
                                                      )

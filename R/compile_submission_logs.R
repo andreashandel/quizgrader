@@ -20,7 +20,6 @@
 compile_submission_logs <- function(studentid, studentsubmissions_folder, df_format = "condensed")
 {
 
-  # require(dplyr)
 
   # find log files
   ## if only one studentid, find only that student's logs, else find all

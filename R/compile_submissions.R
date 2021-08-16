@@ -18,7 +18,6 @@
 compile_submissions <- function(courselocation)
 {
 
-  require(dplyr)
   # Grades Summaries
   ## Find submission files
 

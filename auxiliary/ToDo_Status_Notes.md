@@ -1,3 +1,17 @@
+# Andreas comments
+
+* Maybe make it clear that user can start adding quizzes before roster.
+
+* "Generate course summary" throws an error message if only a quiz and no roster is added. (should work, just indicate that no roster has been added yet.)
+
+* Deploy course works even if no student roster is present. That should not be the case. When clicking deploy course, everything should be checked again and zip file only created if everything is ok.
+
+* Add a "get zip file" button to deploy course, similar to the button for student quizzes
+
+* I loaded an existing course and added a quiz after I had created the server zip file. I re-ran the "make zip file for deployment" but it somehow didn't create a submission folder for the newly added quiz.
+
+
+
 # Main importance
 
 * Analysis functionality
