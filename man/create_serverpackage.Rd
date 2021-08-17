@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_serverpackage.R
 \name{create_serverpackage}
 \alias{create_serverpackage}
-\title{Create file and folder zip file for deployment}
+\title{Create zip file for deployment containing all needed folders and files}
 \usage{
 create_serverpackage(courselocation, newpackage = TRUE)
 }

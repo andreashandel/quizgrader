@@ -17,8 +17,6 @@
 #' Otherwise an error status of 1 and an error message is returned.
 #' @export
 
-
-
 create_course <- function(coursename, courselocation = NULL)
 {
 
@@ -48,10 +46,10 @@ create_course <- function(coursename, courselocation = NULL)
 
     fs::dir_create(fs::path(newfolder,'studentsubmissions')) #will contain all student submissions
 
-
-
     fs::dir_create(fs::path(newfolder,'studentsubmissions', 'logs')) #will contain student submissions log file
 
+    #create an empty log file with just the column headers
+    #this file will be filled as students start submitting
     submissions_log <- data.frame(StudentID = NA,
                                   QuizID = NA,
                                   Attempt = NA,
@@ -67,8 +65,6 @@ create_course <- function(coursename, courselocation = NULL)
     submissions_log_filenamepath = fs::path(newfolder, "studentsubmissions", "logs", submissions_log_filename)
     writexl::write_xlsx(submissions_log, submissions_log_filenamepath, col_names = TRUE, format_headers = TRUE)
 
-
-    # fs::dir_create(fs::path(newfolder,'gradelists')) #for file(s) that tracks all grades
   }
 
   #copy templates of files into folders

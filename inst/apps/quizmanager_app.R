@@ -267,6 +267,42 @@ server <- function(input, output, session) {
 
 
 
+  #######################################################
+  #start code block that removes quizzes from course
+  #######################################################
+
+  observeEvent(input$deletequiz,{
+
+    msg <- NULL
+
+    if (is.null(courselocation)) #not sure why integer, but that's how the example is
+    {
+      msg <- "Please set the course location"
+      shinyjs::reset(id  = "deletequiz")
+
+      showModal(modalDialog(HTML(msg), easyClose = FALSE))
+    }
+    if (is.null(msg))
+    {
+      volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
+
+      shinyFiles::shinyFileChoose(input, 'deletequiz', roots=c(Coursefolder=fs::path(courselocation, "completequizzes")), filetypes=c('', 'xlsx'),
+                                  defaultPath='', defaultRoot='Coursefolder')
+
+      deletefile <- shinyFiles::parseFilePaths(volumes, input$deletequiz) #save course folder to global variable
+      file.remove(deletefile$datapath)
+      msg <- paste0("Removed:<br><ul><li>", paste0(deletefile$name, collapse = "</li><li>"), "</li></ul>")
+
+
+      if(nrow(deletefile)!=0){
+        showModal(modalDialog(HTML(msg), easyClose = FALSE))
+      }
+
+    }
+
+  })
+
+
 
 #------------------------------------------------------
 # Course Summary
@@ -304,13 +340,6 @@ server <- function(input, output, session) {
 
 
 
-
-
-  #---------------------------------------------------------------
-  # Initial Course Deployment
-  #---------------------------------------------------------------
-
-
   ##############################################################
   #start code block that turns filled quizzes into student quizzes
   ##############################################################
@@ -340,7 +369,6 @@ server <- function(input, output, session) {
   })
 
 
-
   ##############################################################
   #start code block that returns zip file of student quizzes
   ##############################################################
@@ -354,6 +382,12 @@ server <- function(input, output, session) {
     contentType = "application/zip"
   )
 
+
+
+
+  #---------------------------------------------------------------
+  # Course Deployment
+  #---------------------------------------------------------------
 
 
   ##############################################################
@@ -377,7 +411,6 @@ server <- function(input, output, session) {
   }) #end code block that zips files/folders needed for initial deployment
 
 
-
   ##############################################################
   #start code block that returns zip file of deployment package
   ##############################################################
@@ -391,49 +424,6 @@ server <- function(input, output, session) {
     contentType = "application/zip"
   )
 
-
-
-  #------------------------------------------------------
-  # Course Modification
-  #------------------------------------------------------
-
-  #######################################################
-  #start code block that removes quizzes from course
-  #######################################################
-
-
-
-
-  observeEvent(input$deletequiz,{
-
-    msg <- NULL
-
-    if (is.null(courselocation)) #not sure why integer, but that's how the example is
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "deletequiz")
-
-      showModal(modalDialog(HTML(msg), easyClose = FALSE))
-    }
-    if (is.null(msg))
-    {
-      volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
-
-      shinyFiles::shinyFileChoose(input, 'deletequiz', roots=c(Coursefolder=fs::path(courselocation, "completequizzes")), filetypes=c('', 'xlsx'),
-                                  defaultPath='', defaultRoot='Coursefolder')
-
-      deletefile <- shinyFiles::parseFilePaths(volumes, input$deletequiz) #save course folder to global variable
-      file.remove(deletefile$datapath)
-      msg <- paste0("Removed:<br><ul><li>", paste0(deletefile$name, collapse = "</li><li>"), "</li></ul>")
-
-
-      if(nrow(deletefile)!=0){
-        showModal(modalDialog(HTML(msg), easyClose = FALSE))
-      }
-
-    }
-
-  })
 
 
 
@@ -560,6 +550,7 @@ ui <- fluidPage(
                                             shinyFiles::shinyFilesButton("deletequiz", label = "Remove a quiz", title = "Remove a quiz from the course", multiple = TRUE),
                                             br(),
                                             h4('Quizzes for students'),
+                                            p('After you update the complete quizzes, do not forget to update and re-distribute updated student quiz sheets.'),
                                             br(),
                                             actionButton("createstudentquizzes", "Create all student quiz files", class = "actionbutton"),
                                             downloadButton("getstudentquizzes", "Get zip file with all student quiz files", class = "actionbutton"),
@@ -577,8 +568,12 @@ ui <- fluidPage(
                                             ), # end setup overview panel
                                    tabPanel(title = "Deployment", value = "deployment",
                                             h2('Deploy course'),
-                                            actionButton("makepackage", "Make zip file for initial deployment", class = "actionbutton"),
+                                            actionButton("makepackage", "Make zip file for deployment", class = "actionbutton"),
+                                            p('This checks student file and complete quizzes, creates student quizzes, then combines all folders and files needed for the grading server into a zip file.'),
                                             downloadButton("getpackage", "Get zip file of deployment package", class = "actionbutton"),
+                                            p('Copy the zip file to the server, delete any prior content, then unzip again (and re-set permissions as needed).'),
+                                            p('Any student submissions you previously retrieved from the server will be included and thus preserved upon extraction of this file on the server (but better make a backup).'),
+                                            p('Any prior student lists or quiz files will be overwritten.'),
                                             #actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
                                             p(textOutput("warningtext")),
                                             br(),

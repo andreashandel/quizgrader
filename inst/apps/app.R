@@ -221,27 +221,32 @@ server <- function(input, output) {
         writexl::write_xlsx(submission, submission_filenamepath, col_names = TRUE, format_headers = TRUE)
 
 
+        #####################################
+        #also create a single log file that has the summary of each submissions for record keeping
+        #log files will be kept and new ones created
+        #####################################
+
+        #log entry to be recorded
         new_submission_log <- dplyr::bind_cols(StudentID = metadata$StudentID,
                                                QuizID = quizid,
                                                Attempt = this_attempt,
                                                Score = score,
                                                n_Questions = nrow(result_table),
                                                n_Correct = sum(result_table$Score == "Correct"),
-                                               Submit_Date = Sys.Date()#,
-                                               #tidyr::pivot_wider(result_table, names_from = "QuestionID", values_from = "Score")
+                                               Submit_Date = Sys.Date()
                                                )
-
         new_submission_log <- dplyr::mutate_all(new_submission_log, as.character)
 
-        #read most recent log file of submissions
-        listfiles <- fs::dir_info(fs::path(studentsubmissions_folder))
+        #name for new file, corresponds to time stamp above
+        submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", paste0("submissions_log_", timestamp, ".xlsx"))
+
+        #read previous most recent log file of submissions
+        listfiles <- fs::dir_info(fs::path(studentsubmissions_folder,"logs"))
         #load the most recent one, which is the one to be used
         filenr = which.max(listfiles$modification_time) #find most recently changed file
         submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
         #append new submission log entry
         submissions_log <- dplyr::bind_rows(submissions_log, new_submission_log)
-
-        submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", paste0("submissions_log_", timestamp, ".xlsx"))
         #write a new log file with the current submission appended
         writexl::write_xlsx(submissions_log, submissions_log_filenamepath, col_names = TRUE, format_headers = TRUE)
 
@@ -259,11 +264,11 @@ server <- function(input, output) {
         #also compute submission stats for student and display
 
         log_table <- dplyr::filter(submissions_log, StudentID == metadata$StudentID)
+        log_table$Score <- as.numeric(log_table$Score) #convert to numeric so we can round
         output$historytable <- shiny::renderTable(log_table, digits = 1)
 
-        quiz_stats <- dplyr::filter(dplyr::group_by(log_table, QuizID), Attempt == which.max(Attempt))
-
-        quiz_stats <- dplyr::summarise(dplyr::ungroup(quiz_stats), n_Quizzes = dplyr::n(), Average_Score = mean(as.numeric(Score)))
+        #quiz_stats <- dplyr::filter(dplyr::group_by(log_table, QuizID), Attempt == which.max(Attempt))
+        #quiz_stats <- dplyr::summarise(dplyr::ungroup(quiz_stats), n_Quizzes = dplyr::n(), Average_Score = mean(as.numeric(Score)))
 
         historytext = "The table below shows your complete quiz submission history."
         output$historytext <- shiny::renderText(historytext)

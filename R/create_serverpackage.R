@@ -1,4 +1,4 @@
-#' @title Create file and folder zip file for deployment
+#' @title Create zip file for deployment containing all needed folders and files
 #'
 #' @description This function takes all files and folders
 #' needed for the server and places it in a zip file.
@@ -92,14 +92,14 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
         zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"quizgrader.css"),
                         mode = "cherry-pick",
                         recurse = TRUE, include_directories = TRUE)
-        #add empty folder for submissions
-        #also adds empty sub-folders for student submissions for each quiz to keep things more organized
+
+        #add folder for submissions and logs
+        #this folder might initially be empty
         zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentsubmissions"),
                         mode = "cherry-pick",
                         recurse = TRUE, include_directories = TRUE)
 
     }
-
 
     #if things worked ok, return NULL
     return(msg)
