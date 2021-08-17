@@ -14,7 +14,7 @@
 
 #function that takes list of file names, keeps only indicated columns
 #saves them to indicated location
-create_student_quizzes <- function(courselocation)
+create_studentquizzes <- function(courselocation)
 {
 
     #error message if things don't work, otherwise will remain NULL

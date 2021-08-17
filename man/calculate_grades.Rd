@@ -11,7 +11,7 @@ calculate_grades(
 )
 }
 \arguments{
-\item{courselocation}{parent folder for all course directories}
+\item{courselocation}{parent folder for the course}
 
 \item{grades_type}{one of c("overview", "student", "question")}
 
@@ -23,4 +23,5 @@ Otherwise an error message is returned.
 }
 \description{
 This function creates a dataframe summarizing the quizzes in the course.
+This is used by the quizmanager part of the package
 }

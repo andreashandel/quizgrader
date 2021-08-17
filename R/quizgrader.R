@@ -8,6 +8,7 @@
 #' \dontrun{quizmanager()}
 #' @author Andreas Handel
 #' @import shiny
+#' @importFrom magrittr %>%
 #' @export
 
 quizmanager <- function() {

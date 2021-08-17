@@ -27,7 +27,6 @@ compile_submissions <- function(courselocation)
   submissions.files <- submissions.files[which(!grepl("submissions_log.*?[.]xlsx$", submissions.files))]
 
 
-
   ## Decompose filenames
   ### Decompose filenames into directory components (2) and filenames
   #### returned list of dataframes with variables for QuizID and Submission (a base filename)
@@ -71,14 +70,17 @@ compile_submissions <- function(courselocation)
 
 
   ## Convert to Tibble and store submission files within
-  submissions <- as_tibble(submissions)
+  submissions <- dplyr::as_tibble(submissions)
 
   ### each spreadsheet cell for submission will contain a nested spreadsheet
   submissions$Submission <- lapply(submissions$Full.Filename, readxl::read_xlsx, col_types = "text", col_names = TRUE)
 
   ### keep only the latest attempt
-  submissions <- submissions %>% arrange(`Submission Time`) %>% group_by(StudentID, QuizID) %>% mutate(Attempt = row_number())
-    submissions <- submissions %>% group_by(StudentID, QuizID) %>% filter(Attempt == max(Attempt))
+  submissions <- submissions %>% dplyr::arrange(`Submission Time`) %>%
+                                 dplyr::group_by(StudentID, QuizID) %>%
+                                 dplyr::mutate(Attempt = dplyr::row_number()) %>%
+                                 dplyr::group_by(StudentID, QuizID) %>%
+                                 dplyr::filter(Attempt == max(Attempt))
 
 
 
@@ -130,7 +132,7 @@ compile_submissions <- function(courselocation)
   #### Wrap previous function to apply to all records of same quizID, prepare for join
   wrapper.Widen.Grades <- function(.records){
     temp <- apply(.records, 1, widen.Grades)
-    .records <- bind_cols(.records, bind_rows(temp))
+    .records <- dplyr::bind_cols(.records, dplyr::bind_rows(temp))
     names(.records)[which(!names(.records)%in%"StudentID")] <- paste(.records$QuizID[1], names(.records)[which(!names(.records)%in%"StudentID")], sep = ".")
     return(.records)
   }
@@ -139,14 +141,13 @@ compile_submissions <- function(courselocation)
   submissions.list.by.quiz <- lapply(submissions.list.by.quiz, wrapper.Widen.Grades)
 
 
-
   ### Read in studentlist for scaffold
-  grades.scaffold <- quizgrader::read_studentlist(fs::path(courselocation, "studentlists"))
+  grades.scaffold <- readxl::read_xlsx(fs::dir_ls(fs::path(courselocation, "studentlists")), col_types = "text", col_names = TRUE)
 
 
   ### Join class list with graded submissions
   for(i in 1:length(submissions.list.by.quiz)){
-    grades.scaffold <- full_join(grades.scaffold, submissions.list.by.quiz[[i]], by="StudentID")
+    grades.scaffold <- dplyr::full_join(grades.scaffold, submissions.list.by.quiz[[i]], by="StudentID")
   }
 
   return(grades.scaffold)

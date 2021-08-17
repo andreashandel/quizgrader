@@ -1,17 +1,10 @@
 # Andreas comments
 
-* Do the "advance" buttons at the bottom do anything the sidebar doesn't do?
-
-* Make it such that one can only use the buttons below directory setup if a new course is created or a valid course has been loaded.
-
-
-* "Generate course summary" throws an error message if only a quiz and no roster is added. (should work, just indicate that no roster has been added yet.)
-
-* Deploy course works even if no student roster is present. That should not be the case. When clicking deploy course, everything should be checked again and zip file only created if everything is ok. I started adding code to create_serverpackage.R for that.
-
-* I loaded an existing course and added a quiz after I had created the server zip file. I re-ran the "make zip file for deployment" but it somehow didn't create a submission folder for the newly added quiz. Might be fixed now, unsure.
+* Can one make it that user can only leave the "course Location" area if a course has been set, otherwise an error message shows up?
 
 * Maybe create a .txt file inside a quiz folder (with the same name as the folder). Then the package functions look for that file as an indication that the chosen folder is a proper quiz folder and if not produce an error message.
+
+* Analysis part not working. I removed creation of coursesummary.xlsx, now rest of code needs to be adjusted. Is that file really necessary? Prefer to not create extra files. 
 
 # Main importance
 

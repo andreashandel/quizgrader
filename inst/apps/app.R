@@ -91,9 +91,9 @@ server <- function(input, output) {
         metadata$StudentID = trimws(tolower(input$StudentID))
         metadata$Password = trimws(tolower(input$Password))
 
-        #read gradelist every time submit button is pressed to make sure it's the latest version
-        # gradelist = quizgrader::read_gradelist(gradelists_folder)
-        studentlist = quizgrader::read_studentlist(studentlists_folder)
+        #read student list every time submit button is pressed to make sure it's the latest version
+        studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlists_folder)), col_types = "text", col_names = TRUE)
+
         #check that student ID and password are correct and can be matched with entry in gradelist
         #if student is found, check name and password
         metaerror <- quizgrader::check_metadata(metadata, studentlist)
@@ -154,7 +154,7 @@ server <- function(input, output) {
 
         #a bit of extra code to allow some users (teacher/testers) to submit as many times as they want
         #if not wanted, disable/uncomment
-        if ( !(metadata$StudentID %in% c("ahandel@uga.edu", "daileyco@uga.edu", "wesley.billings@uga.edu")))
+        if ( !(metadata$StudentID %in% c("ahandel@uga.edu", "daileyco@uga.edu")))
         {
           if (n_attempts >= solution$Attempts[1]) #if this is true, it means the due date has passed
           {
@@ -182,28 +182,20 @@ server <- function(input, output) {
         #also make a data frame instead of tibble
         #this should work on any excel file (even if student submits a non-quiz)
         #therefore do this before quiz format check
-        #submission <- submission_original %>%
-        #  dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%
-        #  data.frame()
         submission <- data.frame(dplyr::mutate_all(submission_original, ~ tidyr::replace_na(.x, "")))
 
-
-
         #check submitted file against solution to make sure content is right
-        #if file is not right, check_submission will return an error message
+        #if file is not right, this will return an error message
         #then display error message and stop the process
         filecheck <- quizgrader::check_submission(submission, quizid)
-        #docerrors <- check_submission(submission,solution,studentid,quizid,gradelist)
         if (!is.null(filecheck))
         {
           show_error(filecheck)
           return()
         }
 
-
-
         #if all seems  ok, we can go ahead and grade
-        result_table <- grade_quiz(submission,solution)
+        result_table <- quizgrader::grade_quiz(submission,solution)
         # if an error occurs during grading, result_table will contain the error message as a string
         if (is.character(result_table))
         {
@@ -241,12 +233,16 @@ server <- function(input, output) {
 
         new_submission_log <- dplyr::mutate_all(new_submission_log, as.character)
 
-        submissions_log <- quizgrader::read_submissions_log(studentsubmissions_folder)
-
+        #read most recent log file of submissions
+        listfiles <- fs::dir_info(fs::path(studentsubmissions_folder))
+        #load the most recent one, which is the one to be used
+        filenr = which.max(listfiles$modification_time) #find most recently changed file
+        submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
+        #append new submission log entry
         submissions_log <- dplyr::bind_rows(submissions_log, new_submission_log)
 
-        submissions_log_filename = paste0("submissions_log_", timestamp, ".xlsx")
-        submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", submissions_log_filename)
+        submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", paste0("submissions_log_", timestamp, ".xlsx"))
+        #write a new log file with the current submission appended
         writexl::write_xlsx(submissions_log, submissions_log_filenamepath, col_names = TRUE, format_headers = TRUE)
 
         #####################################

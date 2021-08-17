@@ -14,6 +14,7 @@
 
 #function that takes list of file names, keeps only indicated columns
 #saves them to indicated location
+#this also runs check_studentlist, check_quiz and create_studentquizzes
 create_serverpackage <- function(courselocation, newpackage = TRUE)
 {
 
@@ -53,7 +54,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     }
 
     #also, recreate fresh student quiz docs
-    msg <- quizgrader::create_student_quizzes(courselocation)
+    msg <- quizgrader::create_studentquizzes(courselocation)
     if (!is.null(msg))
     {
         return(msg) #something didn't go right when checking quizzes

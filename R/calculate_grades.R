@@ -1,8 +1,9 @@
 #' @title Generate a summary of all quizzes in the course
 #'
 #' @description This function creates a dataframe summarizing the quizzes in the course.
+#' This is used by the quizmanager part of the package
 #'
-#' @param courselocation parent folder for all course directories
+#' @param courselocation parent folder for the course
 #' @param grades_type one of c("overview", "student", "question")
 #' @param duedate_filter logical indicating whether to output statistics for past quizzes only
 #'
@@ -13,7 +14,7 @@
 
 
 
-
+# this calls summarize_course, compile_submissions and compile_submission_logs
 #######################################################
 
 
@@ -32,11 +33,12 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
     }
 
     course.summary <- readxl::read_xlsx(fs::path(courselocation, "course_summary.xlsx"))
-    studentlist <- quizgrader::read_studentlist(fs::path(courselocation, "studentlists"))
+
+    studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(courselocation, "studentlists")), col_types = "text", col_names = TRUE)
 
     grades.scaffold <- expand.grid(QuizID = course.summary$QuizID, StudentID = studentlist$StudentID)
 
-    grades <- dplyr::full_join(studentlist, full_join(course.summary, grades.scaffold, by = "QuizID"), by = "StudentID")
+    grades <- dplyr::full_join(studentlist, dplyr::full_join(course.summary, grades.scaffold, by = "QuizID"), by = "StudentID")
 
 
 
@@ -70,13 +72,13 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
       long.data[[i]] <- temp
     }
 
-    simple.grades <- bind_rows(long.data)
+    simple.grades <- dplyr::bind_rows(long.data)
 
 
     # due date filter
 
     if(duedate_filter){
-      grades <- grades %>% filter(DueDate<=Sys.Date())
+      grades <- grades %>% dplyr::filter(DueDate<=Sys.Date())
     }
 
 
@@ -90,10 +92,10 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
         n.correct = ifelse(is.na(n.correct), 0, as.numeric(n.correct))
       ) %>%
 
-      group_by(Lastname, Firstname) %>%
+      dplyr::group_by(Lastname, Firstname) %>%
 
       dplyr::summarise(
-        n.quizzes = n(),
+        n.quizzes = dplyr::n(),
         n.submitted = sum(!is.na(grade)),
         n.missing = sum(is.na(grade)),
         grade = paste0(round(mean(grade.zeros), 2)),
@@ -129,10 +131,14 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
     # )
 
     ## hard code add to line list grades for simple viewing of average alongside individual grades
-    simple.grades <- simple.grades %>% mutate(grade = round(grade, 2)) %>% lapply(as.character) %>% bind_rows(grades.summary) %>% arrange(Lastname, Firstname) %>% mutate_all(~as.character(.))
+    simple.grades <- simple.grades %>% mutate(grade = round(grade, 2)) %>%
+                                       lapply(as.character) %>%
+                                       dplyr::bind_rows(grades.summary)  %>%
+                                       dplyr::arrange(Lastname, Firstname) %>%
+                                       dplyr::mutate_all(~as.character(.))
 
     ## add placeholder
-    simple.grades <- simple.grades %>% add_row(.before = 1)
+    simple.grades <- simple.grades %>% dplyr::add_row(.before = 1)
     simple.grades[1,] <- as.list(toupper(names(simple.grades)))
 
 
@@ -173,7 +179,7 @@ calculate_grades <- function(courselocation, grades_type="overview", duedate_fil
     questionID <- names(questions.summary)
     quizID <- gsub("(.+?)\\..*", "\\1", questionID)
 
-    questions.summary <- bind_cols(quizID = quizID, questionID = questionID, bind_rows(questions.summary))
+    questions.summary <- dplyr::bind_cols(quizID = quizID, questionID = questionID, dplyr::bind_rows(questions.summary))
 
 
 
