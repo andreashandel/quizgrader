@@ -148,13 +148,13 @@ server <- function(input, output) {
         }
 
         n_attempts <- length(list.files(path = fs::path(studentsubmissions_folder, quizid),
-                                      pattern = paste0(input$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
+                                      pattern = paste0(metadata$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
                                      )
                           )
 
         #a bit of extra code to allow some users (teacher/testers) to submit as many times as they want
         #if not wanted, disable/uncomment
-        if ( !(metadata$StudentID %in% c("ahandel@uga.edu","daileyco@uga.edu","wesley.billings@uga.edu")))
+        if ( !(metadata$StudentID %in% c("ahandel@uga.edu", "daileyco@uga.edu", "wesley.billings@uga.edu")))
         {
           if (n_attempts >= solution$Attempts[1]) #if this is true, it means the due date has passed
           {
@@ -165,9 +165,6 @@ server <- function(input, output) {
         }
 
         this_attempt <- n_attempts + 1
-
-
-
 
 
         #if file names, solution file, due date, attempt number are okay, proceed by loading the submitted file
@@ -227,12 +224,12 @@ server <- function(input, output) {
         #this allows checking if things in the app go wrong
         #give each submission a time-stamp
         timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
-        submission_filename = paste(input$StudentID, timestamp, quizid, 'submission.xlsx', sep='_')
+        submission_filename = paste(metadata$StudentID, timestamp, quizid, 'submission.xlsx', sep='_')
         submission_filenamepath = fs::path(studentsubmissions_folder, quizid, submission_filename)
         writexl::write_xlsx(submission, submission_filenamepath, col_names = TRUE, format_headers = TRUE)
 
 
-        new_submission_log <- dplyr::bind_cols(StudentID = input$StudentID,
+        new_submission_log <- dplyr::bind_cols(StudentID = metadata$StudentID,
                                                QuizID = quizid,
                                                Attempt = this_attempt,
                                                Score = score,
@@ -252,22 +249,6 @@ server <- function(input, output) {
         submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", submissions_log_filename)
         writexl::write_xlsx(submissions_log, submissions_log_filenamepath, col_names = TRUE, format_headers = TRUE)
 
-
-        # log_filename <- paste("log", input$StudentID, quizid, "attempt", paste0(this_attempt, ".txt"), sep = "_")
-        # log_filenamepath = fs::path(studentsubmissions_folder, quizid, log_filename)
-        # write.table(submission_log, file = log_filenamepath, sep = '\t', col.names = TRUE, row.names = FALSE, quote = FALSE)
-
-
-        #####################################
-        #save student grade to gradelist file
-        #####################################
-        #saves new score in time-stamped gradelist file
-        #creates a new gradelist file with score recorded and current date
-        #returns nothing
-        #that extra if statement is to prevent recording for test submissions
-        #otherwise one always has to go in manually to delete submission to prevent 'already submitted' message
-        # save_grade(score, input$StudentID, quizid, gradelist, gradelists_folder)
-
         #####################################
         #display results
         #if no errors occurred during grading, show and record results
@@ -281,7 +262,7 @@ server <- function(input, output) {
         #####################################
         #also compute submission stats for student and display
 
-        log_table <- dplyr::filter(submissions_log, StudentID == input$StudentID)
+        log_table <- dplyr::filter(submissions_log, StudentID == metadata$StudentID)
         output$historytable <- shiny::renderTable(log_table, digits = 1)
 
         quiz_stats <- dplyr::filter(dplyr::group_by(log_table, QuizID), Attempt == which.max(Attempt))
@@ -291,14 +272,6 @@ server <- function(input, output) {
         historytext = "The table below shows your complete quiz submission history."
         output$historytext <- shiny::renderText(historytext)
 
-
-
-        #load the latest gradelist which contains the just submitted grade
-        # gradelist = quizgrader::read_gradelist(gradelists_folder)
-        #compute stats for that student
-        # quizstats <- compute_student_stats(input$StudentID, quizid, gradelist)
-        # stats_text = paste0("You have submitted ", quizstats["gradesubmissions"], " out of ",quizstats["totalquizzes"], " quizzes and your average score is ",round(quizstats["gradeaverage"],2))
-        # output$statstext <- shiny::renderText(stats_text)
         #some text with a note about the displayed stats
         warningtext = "If anything doesn't look right, let your instructor know."
         output$warningtext = shiny::renderText(warningtext)
