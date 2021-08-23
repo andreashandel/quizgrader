@@ -570,6 +570,7 @@ ui <- fluidPage(
                                             h2('Deploy course'),
                                             actionButton("makepackage", "Make zip file for deployment", class = "actionbutton"),
                                             p('This checks student file and complete quizzes, creates student quizzes, then combines all folders and files needed for the grading server into a zip file.'),
+                                            h3('Remember to first copy all submissions from the server into the quiz folder before creating an updated package!'),
                                             downloadButton("getpackage", "Get zip file of deployment package", class = "actionbutton"),
                                             p('Copy the zip file to the server, delete any prior content, then unzip again (and re-set permissions as needed).'),
                                             p('Any student submissions you previously retrieved from the server will be included and thus preserved upon extraction of this file on the server (but better make a backup).'),

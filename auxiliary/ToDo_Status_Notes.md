@@ -2,7 +2,7 @@
 
 * Can one make it that user can only leave the "course Location" area if a course has been set, otherwise an error message shows up?
 
-* Maybe create a .txt file inside a quiz folder (with the same name as the folder). Then the package functions look for that file as an indication that the chosen folder is a proper quiz folder and if not produce an error message.
+* Maybe create a .txt file inside a quiz folder (with the same name as the folder). Then the package functions look for that file as an indication that the chosen folder is a proper quiz folder and if not produce an error message. Or maybe just set up a new quiz as an R project with a .rproj file. This can be checked to make sure it's a quiz folder. And also if one clicks on an existing R project file, the quizmanager pops up with the current quiz selected? Not sure that's possible though.
 
 * Analysis part not working. I removed creation of coursesummary.xlsx, now rest of code needs to be adjusted. Is that file really necessary? Prefer to not create extra files. 
 
