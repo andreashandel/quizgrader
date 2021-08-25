@@ -459,9 +459,9 @@ server <- function(input, output, session) {
 
 
   #######################################################
-  #start code block that generates analysis summary stats
+  #start code block that generates overall summary stats
   #######################################################
-  observeEvent(input$analyze,{
+  observeEvent(input$analyze_overview,{
 
     msg <- NULL
     output$summarystats <- NULL
@@ -470,12 +470,11 @@ server <- function(input, output, session) {
       msg <- "Please set the course location"
     } else {
 
-      grades <- quizgrader::calculate_grades(courselocation, input$grades_type, ifelse(input$duedate_filter=="Yes", TRUE, FALSE))
+      analysis_table <- quizgrader::analyze_overview(courselocation)
 
       output$summarystats <- DT::renderDataTable({
-            return(DT::datatable(grades, class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+            return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
           })
-
     }# end outer else statement
 
     if(!is.null(msg))
@@ -585,12 +584,12 @@ ui <- fluidPage(
 
 
              tabPanel("Analyze Submissions",  value = "analyze",
-                      #h2('Retrieve submissions'),
-                      #actionButton("retrieve", "Retrieve submissions from shiny server", class = "actionbutton"),
-                      #h2('Analyze submissions'),
-                      selectInput("grades_type", "Select which analysis to generate", choices = c("overview", "student", "question")),
-                      selectInput("duedate_filter", "Do you want to include only past quizzes?", choices = c("Yes", "No")),
-                      actionButton("analyze", "Analyze submissions", class = "actionbutton"),
+                      h2('Show summary data for all submissions'),
+                      actionButton("analyze_overview", "Summary Data", class = "actionbutton"),
+                      h2('Show information for a specific student'),
+                      actionButton("analyze_student", "Student Data", class = "actionbutton"),
+                      h2('Show information for a specific quiz'),
+                      actionButton("analyze_quiz", "Quiz Data", class = "actionbutton"),
                       DT::dataTableOutput("summarystats")
                       ), #close "Analyze" tab
 

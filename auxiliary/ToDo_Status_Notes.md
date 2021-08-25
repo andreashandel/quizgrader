@@ -6,6 +6,8 @@
 
 * Analysis part not working. I removed creation of coursesummary.xlsx, now rest of code needs to be adjusted. Is that file really necessary? Prefer to not create extra files. 
 
+* Add "due date" to log so one can sort quizzes easily "in order"?
+
 # Main importance
 
 * Analysis functionality

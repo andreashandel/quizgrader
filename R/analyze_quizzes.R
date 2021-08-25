@@ -14,18 +14,19 @@
 
 
 
-# this calls summarize_course, compile_submissions and compile_submission_logs
 #######################################################
+# this function calls summarize_course, compile_submissions and compile_submission_logs
 
 
-calculate_grades <- function(courselocation, grades_type="overview", duedate_filter=FALSE)
+analyze_quizzes <- function(courselocation, grades_type="overview", duedate_filter=FALSE)
 {
 
   # aggregate all submissions to a single tibble
   submissions <- quizgrader::compile_submissions(courselocation)
 
 
-  if(grades_type %in% c("overview", "student")){
+  if(grades_type %in% c("overview", "student"))
+  {
 
     # load course summary and studentlist to have complete data shell regardless of missing submissions
     if(!fs::file_exists(fs::path(courselocation, "course_summary.xlsx"))){
