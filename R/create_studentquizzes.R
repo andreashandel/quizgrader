@@ -82,8 +82,8 @@ create_studentquizzes <- function(courselocation)
         studentfile_fullname = fs::path(studentquizpath, studentfilename)
         writexl::write_xlsx(quizdf, studentfile_fullname, col_names = TRUE, format_headers = TRUE)
 
-
         # create sub-directory in student submissions
+        # this only happens if not already exists. If exists, nothing will happen
         fs::dir_create(fs::path(courselocation,"studentsubmissions", quizdf$QuizID[1]))
     }
 
@@ -93,7 +93,6 @@ create_studentquizzes <- function(courselocation)
     zipfilename = fs::path(studentquizpath,"studentquizsheets.zip")
     allstudentfiles = fs::dir_ls(studentquizpath)
     zip::zipr(zipfile = zipfilename, files = allstudentfiles, recurse = FALSE, include_directories = FALSE)
-
 
     #if things worked ok, return NULL
     return(errormsg)

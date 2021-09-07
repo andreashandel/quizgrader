@@ -39,6 +39,7 @@ All QM functions can be called directly without using the UI. (The GQ related fu
 Functions for QM:
 * `calculate_grades` - computes grades for each student.
 * `check_quiz` - makes sure complete quizzes are properly formatted and filled.
+* `check_courselocation` - checks if a provided/chosen location is the main directory of a quizgrader quiz setup
 * `check_studentlist` - makes sure that student list is properly formatted and filled.
 * `compile_submission_logs` - called by `calculate_grades`
 * `compile_submissions` - called by `calculate_grades`

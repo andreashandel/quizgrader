@@ -1,4 +1,4 @@
-#' @title Generate a summary of all quizzes in the course
+#' @title Generate a table of the log file for all quizzes in the course
 #'
 #' @description This function creates a dataframe summarizing the quizzes and submissions in the course.
 #' This is used by the quizmanager part of the package
@@ -16,7 +16,7 @@
 # this function calls summarize_course, compile_submissions and compile_submission_logs
 
 
-analyze_overview <- function(courselocation)
+analyze_log <- function(courselocation)
 {
 
   # read latest log file
@@ -25,11 +25,11 @@ analyze_overview <- function(courselocation)
   filenr = which.max(listfiles$modification_time) #find most recently changed file
   submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
 
-  summary_table <- submissions_log %>% dplyr::group_by(QuizID) %>%
-                                       dplyr::summarize( submissions = dplyr::n(), students = length(unique(StudentID)), lowest = min(as.numeric(Score)), highest = max(as.numeric(Score)) )
+  overview_table <- submissions_log %>% dplyr::select(-n_Questions, -n_Correct, -Submit_Date) %>%
+                                        dplyr::arrange(QuizID, StudentID)
 
 
-  return(summary_table)
+  return(overview_table)
 
 
 }

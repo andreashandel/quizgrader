@@ -1,12 +1,33 @@
+quizmanager("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
+
+
 # Andreas comments
 
-* Can one make it that user can only leave the "course Location" area if a course has been set, otherwise an error message shows up?
-
-* Maybe create a .txt file inside a quiz folder (with the same name as the folder). Then the package functions look for that file as an indication that the chosen folder is a proper quiz folder and if not produce an error message. Or maybe just set up a new quiz as an R project with a .rproj file. This can be checked to make sure it's a quiz folder. And also if one clicks on an existing R project file, the quizmanager pops up with the current quiz selected? Not sure that's possible though.
+ANALYSIS
 
 * Analysis part not working. I removed creation of coursesummary.xlsx, now rest of code needs to be adjusted. Is that file really necessary? Prefer to not create extra files. 
+* Thought: Add "due date" to log so one can sort quizzes easily "in order"? 
 
-* Add "due date" to log so one can sort quizzes easily "in order"?
+MANAGEMENT
+* Fix check for valid course when user opens existing course in quizmanager_app.
+
+* Can we change look of disabled tabs?
+
+* I'm leaning toward only allowing addition of one full quiz at a time. A bit less convenient, but seems more stable/error proof. Also, maybe we should do it that if 
+1) a NEW complete quiz is added, a student quiz is created at the same time, as well as a submission folder.
+2) an EXISTING complete quiz is added, a new student quiz is created, NO submission folder (since that might contain previous submissions.)
+Then we disable the "create student quiz files" button, since that's automatic.
+We can leave it as currently is, i.e. whenever a quiz is newly added, all student quizzes will be rebuilt using the create_studentquizzes function.
+
+If a complete quiz is removed, it will also remove the student quiz AND the submission folder. We'll issue a warning message there before proceeding.
+
+* Maybe move "course overview" to top of that panel and make it run automatically? (if tricky, we can keep the press-button setup).
+
+* With new setup as described above, deployment should not re-create student quizzes (unneccesary).
+
+GENERAL
+* Thorough testing of all quizmanager functionality (changes were made).
+
 
 # Main importance
 
@@ -23,8 +44,6 @@
 
 * Keep updating vignettes.
 
-* check_studentlist()
-  + find where used / incorporate it in workflow
 
 
 

@@ -32,6 +32,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     ###########################################
     #first, check that all documents are correct
     ############################################
+
     # check roster
     studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlists"))
     studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
@@ -40,6 +41,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     {
         return(msg) #something didn't go right when checking student list/roster, return with error message
     }
+
     #check all quizzes
     listfiles <- fs::dir_ls(fs::path(courselocation,"completequizzes"))
     for (nn in 1:length(listfiles))
@@ -54,11 +56,11 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     }
 
     #also, recreate fresh student quiz docs
-    msg <- quizgrader::create_studentquizzes(courselocation)
-    if (!is.null(msg))
-    {
-        return(msg) #something didn't go right when checking quizzes
-    }
+    #msg <- quizgrader::create_studentquizzes(courselocation)
+    #if (!is.null(msg))
+    #{
+     #   return(msg) #something didn't go right when checking quizzes
+    #}
 
 
 
@@ -74,13 +76,12 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     #add completequizzes folder and contents
     zip::zip(zipfile = zipfilename, files = fs::path(courselocation,"completequizzes"),
                                     mode = "cherry-pick",
-                                    recurse = TRUE, include_directories = TRUE)
+                                    recurse = TRUE, include_directories = FALSE)
 
     #add studentlist folder and contents
-    #also adds empty sub-folders for student submissions for each quiz to keep things more organized
     zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentlists"),
                     mode = "cherry-pick",
-                    recurse = TRUE, include_directories = TRUE)
+                    recurse = TRUE, include_directories = FALSE)
 
     if (newpackage == TRUE)
     {

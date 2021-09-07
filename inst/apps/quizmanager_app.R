@@ -4,25 +4,52 @@
 # It helps both in preparing the quizzes and analyzing student submissions
 ######################################################
 
-#for debugging/manual fiddling
-#courselocation <- ("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 
 ##############################################
 #Set up some variables, define all as global (the <<- notation)
+#not fully sure if the global definition is needed, but it was at some point in the development
+#i'm sticking to it for now, doesn't seem to be a problem
 #name of R package
 packagename <<- "quizgrader"
 #path to templates
 quiztemplatefile <<- file.path(system.file("templates", package = packagename),"quiz_template.xlsx")
 studentlisttemplatefile <<- file.path(system.file("templates", package = packagename),"studentlist_template.xlsx")
-# will contain location/path to course
-courselocation <<- NULL
 
+courselocation <<- courselocation_global #use the variable set in quizmanager()
+#for debugging/manual fiddling
+#courselocation <- ("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 
 #######################################################
 #server part for shiny app
 #######################################################
 
 server <- function(input, output, session) {
+
+  ##################################################
+  #Check if a course has been set/provided or not
+  #based on that, disable/enable certain tabs
+  ##################################################
+  #disable all course related functions
+  #unless a valid course location is set
+  if (is.null(courselocation))
+  {
+    shinyjs::disable(selector = '.navbar-nav a[data-value="managecourse"')
+    shinyjs::disable(selector = '.navbar-nav a[data-value="analyzesubmissions"')
+  }
+  if (!is.null(courselocation))
+  {
+    shinyjs::enable(selector = '.navbar-nav a[data-value="managecourse"')
+    shinyjs::enable(selector = '.navbar-nav a[data-value="analyzesubmissions"')
+    # if a course location is provided on startup
+    # show it in the corresponding output field
+    output$coursedir <- renderText(courselocation)
+  }
+
+
+  #set roots folders
+  #this is taken from the shinyFilesExample() examples
+  volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
+
 
 
 #---------------------------------------------------------------
@@ -34,15 +61,16 @@ server <- function(input, output, session) {
   ##############################################################
 
   #server functionality that lets user choose a folder for the new course
-  #this is taken from the shinyFilesExample() examples
-  volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
-
   #if user clicks the button to select a folder for new course
   observeEvent(input$newcoursedir, {
     shinyFiles::shinyDirChoose(input, "newcoursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
     courselocation <<- shinyFiles::parseDirPath(volumes, input$newcoursedir)
     output$newcoursedir <- renderText(courselocation)
     output$coursedir <- renderText(courselocation)
+    #turn on other tabs now that course has been selected
+    shinyjs::enable(selector = '.navbar-nav a[data-value="managecourse"')
+    shinyjs::enable(selector = '.navbar-nav a[data-value="analyzesubmissions"')
+
   })
 
 
@@ -52,9 +80,22 @@ server <- function(input, output, session) {
 
   #this is used for working on an existing course
   observeEvent(input$coursedir, {
-    shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
-    courselocation <<- shinyFiles::parseDirPath(volumes, input$coursedir)
+    shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
+
+    courselocation_temp <- shinyFiles::parseDirPath(volumes, input$coursedir)
+    #check that course location is a valid quiz folder
+    #msg <- quizgrader::check_courselocation(courselocation_temp)
+    #if (!is.null(msg))
+    #{
+    #  showModal(modalDialog(msg, easyClose = FALSE))
+    #} else {
+      #if no error, assign to courselocation
+      courselocation <<- courselocation_temp
+    #}
     output$coursedir <- renderText(courselocation)
+    #turn on other tabs now that course has been selected
+    shinyjs::enable(selector = '.navbar-nav a[data-value="managecourse"')
+    shinyjs::enable(selector = '.navbar-nav a[data-value="analyzesubmissions"')
   })
 
 
@@ -100,7 +141,7 @@ server <- function(input, output, session) {
 
 
 #---------------------------------------------------------------
-# Roster Creation
+# Roster/Student List management
 #---------------------------------------------------------------
 
 
@@ -127,21 +168,12 @@ server <- function(input, output, session) {
   ##############################################################
   observeEvent(input$addstudentlist,{
 
-    #check that a course folder has been selected
-    msg <- NULL
-    if (is.null(courselocation))
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "addstudentlist")
-    }
+    studentdf <- readxl::read_xlsx(input$addstudentlist$datapath, col_types = "text", col_names = TRUE)
+    msg <- quizgrader::check_studentlist(studentdf)
 
-    if (is.null(msg)) #if course location is ok, get and check student roster
-    {
-      studentdf <- readxl::read_xlsx(input$addstudentlist$datapath, col_types = "text", col_names = TRUE)
-      msg <- quizgrader::check_studentlist(studentdf)
-    }
-
-    if (is.null(msg)) #if no prior error, add student list to folder
+    #if student list check went ok without errors, add student list to folder
+    #otherwise skip this block and jump to message display below
+    if (is.null(msg))
     {
 
       #do some data cleaning of student list
@@ -162,7 +194,7 @@ server <- function(input, output, session) {
       #save data frame to time-stamped file to student list folder
       writexl::write_xlsx(studentdf, path = new_path, col_names = TRUE)
 
-      msg <- paste0("student list has been saved to ", new_path)
+      msg <- paste0("Student list has been saved to ", new_path,'.\nAny previous student list has been overwritten.')
     }
 
     showModal(modalDialog(msg, easyClose = FALSE))
@@ -173,7 +205,7 @@ server <- function(input, output, session) {
 
 
 #---------------------------------------------------------------
-# Quiz Creation
+# Quiz management
 #---------------------------------------------------------------
 
 
@@ -201,17 +233,15 @@ server <- function(input, output, session) {
 
   observeEvent(input$addquiz,{
 
-    #check that a course folder has been selected
-    msg <- NULL
-    if (is.null(courselocation)) #not sure why integer, but that's how the example is
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "addquiz")
-    }
 
-    if (is.null(msg)) #if no prior error, try to open quiz file, then copy
-    {
+    # New setup
+    # Only allow single quiz at a time
+    # for each added quiz, check it, copy to folder
+    # then run create_studentquizzes to recreate all student files and the zip file
+    # move the code that creates new submission folder to here, out of create_studentquizzes
 
+
+    #open quiz file, then copy
       successfully_added <- c()
       unsuccessfully_added <- c()
 
@@ -257,10 +287,6 @@ server <- function(input, output, session) {
         }
       }
 
-
-
-    } #end if for attempting quiz add
-
     # result message, wrapped in HTML for lists
     showModal(modalDialog(HTML(msg), easyClose = FALSE))
   })
@@ -273,71 +299,26 @@ server <- function(input, output, session) {
 
   observeEvent(input$deletequiz,{
 
-    msg <- NULL
 
-    if (is.null(courselocation)) #not sure why integer, but that's how the example is
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "deletequiz")
+    # New setup
+    # Only allow single quiz at a time
+    # for each deleted quiz, remove from folder
+    # then run create_studentquizzes to recreate all student files and the zip file
+    # add code that deletes submission subfolder
 
-      showModal(modalDialog(HTML(msg), easyClose = FALSE))
-    }
-    if (is.null(msg))
-    {
-      volumes = c(Coursefolder = fs::path(courselocation,"completequizzes"))
+      localroot = c(Coursefolder = fs::path(courselocation,"completequizzes"))
 
-      shinyFiles::shinyFileChoose(input, 'deletequiz', roots=c(Coursefolder=fs::path(courselocation, "completequizzes")), filetypes=c('', 'xlsx'),
+      shinyFiles::shinyFileChoose(input, 'deletequiz', roots = localroot, filetypes=c('', 'xlsx'),
                                   defaultPath='', defaultRoot='Coursefolder')
 
-      deletefile <- shinyFiles::parseFilePaths(volumes, input$deletequiz) #save course folder to global variable
+      deletefile <- shinyFiles::parseFilePaths(localroot, input$deletequiz) #save course folder to global variable
       file.remove(deletefile$datapath)
       msg <- paste0("Removed:<br><ul><li>", paste0(deletefile$name, collapse = "</li><li>"), "</li></ul>")
-
 
       if(nrow(deletefile)!=0){
         showModal(modalDialog(HTML(msg), easyClose = FALSE))
       }
-
-    }
-
   })
-
-
-
-#------------------------------------------------------
-# Course Summary
-#------------------------------------------------------
-
-
-  #######################################################
-  #start code block that generates course summary of all quizzes
-  #######################################################
-  observeEvent(input$generate_course_summary,{
-
-    ret <- NULL
-
-    if (is.null(courselocation))
-    {
-      ret <- "Please set the course location"
-    } else {
-
-      ret <- quizgrader::summarize_course(courselocation)
-
-      # this means it should have worked
-      if (is.list(ret))
-      {
-
-        output$studentlist_summary <- shiny::renderText(paste0("There are currently ", ret$nstudents, " students enrolled in your course."))
-        output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
-      }
-    } #end else statement
-
-    if(!is.list(ret)) #if no list returned, it means it's an error message
-    {
-      showModal(modalDialog(ret, easyClose = FALSE))
-    }
-  }) #end generate_course_summary code block
-
 
 
   ##############################################################
@@ -345,13 +326,6 @@ server <- function(input, output, session) {
   ##############################################################
 
   observeEvent(input$createstudentquizzes,{
-
-    if (is.null(courselocation)) #not sure why integer, but that's how the example is
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "createstudentquizzes")
-    } else {
-
 
       #run function to generate student versions of quizzes
       #this takes all quizzes in the specified location
@@ -364,7 +338,6 @@ server <- function(input, output, session) {
         msg <- paste0('All student quiz sheets have been created and copied to ', fs::path(courselocation,'studentquizzes'))
       }
 
-    }
     showModal(modalDialog(msg, easyClose = FALSE))
   })
 
@@ -384,10 +357,38 @@ server <- function(input, output, session) {
 
 
 
+#------------------------------------------------------
+# Course Overview
+#------------------------------------------------------
 
-  #---------------------------------------------------------------
-  # Course Deployment
-  #---------------------------------------------------------------
+
+  #######################################################
+  #start code block that generates course summary of all quizzes
+  #######################################################
+  observeEvent(input$generate_course_summary,{
+
+      ret <- quizgrader::summarize_course(courselocation)
+
+      # this means it should have worked
+      if (is.list(ret))
+      {
+
+        output$studentlist_summary <- shiny::renderText(paste0("There are currently ", ret$nstudents, " students enrolled in your course."))
+        output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
+      }
+
+    if(!is.list(ret)) #if no list returned, it means it's an error message
+    {
+      showModal(modalDialog(ret, easyClose = FALSE))
+    }
+  }) #end generate_course_summary code block
+
+
+
+
+#---------------------------------------------------------------
+# Course Deployment
+#---------------------------------------------------------------
 
 
   ##############################################################
@@ -395,18 +396,13 @@ server <- function(input, output, session) {
   ##############################################################
   observeEvent(input$makepackage,{
 
-    if (is.null(courselocation))
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "createstudentquizzes")
-    } else {
       #make zip file
       msg <- quizgrader:: create_serverpackage(courselocation, newpackage = TRUE)
       if (is.null(msg)) #this means it worked
       {
         msg <- paste0('The serverpackage.zip file for deployment has been created and copied to ', file.path(courselocation))
       }
-    }
+
     showModal(modalDialog(msg, easyClose = FALSE))
   }) #end code block that zips files/folders needed for initial deployment
 
@@ -425,31 +421,26 @@ server <- function(input, output, session) {
   )
 
 
-
-
-
-
   #######################################################
   #start code block that combines and zips documents needed for updates
+  #CURRENTLY NOT USED
   #######################################################
-  observeEvent(input$updatepackage,{
-
-    if (is.null(courselocation))
-    {
-      msg <- "Please set the course location"
-      shinyjs::reset(id  = "createstudentquizzes")
-    } else {
-      #make zip file
-      msg <- quizgrader:: create_serverpackage(courselocation, newpackage = FALSE)
-      if (is.null(msg)) #this means it worked
-      {
-        msg <- paste0('The serverpackage.zip file for updates has been created and copied to ', file.path(courselocation))
-      }
-    }
-    showModal(modalDialog(msg, easyClose = FALSE))
-  }) #end code block that zips files/folders needed for updates
-
-
+  # observeEvent(input$updatepackage,{
+  #
+  #   if (is.null(courselocation))
+  #   {
+  #     msg <- "Please set the course location"
+  #     shinyjs::reset(id  = "createstudentquizzes")
+  #   } else {
+  #     #make zip file
+  #     msg <- quizgrader:: create_serverpackage(courselocation, newpackage = FALSE)
+  #     if (is.null(msg)) #this means it worked
+  #     {
+  #       msg <- paste0('The serverpackage.zip file for updates has been created and copied to ', file.path(courselocation))
+  #     }
+  #   }
+  #   showModal(modalDialog(msg, easyClose = FALSE))
+  # }) #end code block that zips files/folders needed for updates
 
 
 
@@ -463,26 +454,28 @@ server <- function(input, output, session) {
   #######################################################
   observeEvent(input$analyze_overview,{
 
-    msg <- NULL
-    output$summarystats <- NULL
-    if (is.null(courselocation))
-    {
-      msg <- "Please set the course location"
-    } else {
-
-      analysis_table <- quizgrader::analyze_overview(courselocation)
-
-      output$summarystats <- DT::renderDataTable({
-            return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+    analysis_table <- quizgrader::analyze_overview(courselocation)
+    output$summarystats <- DT::renderDataTable({
+            return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE,
+                                 filter = "top", extensions = "Buttons",
+                                 options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
           })
-    }# end outer else statement
 
-    if(!is.null(msg))
-    {
-      showModal(modalDialog(msg, easyClose = FALSE))
-    }
   }) #end generate_course_summary code block
 
+
+  #######################################################
+  #start code block that generates log table
+  #######################################################
+  observeEvent(input$analyze_log,{
+
+    analysis_table <- quizgrader::analyze_log(courselocation)
+    output$summarystats <- DT::renderDataTable({
+        return(DT::datatable(analysis_table, class = "cell-border stripe",
+                             rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+      })
+
+  }) #end generate_course_summary code block
 
 
 
@@ -515,24 +508,23 @@ ui <- fluidPage(
   p('Happy teaching!', class='maintext'),
 
 
-  navbarPage(title = "quizmanager", id = "topmenu", selected = "manage",
+  navbarPage(title = "quizmanager", id = "topmenu", selected = "setcourse",
+             tabPanel(title = "Set Course", value = "setcourse",
+                               h3('Start a new Course'),
+                               textInput("coursename",label = "Course Name"),
+                               shinyFiles::shinyDirButton("newcoursedir", "Set parent directory for new course", "Select a parent folder for new course"),
+                               verbatimTextOutput("newcoursedir", placeholder = TRUE),  # added a placeholder
+                               actionButton("createcourse", "Start new course", class = "actionbutton"),
+                               h3('Load existing Course'),
+                               shinyFiles::shinyDirButton("coursedir", "Find existing course", "Select an existing course folder"),
+                               verbatimTextOutput("coursedir", placeholder = TRUE),  # added a placeholder
+                               br(),
+                               br()
+                      ), # end set course tab panel
 
-             tabPanel(title = "Manage Course", value = "manage",
-                      navlistPanel(id = "manage_submenu", selected = "courselocation",
-                                   tabPanel(title = "Course Location", value = "courselocation",
-
-                                            h3('Start a new Course'),
-                                            textInput("coursename",label = "Course Name"),
-                                            shinyFiles::shinyDirButton("newcoursedir", "Set parent directory for new course", "Select a parent folder for new course"),
-                                            verbatimTextOutput("newcoursedir", placeholder = TRUE),  # added a placeholder
-                                            actionButton("createcourse", "Start new course", class = "actionbutton"),
-                                            h3('Load existing Course'),
-                                            shinyFiles::shinyDirButton("coursedir", "Find existing course", "Select an existing course folder"),
-                                            verbatimTextOutput("coursedir", placeholder = TRUE),  # added a placeholder
-                                            br(),
-                                            br()
-                                            ), # end setup directory panel
-                                   tabPanel(title = "Student List Management", value = "studentlist",
+             tabPanel(title = "Manage Course", value = "managecourse", id = 'managecourse',
+                      navlistPanel(id = "manage_submenu", selected = "courselocation_ui",
+                                   tabPanel(title = "Student List Management", id = "studentlist", value = "studentlist",
                                             downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
                                             p('Fill this template with your student information, then add with the button below.'),
                                             fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
@@ -583,13 +575,15 @@ ui <- fluidPage(
                       ), # end management panel
 
 
-             tabPanel("Analyze Submissions",  value = "analyze",
+             tabPanel("Analyze Submissions",  value = "analyzesubmissions", id = 'analyzesubmissions',
                       h2('Show summary data for all submissions'),
                       actionButton("analyze_overview", "Summary Data", class = "actionbutton"),
                       h2('Show information for a specific student'),
                       actionButton("analyze_student", "Student Data", class = "actionbutton"),
                       h2('Show information for a specific quiz'),
                       actionButton("analyze_quiz", "Quiz Data", class = "actionbutton"),
+                      h2('Show summary of log'),
+                      actionButton("analyze_log", "Log Data", class = "actionbutton"),
                       DT::dataTableOutput("summarystats")
                       ), #close "Analyze" tab
 

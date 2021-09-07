@@ -52,7 +52,14 @@ create_serverpackage(courselocation = "path/to/location/for/course")
 
 This will make a zip file containing almost all the files and folders you need. You'll get a message telling you where the file has been placed (the main folder of your course). 
 
-Once you have this file, connect to your shiny server. Go into the folder where you host shiny apps (usually `shiny-server`), make a folder called `quizgrader` and copy the zip file to that location. Unzip it. You should now have `app.R` and `quizgrader.css` in the main directory, and 2 folders, namely `completequizzes` and `gradelists`. By hand, create another folder called `studentsubmissions`. **Change the permissions for all 3 folders such that it allows write access by the shiny server/app. Not having the right permissions is a common problem leading to weird error messages for students.** Start the shiny server and if everything works, students should no be able to go to the URL where your app lives (e.g., `https://shiny.mysite.com/quizgrader/`) and start submitting.
+Once you have this file, connect to your shiny server. Go into the folder where you host shiny apps (usually `/srv/shiny-server/`), make a new folder. This can be called `quizgrader` or any other name, e.g., the name of the course (`mycoursename`). It will be the URL where students connect to, e.g., `https://shiny.mysite.com/mycoursename/`
+
+Copy the zip file from your local computer into that newly created folder, then unzip it. You should now have a `app.R` and `quizgrader.css` in the main directory, and 3 folders, namely `completequizzes`, `studentlists` and `studentsubmissions`. 
+
+**Change the permissions for at least the `studentsubmissions` folder and all its sub-folders such that it allows write access by the shiny server/app. Also make sure permissions to other files and folders are correct and at least allow for user read access. Not having the right permissions is a common problem leading to weird error messages for students.** (I usually just set permissions to full read-write-execute for all files and folders. Is probably not the safest thing to do, but makes sure no permission issues occur.)
+
+Start the shiny server and if everything works, students should no be able to go to the URL where your app lives (e.g., `https://shiny.mysite.com/mycoursename/`
+) and start submitting.
 
 **It goes without saying that you should test that everything works before telling students to start submitting. I suggest creating one or a few test users in the student tracking sheet, so you can test-submit quizzes to make sure things work as expected.**
 
@@ -60,7 +67,9 @@ Once you have this file, connect to your shiny server. Go into the folder where 
 
 ## Retrieving and Analyzing student submissions
 
-Once students start submitting, their grades are recorded in (always time-stamped and not overwritten) `gradelist.xlsx` files, and all their submissions, including their user ID and timestamp, are placed into the `studentsubmissions` folder. you'll want to pull files from the server every so often. Currently, this needs to be done manually. To that end, log into the shiny server and copy everything in the `studentsubmissions` and `gradelists` folders to the local versions of your course. Once done, open `quizmanager`, load the course you want to look at, and use the `Analyze Submissions` tab to see the performance of students and how the different quiz questions are being answered.  
+Once students start submitting, their submissions (filled Excel sheets) are stored in the quiz-specific folder inside `studentsubmissions`. For each submission, there is also a new entry (and in fact, a new file) created in the `logs` folder. We decided to create new files instead of just modifying a single one to have a better track record of all submissions. Only the most recent log file is used, so if too many files start accumulating, you can pull them to your local machine, archive there, and delete old log files on the server. 
+
+You will want to pull all contents from the `studentsubmissions` folder to your local computer every so often. To that end, log into the shiny server and copy everything in the `studentsubmissions` folder to the local versions of your course. This can't be done through the graphical interface, so for this you need to find your local instance of the quiz and copy it there. Once done, open `quizmanager`, load the course you want to look at, and use the `Analyze Submissions` tab to see the performance of students and how the different quiz questions are being answered.  
 
 
 ## Updating materials

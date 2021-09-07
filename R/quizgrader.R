@@ -1,32 +1,13 @@
-#' @title The main menu for creating and administering quizzes
+#' quizgrader: A package to do grading
 #'
-#' @description This function opens a Shiny app called quizgrader with a menu
-#' that allows the user to perform all relevant operations.
+#' More text here
 #'
-#' @details Run this function with no arguments to start the main menu (a Shiny app)
-#' @examples
-#' \dontrun{quizmanager()}
-#' @author Andreas Handel
-#' @import shiny
-#' @importFrom magrittr %>%
-#' @export
-
-quizmanager <- function() {
-
-    appDir <- system.file( "apps", package = "quizgrader") #get directory for main menu app
-    appFile <- shinyAppFile(file.path(appDir,"quizmanager_app.R"))
-    shiny::runApp(appDir = appFile) #run quizmanager app
-
-    print('*************************************************')
-    print('Exiting the quizmanager main menu.')
-    print('I hope you had a productive session!')
-    print('*************************************************')
-}
-
-#needed to prevent NOTE messages on CRAN checks
-#utils::globalVariables(c("xvals", "yvals", "varnames","IDvar","style","Condition", "simfunction","flu1918data","norodata"))
-
-
-.onAttach <- function(libname, pkgname){
-  packageStartupMessage("Welcome to the quizgrader package. Type quizmanager() to get started.")
-}
+#' Start the main menu of the package by calling quizmanager().
+#'
+#' To learn more about how to use the package, see the documentation
+#' on the package website:
+#' https://andreashandel.github.io/quizgrader/
+#'
+#' @docType package
+#' @name quizgrader
+NULL

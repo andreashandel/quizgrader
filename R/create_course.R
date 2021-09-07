@@ -37,7 +37,16 @@ create_course <- function(coursename, courselocation = NULL)
   }
   else
   {
+    #create new main quiz folder
     fs::dir_create(newfolder)
+
+    #add a quizgrader.txt file indicating that this is the quizgrader main quiz folder
+    #the first line of the file contains the quiz/course name.
+    file_path_and_name = fs::path(newfolder,"quizgrader.txt")
+    sink(file_path_and_name)
+    cat(coursename,"\nThis is the main quiz folder.\nDo not delete this file.")
+    sink()
+
     fs::dir_create(fs::path(newfolder,'templates')) #contains template files submissions
 
     fs::dir_create(fs::path(newfolder,'studentlists')) #for student roster files
