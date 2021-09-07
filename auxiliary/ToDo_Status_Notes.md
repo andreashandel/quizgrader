@@ -3,6 +3,8 @@ quizmanager("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 
 # Andreas comments
 
+### QUIZMANAGER
+
 ANALYSIS
 
 * Analysis part not working. I removed creation of coursesummary.xlsx, now rest of code needs to be adjusted. Is that file really necessary? Prefer to not create extra files. 
@@ -29,6 +31,14 @@ GENERAL
 * Thorough testing of all quizmanager functionality (changes were made).
 
 
+### QUIZGRADER
+
+* Idea: Instead/in addition to students seeing their past submissions when submitting a new one, maybe split it so that they can log in and press a "see submissions" and see their previous submissions, without having to submit a new one.
+
+* Connected to above idea: Instructor can provide an additional sheet of grades for other things (e.g. exercises) that would be loaded and shown to students.
+
+
+
 # Main importance
 
 * Analysis functionality
@@ -43,8 +53,6 @@ GENERAL
   + establish *idealized* workflow scenario (feeds into next)
 
 * Keep updating vignettes.
-
-
 
 
 
@@ -63,8 +71,6 @@ GENERAL
 
 
 # Minor priority
-
-* Allow adding multiple quizzes at a time through quizmanager shiny app
 
 * Need to harmonize quizgrader and the solution files from DSAIDE and DSAIRM
 
