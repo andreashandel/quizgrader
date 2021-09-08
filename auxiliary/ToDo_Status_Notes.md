@@ -1,3 +1,4 @@
+library(quizgrader)
 quizmanager("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 
 
@@ -13,73 +14,35 @@ ANALYSIS
 MANAGEMENT
 * Fix check for valid course when user opens existing course in quizmanager_app.
 
-* Can we change look of disabled tabs?
-
 * I'm leaning toward only allowing addition of one full quiz at a time. A bit less convenient, but seems more stable/error proof. Also, maybe we should do it that if 
 1) a NEW complete quiz is added, a student quiz is created at the same time, as well as a submission folder.
 2) an EXISTING complete quiz is added, a new student quiz is created, NO submission folder (since that might contain previous submissions.)
+
+Take out submission quiz folder creation from create_studentquizzes and add to quizmanager_app.R?
+
 Then we disable the "create student quiz files" button, since that's automatic.
 We can leave it as currently is, i.e. whenever a quiz is newly added, all student quizzes will be rebuilt using the create_studentquizzes function.
 
 If a complete quiz is removed, it will also remove the student quiz AND the submission folder. We'll issue a warning message there before proceeding.
 
+* With new setup as described above, deployment should not re-create student quizzes (unnecessary).
+
 * Maybe move "course overview" to top of that panel and make it run automatically? (if tricky, we can keep the press-button setup).
 
-* With new setup as described above, deployment should not re-create student quizzes (unneccesary).
 
 GENERAL
 * Thorough testing of all quizmanager functionality (changes were made).
 
 
-### QUIZGRADER
 
-* Idea: Instead/in addition to students seeing their past submissions when submitting a new one, maybe split it so that they can log in and press a "see submissions" and see their previous submissions, without having to submit a new one.
+# ToDo for later
 
-* Connected to above idea: Instructor can provide an additional sheet of grades for other things (e.g. exercises) that would be loaded and shown to students.
-
-
-
-# Main importance
-
-* Analysis functionality
-  + adapt old code for compiling gradelists (now logs) and re-grading all submissions
-    - how to have a list of included students / quizzes (students via latest student list; figure out quiz deletion to solve quiz analysis)
-
-* Get grading app to work using the self-hosted shiny server setup.
-  + currently (01 July 2021) works (make note that permissions needed to be changed after initial deployment to allow write (maybe more) for app)
-  + investigate ShinyApps server deployment
-
-* Figure out and implement setup for quiz/course maintenance while course is running.
-  + establish *idealized* workflow scenario (feeds into next)
-
-* Keep updating vignettes.
-
-
-
-# Medium importance
-
-* Get quiz deletion to work in quizmanager.
-  + ignore.txt utility? or reference completequizzes directory? for to-date quiz list
-
-* Add code that creates subfolders in studentsubmissions for each quiz. Should either happen when grade tracking list is created or during deployment package. 
-  + Subfolders are created when grade tracking list is created. Also, submissions are placed into quizid subfolder when submitted. **Need to make sure this doesn't overwrite files once class is in session.**
-
-* UI alterations
-  + Friendlier UI with built-in walkthrough. May play with CSS for navbarPage().
-  + Separation of "Creating Course", "Modifying Course", "Analysis"?
-
-
-
-# Minor priority
-
+* investigate ShinyApps server deployment
 * Need to harmonize quizgrader and the solution files from DSAIDE and DSAIRM
-
-* Regrade functionality?
-  + could just be built into the quiz analysis section of quizmanager.R rather than updating log file (would be a pain)
-
-* Course summaries (studentlist, quizlist, overview?)
-  + print / download schedule document?
-
+* Can we change look of disabled tabs?
+* Do error check and catch if user tries to load non-Excel files (right now readxl throws an error)
+* Maybe reorganize quizmanager UI
+* Keep updating vignettes.
 
 
 # General Notes
@@ -89,6 +52,11 @@ https://shiny.rstudio.com/articles/persistent-data-storage.html
 
 Keeping a temporary "archive" of old scripts within auxilliary.
 
+
+
+#############################
+### Old/Archived information
+#############################
 
 ## 14 June 2021
 

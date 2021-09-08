@@ -201,6 +201,45 @@ server <- function(input, output, session) {
   })
 
 
+  ##############################################################
+  #start code block that adds optional grade list to course
+  ##############################################################
+  observeEvent(input$addgradelist,{
+
+    gradedf <- readxl::read_xlsx(input$addgradelist$datapath, col_types = "text", col_names = TRUE)
+
+    #needs to have at least StudentID columns.
+    msg <- NULL
+    if (!("StudentID" %in% names(gradedf)))
+    {
+      msg <- "Column StudentID is missing"
+    }
+    #if student list check went ok without errors, add student list to folder
+    #otherwise skip this block and jump to message display below
+    if (is.null(msg))
+    {
+
+      #do some data cleaning of student list
+      #read data in
+      gradedf <- readxl::read_xlsx(input$addgradelist$datapath, col_types = "text", col_names = TRUE)
+      #change everything to lowercase. does not apply to column headers
+      gradedf <- dplyr::mutate_all(gradedf, .funs=tolower)
+      #trim any potential white spaces before and after
+      gradedf <- dplyr::mutate_all(gradedf, .funs=trimws)
+      # needs to have name gradelist.xlsx
+      filename = "gradelist.xlsx"
+      #place in main quiz folder
+      new_path = fs::path(courselocation, filename)
+
+      #save data frame to time-stamped file to student list folder
+      writexl::write_xlsx(gradedf, path = new_path, col_names = TRUE)
+
+      msg <- paste0("Grade list has been saved to ", new_path,'.\nAny previous grade list has been overwritten.')
+    }
+
+    showModal(modalDialog(msg, easyClose = FALSE))
+  })
+
 
 
 
@@ -268,6 +307,7 @@ server <- function(input, output, session) {
           successfully_added <- c(successfully_added, input$addquiz$name[quiz_i])
         }# end if check worked, copy file
       } # end loop for adding quizzes
+
 
 
       # Aggregate messages with HTML unordered lists, description lists for error messages with unsuccessfully loaded quizzes
@@ -530,6 +570,8 @@ ui <- fluidPage(
                                             fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
                                             p('You can add the student list at any time before deployment. If you add a new list, any old ones will be overwritten.'),
                                             br(),
+                                            fileInput("addgradelist", label = "", buttonLabel = "Add optional gradelist to course", accept = '.xlsx'),
+                                            p('This Excel sheet needs to have at least the StudentID column. Add any columns with scores from other activities you want the students to be able to check. All columns will be shown.'),
                                             br()
                                             ), # end setup roster panel
                                    tabPanel(title = "Quiz Management", value = "quizzes",
