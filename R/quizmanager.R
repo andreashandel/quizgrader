@@ -38,6 +38,9 @@ quizmanager <- function(courselocation = NULL) {
     print('Exiting the quizmanager main menu.')
     print('I hope you had a productive session!')
     print('*************************************************')
+
+    courselocation <<- NULL
+
 }
 
 
