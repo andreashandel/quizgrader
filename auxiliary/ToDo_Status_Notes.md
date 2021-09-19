@@ -52,6 +52,8 @@ https://shiny.rstudio.com/articles/persistent-data-storage.html
 
 Keeping a temporary "archive" of old scripts within auxilliary.
 
+Possibly interesting package for interacting with dropbox:
+https://github.com/karthik/rdrop2
 
 
 #############################
