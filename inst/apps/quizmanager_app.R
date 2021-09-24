@@ -505,6 +505,34 @@ server <- function(input, output, session) {
 
 
   #######################################################
+  #start code block that generates student table
+  #######################################################
+  observeEvent(input$analyze_student,{
+
+    analysis_table <- quizgrader::analyze_quizzes(courselocation, "student", duedate_filter = TRUE)
+    output$summarystats <- DT::renderDataTable({
+      return(DT::datatable(analysis_table, class = "cell-border stripe",
+                           rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+    })
+
+  }) #end generate_course_summary code block
+
+
+  #######################################################
+  #start code block that generates question table
+  #######################################################
+  observeEvent(input$analyze_quiz,{
+
+    analysis_table <- quizgrader::analyze_quizzes(courselocation, "question", duedate_filter = TRUE)
+    output$summarystats <- DT::renderDataTable({
+      return(DT::datatable(analysis_table, class = "cell-border stripe",
+                           rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+    })
+
+  }) #end generate_course_summary code block
+
+
+  #######################################################
   #start code block that generates log table
   #######################################################
   observeEvent(input$analyze_log,{
@@ -516,6 +544,10 @@ server <- function(input, output, session) {
       })
 
   }) #end generate_course_summary code block
+
+
+
+
 
 
 

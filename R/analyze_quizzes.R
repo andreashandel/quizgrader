@@ -29,11 +29,7 @@ analyze_quizzes <- function(courselocation, grades_type="overview", duedate_filt
   {
 
     # load course summary and studentlist to have complete data shell regardless of missing submissions
-    if(!fs::file_exists(fs::path(courselocation, "course_summary.xlsx"))){
-      quizgrader::summarize_course(courselocation)
-    }
-
-    course.summary <- readxl::read_xlsx(fs::path(courselocation, "course_summary.xlsx"))
+    course.summary <- quizgrader::summarize_course(courselocation)[["quizdf"]]
 
     studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(courselocation, "studentlists")), col_types = "text", col_names = TRUE)
 
@@ -79,34 +75,35 @@ analyze_quizzes <- function(courselocation, grades_type="overview", duedate_filt
     # due date filter
 
     if(duedate_filter){
-      grades <- grades %>% dplyr::filter(DueDate<=Sys.Date())
+      grades <-  dplyr::filter(grades, DueDate<=Sys.Date())
     }
 
 
     # generate an overall grade taking simple average of each quiz grade
 
 
-    grades.summary <- dplyr::left_join(grades, simple.grades, by = c("Lastname", "Firstname", "QuizID")) %>%
-      dplyr::mutate(
+    grades.summary <- dplyr::left_join(grades, simple.grades, by = c("Lastname", "Firstname", "QuizID"))
+
+    grades.summary <- dplyr::mutate(grades.summary,
         grade.zeros = ifelse(is.na(grade), 0, as.numeric(grade)),
         n.questions = as.numeric(n_Questions),
         n.correct = ifelse(is.na(n.correct), 0, as.numeric(n.correct))
-      ) %>%
+      )
 
-      dplyr::group_by(Lastname, Firstname) %>%
+    grades.summary <- dplyr::group_by(grades.summary, Lastname, Firstname)
 
-      dplyr::summarise(
+    grades.summary <- dplyr::summarise(grades.summary,
         n.quizzes = dplyr::n(),
         n.submitted = sum(!is.na(grade)),
         n.missing = sum(is.na(grade)),
         grade = paste0(round(mean(grade.zeros), 2)),
         n.questions = paste0("TOTQs = ", sum(n.questions, na.rm = TRUE)),
         n.correct = paste0("TOTcorrect = ", sum(n.correct, na.rm = TRUE))
-      ) %>%
+      )
 
-      dplyr::ungroup() %>%
+    grades.summary <- dplyr::ungroup(grades.summary)
 
-      dplyr::mutate(
+    grades.summary <- dplyr::mutate(grades.summary,
         n.questions = paste0("TOTQs = ", max(as.numeric(gsub("[^0-9]{1-3}", "", n.questions)), na.rm=TRUE)),
         by.question.avg = round(100*as.numeric(gsub("[^0-9]{1-3}", "", n.correct))/as.numeric(gsub("[^0-9]{1-3}", "", n.questions)), 2)
       )
@@ -116,58 +113,21 @@ analyze_quizzes <- function(courselocation, grades_type="overview", duedate_filt
 
     if(grades_type == "overview"){return(grades.summary)}
 
-    # ui <- shinyUI(
-    #   fluidPage(
-    #     verbatimTextOutput("Class Summary from Classlist"),
-    #     DT::dataTableOutput("Class Summary by classlist")
-    #   )
-    # )
-    #
-    #
-    # server <- shinyServer(function(input, output, session) {
-    #   output$`Class Summary by classlist` <- DT::renderDataTable({
-    #     return(DT::datatable(grades.summary, class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-    #   })
-    # }
-    # )
 
     ## hard code add to line list grades for simple viewing of average alongside individual grades
-    simple.grades <- simple.grades %>% mutate(grade = round(grade, 2)) %>%
-                                       lapply(as.character) %>%
-                                       dplyr::bind_rows(grades.summary)  %>%
-                                       dplyr::arrange(Lastname, Firstname) %>%
-                                       dplyr::mutate_all(~as.character(.))
+    simple.grades <-  dplyr::mutate(simple.grades, grade = round(grade, 2))
+    simple.grades <-  lapply(simple.grades, as.character)
+    simple.grades <-  dplyr::bind_rows(simple.grades, grades.summary)
+    simple.grades <-  dplyr::arrange(simple.grades, Lastname, Firstname)
+    simple.grades <-  dplyr::mutate_all(simple.grades, ~as.character(.))
 
     ## add placeholder
-    simple.grades <- simple.grades %>% dplyr::add_row(.before = 1)
+    simple.grades <- dplyr::add_row(simple.grades, .before = 1)
     simple.grades[1,] <- as.list(toupper(names(simple.grades)))
 
 
 
     if(grades_type == "student"){return(simple.grades)}
-
-    # ui <- shinyUI(
-    #   fluidPage(
-    #     selectInput("Student Name","Choose a student to view grades.",
-    #                 choices = unique(paste0(simple.grades$Lastname, ", ", simple.grades$Firstname)),
-    #                 selected = "LASTNAME, FIRSTNAME"),
-    #     DT::dataTableOutput("Student Grades")
-    #   )
-    # )
-    #
-    # server <- shinyServer(function(input, output, session) {
-    #   # reactiveData <- reactive({
-    #   #   return(simple.grades %>% filter(email == input$`Student Email`) %>% select(lastname, firstname, QuizID, duedate, grade, n.questions, n.correct, by.q.avg, n.quizzes, n.submitted, n.missing))
-    #   #   })
-    #   reactiveData <- reactive({
-    #     return(simple.grades %>% filter(paste0(Lastname, ", ", Firstname) == input$`Student Name`) %>% select(Lastname, Firstname, QuizID, grade, n.questions, n.correct, by.q.avg, n.quizzes, n.submitted, n.missing))
-    #   })
-    #   output$`Student Grades` <- DT::renderDataTable({
-    #     return(DT::datatable(reactiveData(), class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-    #   })
-    # }
-    # )
-
 
     }
 
@@ -182,27 +142,6 @@ analyze_quizzes <- function(courselocation, grades_type="overview", duedate_filt
 
     questions.summary <- dplyr::bind_cols(quizID = quizID, questionID = questionID, dplyr::bind_rows(questions.summary))
 
-
-
-
-    # ui <- shinyUI(
-    #   fluidPage(
-    #     selectInput("Quiz ID","Choose a Quiz ID to view a summary.",
-    #                 choices = c("ALL", unique(questions.summary$quizID)),
-    #                 selected = "ALL"),
-    #     DT::dataTableOutput("Questions Summary")
-    #   )
-    # )
-    #
-    # server <- shinyServer(function(input, output, session) {
-    #   reactiveData <- reactive({
-    #     if(input$`Quiz ID`=="ALL"){return(questions.summary)}else{return(subset(questions.summary, quizID == input$`Quiz ID`))}
-    #   })
-    #   output$`Questions Summary` <- DT::renderDataTable({
-    #     return(DT::datatable(reactiveData(), class = "cell-border stripe", rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-    #   })
-    # }
-    # )
     }
 
 }

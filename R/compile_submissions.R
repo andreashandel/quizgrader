@@ -76,11 +76,11 @@ compile_submissions <- function(courselocation)
   submissions$Submission <- lapply(submissions$Full.Filename, readxl::read_xlsx, col_types = "text", col_names = TRUE)
 
   ### keep only the latest attempt
-  submissions <- submissions %>% dplyr::arrange(`Submission Time`) %>%
-                                 dplyr::group_by(StudentID, QuizID) %>%
-                                 dplyr::mutate(Attempt = dplyr::row_number()) %>%
-                                 dplyr::group_by(StudentID, QuizID) %>%
-                                 dplyr::filter(Attempt == max(Attempt))
+  submissions <- dplyr::arrange(submissions, `Submission Time`)
+  submissions <- dplyr::group_by(submissions, StudentID, QuizID)
+  submissions <- dplyr::mutate(submissions, Attempt = dplyr::row_number())
+  submissions <- dplyr::group_by(submissions, StudentID, QuizID)
+  submissions <- dplyr::filter(submissions, Attempt == max(Attempt))
 
 
 
@@ -89,9 +89,7 @@ compile_submissions <- function(courselocation)
   #### Set-up to take single row from previously made tibble
 
   collect.Grades <- function(.record){
-    .submission <- .record$Submission %>%
-      dplyr::mutate_all(~ tidyr::replace_na(.x, "")) %>%
-      data.frame()
+    .submission <- data.frame(dplyr::mutate_all(.record$Submission, ~ tidyr::replace_na(.x, "")))
     .solution <- readxl::read_xlsx(fs::path(courselocation, "completequizzes", paste0(.record$QuizID, "_complete.xlsx")))
     return(quizgrader::grade_quiz(.submission, .solution))
   }
