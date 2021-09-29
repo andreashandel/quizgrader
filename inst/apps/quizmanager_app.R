@@ -340,24 +340,22 @@ server <- function(input, output, session) {
   observeEvent(input$deletequiz,{
 
 
-    # New setup
-    # Only allow single quiz at a time
-    # for each deleted quiz, remove from folder
-    # then run create_studentquizzes to recreate all student files and the zip file
-    # add code that deletes submission subfolder
+    #folder where the complete quizzes are
+    localroot = c(Coursefolder = fs::path(courselocation,"completequizzes"))
 
-      localroot = c(Coursefolder = fs::path(courselocation,"completequizzes"))
+    #open file browser to let user pick a file
+    shinyFiles::shinyFileChoose(input, 'deletequiz',
+                                roots = localroot, filetypes=c('', 'xlsx'),
+                                defaultPath='', defaultRoot='Coursefolder')
+    #once user has picked a file to delete, its stored here
+    deletefile <- shinyFiles::parseFilePaths(localroot, input$deletequiz)
+    #delete the file
+    file.remove(deletefile$datapath)
+    msg <- paste0("Removed: ",deletefile$name)
 
-      shinyFiles::shinyFileChoose(input, 'deletequiz', roots = localroot, filetypes=c('', 'xlsx'),
-                                  defaultPath='', defaultRoot='Coursefolder')
-
-      deletefile <- shinyFiles::parseFilePaths(localroot, input$deletequiz) #save course folder to global variable
-      file.remove(deletefile$datapath)
-      msg <- paste0("Removed:<br><ul><li>", paste0(deletefile$name, collapse = "</li><li>"), "</li></ul>")
-
-      if(nrow(deletefile)!=0){
+    if(nrow(deletefile)!=0){
         showModal(modalDialog(HTML(msg), easyClose = FALSE))
-      }
+    }
   })
 
 

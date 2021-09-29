@@ -14,6 +14,7 @@ License: GPL-3
 Encoding: UTF-8
 Imports:
     dplyr,
+    DT,
     fs,
     here,
     lubridate,
@@ -40,7 +41,7 @@ Suggests:
     rmarkdown,
     roxygen2,
     testthat
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 URL: https://andreashandel.github.io/quizgrader/, https://github.com/andreashandel/quizgrader/
 BugReports: https://github.com/ahgroup/DSAIDE/issues
