@@ -53,7 +53,7 @@ server <- function(input, output, session) {
 
 
 #---------------------------------------------------------------
-# Course Creation
+# Course Creation or Loading
 #---------------------------------------------------------------
 
   ##############################################################
@@ -138,6 +138,38 @@ server <- function(input, output, session) {
   })
 
 
+#------------------------------------------------------
+# Course Overview
+#------------------------------------------------------
+
+  #######################################################
+  #start code block that generates course summary of all quizzes
+  #######################################################
+
+  observeEvent(input$topmenu == "managecourse",
+  {
+
+  if (!is.null(courselocation))
+  {
+    ret <- quizgrader::summarize_course(courselocation)
+
+    # this means it should have worked
+    if (is.list(ret))
+    {
+
+      output$studentlist_summary <- shiny::renderText(paste0("There are currently ", ret$nstudents, " students enrolled in your course."))
+      output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
+    }
+
+    if(!is.list(ret)) #if no list returned, it means it's an error message
+    {
+      output$summary_error <- shiny::renderText(ret)
+    }
+  }
+  }) #end generate_course_summary code block
+
+
+
 
 
 #---------------------------------------------------------------
@@ -201,6 +233,12 @@ server <- function(input, output, session) {
   })
 
 
+
+  #---------------------------------------------------------------
+  # Additional/Optional Grade List management
+  #---------------------------------------------------------------
+
+
   ##############################################################
   #start code block that adds optional grade list to course
   ##############################################################
@@ -242,7 +280,6 @@ server <- function(input, output, session) {
 
 
 
-
 #---------------------------------------------------------------
 # Quiz management
 #---------------------------------------------------------------
@@ -259,11 +296,10 @@ server <- function(input, output, session) {
       "quiz_template.xlsx"
     },
     content <- function(file) {
-      file.copy(quiztemplatefile, file)
+      fs::file_copy(quiztemplatefile, file)
     },
     contentType = "application/xlsx"
   )
-
 
 
   ##############################################################
@@ -272,65 +308,34 @@ server <- function(input, output, session) {
 
   observeEvent(input$addquiz,{
 
+    # Load quiz and check that is in the required format
+    quizdf <- readxl::read_excel(input$addquiz$datapath, col_types = "text", col_names = TRUE)
+    msg <- check_quiz(quizdf)
 
-    # New setup
-    # Only allow single quiz at a time
-    # for each added quiz, check it, copy to folder
-    # then run create_studentquizzes to recreate all student files and the zip file
-    # move the code that creates new submission folder to here, out of create_studentquizzes
-
-
-    #open quiz file, then copy
-      successfully_added <- c()
-      unsuccessfully_added <- c()
-
-      # Loop over quizzes to add
-      for(quiz_i in seq_along(input$addquiz$name)){
-
-        # Load quiz and check that is in the required format
-        quizdf <- readxl::read_excel(input$addquiz$datapath[quiz_i], col_types = "text", col_names = TRUE)
-        msg <- check_quiz(quizdf)
-
-        if (!is.null(msg)) # if returned error message, log it as description list: filename = term, error message = description
-        {
-          unsuccessfully_added <- c(unsuccessfully_added, paste0("<dt>", input$addquiz$name[quiz_i], "</dt><dd>- ", msg, "</dd>"))
-        } # end if logging error message
-
-        if (is.null(msg)) #if no problem occurred, try copying
-        {
+    if (is.null(msg)) #if no problem occurred, copying quiz, regenerate student quizzes
+    {
           #find path to course folder
           newname = paste0(quizdf$QuizID[1],'_complete.xlsx')
           new_path = fs::path(courselocation,"completequizzes",newname)
-          #copy renamed file to completequiz folder
-          fs::file_copy(path = input$addquiz$datapath[quiz_i], new_path = new_path, overwrite = TRUE)
-          # msg <- paste0("quiz has been saved to ", new_path)
-          successfully_added <- c(successfully_added, input$addquiz$name[quiz_i])
-        }# end if check worked, copy file
-      } # end loop for adding quizzes
+          #copy renamed file to completequizzes folder
+          fs::file_copy(path = input$addquiz$datapath, new_path = new_path, overwrite = TRUE)
 
+          #create a folder for submissions that corresponds to new quiz
+          # this only happens if not already exists. If exists, nothing will happen
+          fs::dir_create(fs::path(courselocation,"studentsubmissions", quizdf$QuizID[1]))
 
+          #re-create student quizzes
+          msg <- quizgrader::create_studentquizzes(courselocation)
+    }# end new quiz copy, folder creation and student quiz recreation
 
-      # Aggregate messages with HTML unordered lists, description lists for error messages with unsuccessfully loaded quizzes
-      if (is.null(unsuccessfully_added))
-      {
-        msg <- paste0("Quizzes successfully added:<br><ul><li>", paste(successfully_added, collapse = "</li><li>"), "</li></ul>")
-      } else
-      {
-        if (is.null(successfully_added))
-        {
-          msg <- paste0("Quizzes unsuccessfully added:<br><dl><ul><li>", paste(unsuccessfully_added, collapse = "</li><li>"), "</li></ul></dl>")
-        } else
-        {
-          msg <- paste0("Quizzes successfully added:<br><ul><li>", paste(successfully_added, collapse = "</li><li>"), "</li></ul>",
-                        "<br>",
-                        "Quizzes unsuccessfully added:<br><dl><ul><li>", paste(unsuccessfully_added, collapse = "</li><li>"), "</li></ul></dl>")
-        }
-      }
+    #that means the create_studentquizzes() function worked
+    if (is.null(msg))
+    {
+      msg <- paste0("quiz has been saved to:<br>", new_path,"<br>If it didn't yet exist, then a new submission folder has been created.<br>All student quizzes were recreated.")
+    }
 
-    # result message, wrapped in HTML for lists
-    showModal(modalDialog(HTML(msg), easyClose = FALSE))
+    showModal(modalDialog(msg, easyClose = FALSE))
   })
-
 
 
   #######################################################
@@ -349,12 +354,27 @@ server <- function(input, output, session) {
                                 defaultPath='', defaultRoot='Coursefolder')
     #once user has picked a file to delete, its stored here
     deletefile <- shinyFiles::parseFilePaths(localroot, input$deletequiz)
-    #delete the file
-    file.remove(deletefile$datapath)
-    msg <- paste0("Removed: ",deletefile$name)
 
-    if(nrow(deletefile)!=0){
-        showModal(modalDialog(HTML(msg), easyClose = FALSE))
+    # if a file was picked, delete file
+    # also delete submission folder and re-create student quizzes
+    if(nrow(deletefile)!=0)
+    {
+      #delete the file
+      fs::file_delete(deletefile$datapath)
+
+      #remove folder
+      quizname = stringr::str_replace(deletefile$name,"_complete.xlsx","")
+      fs::dir_delete(fs::path(courselocation,"studentsubmissions", quizname))
+
+      #re-create student quizzes
+      msg <- quizgrader::create_studentquizzes(courselocation)
+
+      #that means the create_studentquizzes() function worked
+      if (is.null(msg))
+      {
+        msg <- paste0("Removed:\n",deletefile$name,'\nAlso removed submission folder and re-created student quizzes.')
+      }
+      showModal(modalDialog(HTML(msg), easyClose = FALSE))
     }
   })
 
@@ -392,34 +412,6 @@ server <- function(input, output, session) {
     },
     contentType = "application/zip"
   )
-
-
-
-#------------------------------------------------------
-# Course Overview
-#------------------------------------------------------
-
-
-  #######################################################
-  #start code block that generates course summary of all quizzes
-  #######################################################
-  observeEvent(input$generate_course_summary,{
-
-      ret <- quizgrader::summarize_course(courselocation)
-
-      # this means it should have worked
-      if (is.list(ret))
-      {
-
-        output$studentlist_summary <- shiny::renderText(paste0("There are currently ", ret$nstudents, " students enrolled in your course."))
-        output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
-      }
-
-    if(!is.list(ret)) #if no list returned, it means it's an error message
-    {
-      showModal(modalDialog(ret, easyClose = FALSE))
-    }
-  }) #end generate_course_summary code block
 
 
 
@@ -593,46 +585,37 @@ ui <- fluidPage(
                       ), # end set course tab panel
 
              tabPanel(title = "Manage Course", value = "managecourse", id = 'managecourse',
-                      navlistPanel(id = "manage_submenu", selected = "courselocation_ui",
-                                   tabPanel(title = "Student List Management", id = "studentlist", value = "studentlist",
-                                            downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
-                                            p('Fill this template with your student information, then add with the button below.'),
-                                            fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx'),
-                                            p('You can add the student list at any time before deployment. If you add a new list, any old ones will be overwritten.'),
-                                            br(),
-                                            fileInput("addgradelist", label = "", buttonLabel = "Add optional gradelist to course", accept = '.xlsx'),
-                                            p('This Excel sheet needs to have at least the StudentID column. Add any columns with scores from other activities you want the students to be able to check. All columns will be shown.'),
-                                            br()
-                                            ), # end setup roster panel
-                                   tabPanel(title = "Quiz Management", value = "quizzes",
-                                            h4('Complete Quizzes'),
-                                            downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
-                                            p('Use this template to create your quizzes.'),
-                                            shiny::fileInput("addquiz", label = "", buttonLabel = "Add a completed quiz to course", accept = '.xlsx', multiple = TRUE),
-                                            p('You can add more than one quiz at a time. Any quiz with the same file name as one being added will be overwritten.'),
-                                            shinyFiles::shinyFilesButton("deletequiz", label = "Remove a quiz", title = "Remove a quiz from the course", multiple = TRUE),
-                                            br(),
-                                            h4('Quizzes for students'),
-                                            p('After you update the complete quizzes, do not forget to update and re-distribute updated student quiz sheets.'),
-                                            br(),
-                                            actionButton("createstudentquizzes", "Create all student quiz files", class = "actionbutton"),
-                                            downloadButton("getstudentquizzes", "Get zip file with all student quiz files", class = "actionbutton"),
-                                            br(),
-                                            br()
-                                            ), # end setup quizzes panel
+                      navlistPanel(id = "manage_submenu", selected = "overview",
                                    tabPanel(title = "Course Overview", value = "overview",
-                                            h2('Review Course Structure'),
-                                            actionButton("generate_course_summary", "Generate Course Summary", class = "actionbutton"),
-                                            br(),
                                             textOutput("studentlist_summary"),
                                             tableOutput("quiz_summary"),
-                                            br(),
+                                            textOutput("summary_error"),
                                             br()
-                                            ), # end setup overview panel
+                                   ), # end setup overview panel
+                                   tabPanel(title = "Student List Management", id = "studentlist", value = "studentlist",
+                                            p('Fill this template with your student information, then add with the button below. If you add a new list, any old ones will be overwritten.'),
+                                            downloadButton("getstudentlist", "Get studentlist template", class = "actionbutton"),
+                                            fileInput("addstudentlist", label = "", buttonLabel = "Add filled studentlist to course", accept = '.xlsx')
+                                            ), # end setup roster panel
+                                   tabPanel(title = "Quiz Management", value = "quizzes",
+                                            p('Use this template to create your quizzes.'),
+                                            downloadButton("getquiztemplate", "Get quiz template", class = "actionbutton"),
+                                            p('Add a completed quiz to course. Any quiz with the same file name as one being added will be replaced/overwritten.'),
+                                            shiny::fileInput("addquiz", label = "", buttonLabel = "Add a quiz", accept = '.xlsx', multiple = FALSE),
+                                            p('Remove a quiz from the course. WARNING: This also deletes the submission folder for this quiz. If there are already student submissions you want to keep, move them to a save place first.'),
+                                            shinyFiles::shinyFilesButton("deletequiz", label = "Remove a quiz", title = "Remove a quiz from the course", multiple = FALSE),
+                                            p('After you update the complete quizzes, do not forget to re-distribute updated student quiz sheets.'),
+                                            downloadButton("getstudentquizzes", "Get zip file with all student quiz files", class = "actionbutton")
+                                            ), # end setup quizzes panel
+                                   tabPanel(title = "Grade List Management", id = "gradelist", value = "gradelist",
+                                            p('You can add an Excel sheet with additional grade information that students can check. The sheet needs to have at least the StudentID column. Add any columns with scores from other activities you want the students to be able to check. All columns will be shown.'),
+                                            fileInput("addgradelist", label = "", buttonLabel = "Add optional gradelist to course", accept = '.xlsx'),
+                                            br()
+                                   ), # end setup roster panel
                                    tabPanel(title = "Deployment", value = "deployment",
                                             h2('Deploy course'),
                                             actionButton("makepackage", "Make zip file for deployment", class = "actionbutton"),
-                                            p('This checks student file and complete quizzes, creates student quizzes, then combines all folders and files needed for the grading server into a zip file.'),
+                                            p('This checks student file and complete quizzes, re-creates student quizzes, then combines all folders and files needed for the grading server into a zip file.'),
                                             h3('Remember to first copy all submissions from the server into the quiz folder before creating an updated package!'),
                                             downloadButton("getpackage", "Get zip file of deployment package", class = "actionbutton"),
                                             p('Copy the zip file to the server, delete any prior content, then unzip again (and re-set permissions as needed).'),

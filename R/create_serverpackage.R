@@ -56,11 +56,11 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     }
 
     #also, recreate fresh student quiz docs
-    #msg <- quizgrader::create_studentquizzes(courselocation)
-    #if (!is.null(msg))
-    #{
-     #   return(msg) #something didn't go right when checking quizzes
-    #}
+    msg <- quizgrader::create_studentquizzes(courselocation)
+    if (!is.null(msg))
+    {
+        return(msg) #something didn't go right when checking quizzes
+    }
 
 
 
