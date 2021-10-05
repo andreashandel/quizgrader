@@ -86,13 +86,23 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     if (newpackage == TRUE)
     {
         #add the grading app
-        zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"app.R"),
+        zip::zip_append(zipfile = zipfilename, files = fs::path(fs::path_package(package = "quizgrader","apps"),"app.R"),
                         mode = "cherry-pick",
-                        recurse = TRUE, include_directories = TRUE)
+                        recurse = TRUE, include_directories = FALSE)
         #add css file
-        zip::zip_append(zipfile = zipfilename, files = file.path(system.file("apps", package = "quizgrader"),"quizgrader.css"),
+        zip::zip_append(zipfile = zipfilename, files = fs::path(fs::path_package(package = "quizgrader","apps"),"quizgrader.css"),
                         mode = "cherry-pick",
-                        recurse = TRUE, include_directories = TRUE)
+                        recurse = TRUE, include_directories = FALSE)
+
+        #if exists, add file with additional grades
+        gradelistfile = fs::path(courselocation,"gradelist.xlsx")
+        if (fs::file_exists(gradelistfile))
+        {
+          zip::zip_append(zipfile = zipfilename, files = gradelistfile,
+                          mode = "cherry-pick",
+                          recurse = TRUE, include_directories = FALSE)
+        }
+
 
         #add folder for submissions and logs
         #this folder might initially be empty

@@ -13,6 +13,7 @@ library('quizgrader')
 submission_original <- NULL #the uploaded file
 
 #paths to the different folders
+# gradelists_folder = ('./gradelists')
 studentlists_folder = ('./studentlists')
 completequizzes_folder = ('./completequizzes')
 studentsubmissions_folder = ('./studentsubmissions')
@@ -67,77 +68,6 @@ server <- function(input, output) {
             output$historytable <- NULL
 
     })
-
-
-  #######################################################
-  #code that runs when user presses the 'get scores' button
-  #######################################################
-  observeEvent(input$scoresbutton, {
-
-
-    #remove any previous submission text
-    output$currenttext <- NULL
-    output$historytext <- NULL
-    output$warningtext <- NULL
-    #and table
-    output$currenttable <- NULL
-    output$historytable <- NULL
-
-    #combine all inputs into list for checking
-    #make all inputs lower case and trim any white space
-    #note that list entries need this specific capitalization
-    metadata = list()
-    metadata$StudentID = trimws(tolower(input$StudentID))
-    metadata$Password = trimws(tolower(input$Password))
-
-    #read student list every time submit button is pressed to make sure it's the latest version
-    studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlists_folder)), col_types = "text", col_names = TRUE)
-
-    #check that student ID and password are correct and can be matched with entry in gradelist
-    #if student is found, check name and password
-    metaerror <- quizgrader::check_metadata(metadata, studentlist)
-    if (!is.null(metaerror)) #if errors occur, stop the process with an error message
-    {
-      show_error(metaerror)
-      return()
-    }
-
-    #####################################
-    #compute submission stats for student and display them
-    #####################################
-    #read previous most recent log file of submissions
-    listfiles <- fs::dir_info(fs::path(studentsubmissions_folder,"logs"))
-    #load the most recent one, which is the one to be used
-    filenr = which.max(listfiles$modification_time) #find most recently changed file
-    submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
-
-    log_table <- dplyr::filter(submissions_log, StudentID == metadata$StudentID)
-    log_table$Score <- as.numeric(log_table$Score) #convert to numeric so we can round
-    output$historytable <- shiny::renderTable(log_table, digits = 1)
-
-    historytext = "The table below shows your complete quiz submission history."
-    output$historytext <- shiny::renderText(historytext)
-
-    #some text with a note about the displayed stats
-    warningtext = "If anything doesn't look right, let your instructor know."
-    output$warningtext = shiny::renderText(warningtext)
-
-    #####################################
-    #show additional scores if they exist
-    #####################################
-    if (fs::file_exists("gradelist.xlsx"))
-    {
-      #load list with other grades
-      gradelist <- readxl::read_xlsx("gradelist.xlsx", col_types = "text", col_names = TRUE)
-      #get entry for current student
-      other_grades <- dplyr::filter(gradelist, StudentID == metadata$StudentID)
-      #return other scores as table
-      output$scoretable <- shiny::renderTable(other_grades)
-    }
-
-
-  })
-
 
     #######################################################
     #main code
@@ -299,7 +229,6 @@ server <- function(input, output) {
         #log entry to be recorded
         new_submission_log <- dplyr::bind_cols(StudentID = metadata$StudentID,
                                                QuizID = quizid,
-                                               QuizDueDate = solution$DueDate[1],
                                                Attempt = this_attempt,
                                                Score = score,
                                                n_Questions = nrow(result_table),
@@ -330,10 +259,23 @@ server <- function(input, output) {
         success_text = paste0("Your submission for quiz ",quizid," has been successfully graded and recorded. \n The table below shows detailed feedback for each question.")
         output$currenttext <- renderText(success_text)
 
+
+        #####################################
+        #also compute submission stats for student and display
+
+        log_table <- dplyr::filter(submissions_log, StudentID == metadata$StudentID)
+        log_table$Score <- as.numeric(log_table$Score) #convert to numeric so we can round
+        output$historytable <- shiny::renderTable(log_table, digits = 1)
+
+        #quiz_stats <- dplyr::filter(dplyr::group_by(log_table, QuizID), Attempt == which.max(Attempt))
+        #quiz_stats <- dplyr::summarise(dplyr::ungroup(quiz_stats), n_Quizzes = dplyr::n(), Average_Score = mean(as.numeric(Score)))
+
+        historytext = "The table below shows your complete quiz submission history."
+        output$historytext <- shiny::renderText(historytext)
+
         #some text with a note about the displayed stats
         warningtext = "If anything doesn't look right, let your instructor know."
         output$warningtext = shiny::renderText(warningtext)
-
 
         #reset UI inputs
         submission_original <- NULL #remove file submission
@@ -356,11 +298,8 @@ ui <- fluidPage(
   textInput("StudentID","Student ID"),
   textInput("Password","Password"),
   #h3('Quiz submission not yet enabled.'),
-  h4("Submit a new file"),
   fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
   actionButton("submitbutton", "Submit file", class = "submitbutton"),
-  h4("Check scores"),
-  actionButton("scoresbutton", "Check scores", class = "actionbutton"),
   br(),
   h3(textOutput("currenttext")),
   br(),
@@ -369,8 +308,6 @@ ui <- fluidPage(
   h3(textOutput("historytext")),
   br(),
   tableOutput("historytable"),
-  br(),
-  tableOutput("scoretable"),
   br(),
   h3(textOutput("warningtext"))
 )

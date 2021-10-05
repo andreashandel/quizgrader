@@ -13,7 +13,6 @@ library('quizgrader')
 submission_original <- NULL #the uploaded file
 
 #paths to the different folders
-# gradelists_folder = ('./gradelists')
 studentlists_folder = ('./studentlists')
 completequizzes_folder = ('./completequizzes')
 studentsubmissions_folder = ('./studentsubmissions')
@@ -21,6 +20,9 @@ studentsubmissions_folder = ('./studentsubmissions')
 #names of all complete quizzes
 completequiz_names = list.files(path = completequizzes_folder, recursive=FALSE, pattern = "\\.xlsx$", full.names = FALSE)
 completequiz_ids = stringr::str_replace(completequiz_names,"_complete.xlsx","") #get only part that is name of quiz
+
+#a vector of user IDs who can submit unlimited times and independent of due dates. Potentially good for test users.
+testusers = c("ahandel@uga.edu", "daileyco@uga.edu")
 
 #######################################################
 #small functions not worth sticking into their own files
@@ -63,11 +65,84 @@ server <- function(input, output) {
             output$currenttext <- NULL
             output$historytext <- NULL
             output$warningtext <- NULL
-            #and table
+            #and tables
             output$currenttable <- NULL
             output$historytable <- NULL
+            output$scoretable <- NULL
 
     })
+
+
+  #######################################################
+  #code that runs when user presses the 'get scores' button
+  #######################################################
+  observeEvent(input$scoresbutton, {
+
+
+    #remove any previous submission text
+    output$currenttext <- NULL
+    output$historytext <- NULL
+    output$warningtext <- NULL
+    #and table
+    output$currenttable <- NULL
+    output$historytable <- NULL
+    output$scoretable <- NULL
+
+    #combine all inputs into list for checking
+    #make all inputs lower case and trim any white space
+    #note that list entries need this specific capitalization
+    metadata = list()
+    metadata$StudentID = trimws(tolower(input$StudentID))
+    metadata$Password = trimws(tolower(input$Password))
+
+    #read student list every time submit button is pressed to make sure it's the latest version
+    studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlists_folder)), col_types = "text", col_names = TRUE)
+
+    #check that student ID and password are correct and can be matched with entry in gradelist
+    #if student is found, check name and password
+    metaerror <- quizgrader::check_metadata(metadata, studentlist)
+    if (!is.null(metaerror)) #if errors occur, stop the process with an error message
+    {
+      show_error(metaerror)
+      return()
+    }
+
+    #####################################
+    #compute submission stats for student and display them
+    #####################################
+    #read previous most recent log file of submissions
+    listfiles <- fs::dir_info(fs::path(studentsubmissions_folder,"logs"))
+    #load the most recent one, which is the one to be used
+    filenr = which.max(listfiles$modification_time) #find most recently changed file
+    submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
+
+    log_table <- dplyr::filter(submissions_log, StudentID == metadata$StudentID)
+    log_table$Score <- as.numeric(log_table$Score) #convert to numeric so we can round
+    output$historytable <- shiny::renderTable(log_table, digits = 1)
+
+    historytext = "The table below shows your complete quiz submission history."
+    output$historytext <- shiny::renderText(historytext)
+
+    #some text with a note about the displayed stats
+    warningtext = "If anything doesn't look right, let your instructor know."
+    output$warningtext = shiny::renderText(warningtext)
+
+    #####################################
+    #show additional scores if they exist
+    #####################################
+    if (fs::file_exists("gradelist.xlsx"))
+    {
+      #load list with other grades
+      gradelist <- readxl::read_xlsx("gradelist.xlsx", col_types = "text", col_names = TRUE)
+      #get entry for current student
+      other_grades <- dplyr::filter(gradelist, StudentID == metadata$StudentID)
+      #return other scores as table
+      output$scoretable <- shiny::renderTable(other_grades)
+    }
+
+
+  })
+
 
     #######################################################
     #main code
@@ -83,6 +158,7 @@ server <- function(input, output) {
       #and table
       output$currenttable <- NULL
       output$historytable <- NULL
+      output$scoretable <- NULL
 
         #combine all inputs into list for checking
         #make all inputs lower case and trim any white space
@@ -138,34 +214,32 @@ server <- function(input, output) {
         solution <- data.frame(dplyr::mutate_all(solution_raw, ~ tidyr::replace_na(.x, "")))
 
 
+
+
         #check due date and check attempts
-
-        if (Sys.Date() > solution$DueDate[1]) #if this is true, it means the due date has passed
+        #skip check for test users
+        #count number of files that exist for that student to determine number of already taken attempts
+        n_attempts <- length(fs::dir_ls(path = fs::path(studentsubmissions_folder, quizid),
+                                        regexp = paste0(metadata$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
+                                        )
+                             )
+        if ( !(metadata$StudentID %in% testusers))
         {
-          errormsg = "Quiz submission is no longer permitted as the due date has passed."
-          show_error(errormsg)
-          return()
-        }
 
-        n_attempts <- length(list.files(path = fs::path(studentsubmissions_folder, quizid),
-                                      pattern = paste0(metadata$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
-                                     )
-                          )
-
-        #a bit of extra code to allow some users (teacher/testers) to submit as many times as they want
-        #if not wanted, disable/uncomment
-        if ( !(metadata$StudentID %in% c("ahandel@uga.edu", "daileyco@uga.edu")))
-        {
-          if (n_attempts >= solution$Attempts[1]) #if this is true, it means the due date has passed
+          #check that submission is before due data
+          if (Sys.Date() > solution$DueDate[1]) #if this is true, it means the due date has passed
+          {
+            errormsg = "Quiz submission is no longer permitted as the due date has passed."
+            show_error(errormsg)
+            return()
+          }
+          if (n_attempts >= solution$Attempts[1]) #if this is true, it means max number of attempts is reached
           {
             errormsg = "You have already submitted the maximum number of attempts."
             show_error(errormsg)
             return()
           }
         }
-
-        this_attempt <- n_attempts + 1
-
 
         #if file names, solution file, due date, attempt number are okay, proceed by loading the submitted file
         #read each column as character/text, this is safer for comparison
@@ -229,7 +303,8 @@ server <- function(input, output) {
         #log entry to be recorded
         new_submission_log <- dplyr::bind_cols(StudentID = metadata$StudentID,
                                                QuizID = quizid,
-                                               Attempt = this_attempt,
+                                               QuizDueDate = solution$DueDate[1],
+                                               Attempt = n_attempts+1,
                                                Score = score,
                                                n_Questions = nrow(result_table),
                                                n_Correct = sum(result_table$Score == "Correct"),
@@ -259,23 +334,10 @@ server <- function(input, output) {
         success_text = paste0("Your submission for quiz ",quizid," has been successfully graded and recorded. \n The table below shows detailed feedback for each question.")
         output$currenttext <- renderText(success_text)
 
-
-        #####################################
-        #also compute submission stats for student and display
-
-        log_table <- dplyr::filter(submissions_log, StudentID == metadata$StudentID)
-        log_table$Score <- as.numeric(log_table$Score) #convert to numeric so we can round
-        output$historytable <- shiny::renderTable(log_table, digits = 1)
-
-        #quiz_stats <- dplyr::filter(dplyr::group_by(log_table, QuizID), Attempt == which.max(Attempt))
-        #quiz_stats <- dplyr::summarise(dplyr::ungroup(quiz_stats), n_Quizzes = dplyr::n(), Average_Score = mean(as.numeric(Score)))
-
-        historytext = "The table below shows your complete quiz submission history."
-        output$historytext <- shiny::renderText(historytext)
-
         #some text with a note about the displayed stats
         warningtext = "If anything doesn't look right, let your instructor know."
         output$warningtext = shiny::renderText(warningtext)
+
 
         #reset UI inputs
         submission_original <- NULL #remove file submission
@@ -294,12 +356,35 @@ server <- function(input, output) {
 ui <- fluidPage(
   shinyjs::useShinyjs(),
   includeCSS("quizgrader.css"), #use custom styling
-  titlePanel("Quiz grader"),
-  textInput("StudentID","Student ID"),
-  textInput("Password","Password"),
-  #h3('Quiz submission not yet enabled.'),
-  fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
-  actionButton("submitbutton", "Submit file", class = "submitbutton"),
+  br(),
+  tags$div(id = "shinyheadertitle", "quizgrader - An R package for submission and grading of quizzes."),
+  br(),
+  fluidRow(
+       column(12,
+              align = "center",
+              textInput("StudentID","Student ID")
+              ),
+        class = "mainmenurow"
+        ),
+  fluidRow(
+    column(12,
+           align = "center",
+           textInput("Password","Password")
+          ),
+      class = "mainmenurow"
+    ),
+  fluidRow(
+    column(6,
+      h4("Submit a new file"),
+      fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
+      actionButton("submitbutton", "Submit file", class = "submitbutton")
+    ),
+    column(6,
+        h4("Check scores"),
+        actionButton("scoresbutton", "Check scores", class = "actionbutton")
+    ),
+    class = "mainmenurow"
+  ), #close fluidRow structure for input
   br(),
   h3(textOutput("currenttext")),
   br(),
@@ -308,6 +393,8 @@ ui <- fluidPage(
   h3(textOutput("historytext")),
   br(),
   tableOutput("historytable"),
+  br(),
+  tableOutput("scoretable"),
   br(),
   h3(textOutput("warningtext"))
 )

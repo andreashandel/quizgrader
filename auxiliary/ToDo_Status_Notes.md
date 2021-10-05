@@ -4,13 +4,11 @@ quizmanager("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 
 # Andreas comments
 
+
 ### QUIZMANAGER
 
 ANALYSIS
-
 * For 'per student' and 'per quiz' there should be a dropdown menu containing all students / all quizzes. Once user selects an entry, that should be shown.
-
-* Thought: Add "due date" to log so one can sort quizzes easily "in order"? 
 
 
 MANAGEMENT
