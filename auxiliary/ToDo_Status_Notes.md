@@ -1,5 +1,6 @@
 library(quizgrader)
 quizmanager("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
+quizmanager("C:/data/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 
 
 # Andreas comments
