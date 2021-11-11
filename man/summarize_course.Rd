@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize_course.R
 \name{summarize_course}
 \alias{summarize_course}
-\title{Generate a summary of all quizzes in the course}
+\title{Return IDs of all students and a summary table of all quizzes in the course}
 \usage{
 summarize_course(courselocation)
 }
@@ -10,10 +10,15 @@ summarize_course(courselocation)
 \item{courselocation}{parent folder for all course directories}
 }
 \value{
-ret a list
-If things went well, a list containing a summary of all quizzes.
+If things went well, a list containing two elements:
+\itemize{
+    \item `studentIDs`: A vector with name/ID of all students in course.
+    \item `quizstats`: A data frame of basic quiz stats.
+  }
+
 Otherwise an error message is returned.
 }
 \description{
-This function creates a dataframe summarizing the quizzes in the course.
+This function creates a list based on current student roster
+and course quizzes.
 }

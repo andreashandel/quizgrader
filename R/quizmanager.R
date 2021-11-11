@@ -39,9 +39,13 @@ quizmanager <- function(courselocation = NULL) {
     print('I hope you had a productive session!')
     print('*************************************************')
 
+    # clean up at end
     courselocation <<- NULL
 
 }
+
+#needed to get CRAN checks to shut up about no visible binding
+utils::globalVariables(c("courselocation_global", "DueDate"))
 
 
 

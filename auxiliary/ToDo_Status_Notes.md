@@ -9,7 +9,7 @@ quizmanager("C:/data/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
 ### QUIZMANAGER
 
 ANALYSIS
-* For 'per student' and 'per quiz' there should be a dropdown menu containing all students / all quizzes. Once user selects an entry, that should be shown.
+* Implement the 'per student' and 'per quiz' functionality by writing the analyze_student and analyze_quiz functions.
 
 
 MANAGEMENT
@@ -18,7 +18,7 @@ MANAGEMENT
 
 GENERAL
 * Thorough testing of all quizmanager functionality (changes were made).
-
+* Fix warning message related to navigation containers that shows up when exiting the app.
 
 
 # ToDo for later

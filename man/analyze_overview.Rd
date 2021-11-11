@@ -11,9 +11,8 @@ analyze_overview(courselocation)
 }
 \value{
 If things went well, a dataframe containing a summary of all quizzes.
-Otherwise an error message is returned.
 }
 \description{
 This function creates a dataframe summarizing the quizzes and submissions in the course.
-This is used by the quizmanager part of the package
+This is a helper function called by the quizmanager app.
 }

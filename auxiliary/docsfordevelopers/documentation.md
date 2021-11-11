@@ -36,13 +36,15 @@ The `/inst` folder contains several subfolders.
 The following functions provide functionality for either quizmanager (marked with QM) or quizgrader (QG). 
 All QM functions can be called directly without using the UI. (The GQ related functions could probably too, but the grading portion is not meant to be used without the UI)
 
+* `quizgrader.R` only contains general information so a user can do help('quizgrader')
+* `quizmanager.R` script starts the `quizmanager_app.R` app.
+
+
 Functions for QM:
-* `calculate_grades` - computes grades for each student.
+* `analyze_` - functions run by the different analyze buttons, each analyzing submissions in a different way.
 * `check_quiz` - makes sure complete quizzes are properly formatted and filled.
 * `check_courselocation` - checks if a provided/chosen location is the main directory of a quizgrader quiz setup
 * `check_studentlist` - makes sure that student list is properly formatted and filled.
-* `compile_submission_logs` - called by `calculate_grades`
-* `compile_submissions` - called by `calculate_grades`
 * `create_course` - starts a new course, creates starting folders and files
 * `create_serverpackage` - makes a file/folder bundle for either initial deployment or update that needs to be copied to server 
 * `create_studentquizzes` - takes the completed quizzes, processes them to produce quizzes for students, also places them into a zip file
@@ -52,17 +54,6 @@ Functions for QG:
 * `check_metadata.R` - checks that user input (user ID and password) match information in the student list.
 * `check_submission.R` - checks a submitted quiz for proper formatting before attempting to grade it.
 * `grade_quiz.R` - grades the submitted quiz.
-
-
-* `quizgrader.R` script starts the `quizmanager.R` app.
-
-
-The following functions are used internally:
-* `check_quiz` - is being called at various stages during course management to check if an instructor-created quiz has valid content and structure
-
-
-NOT A COMPLETE LISTING YET
-
 
 
 

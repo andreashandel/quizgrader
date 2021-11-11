@@ -2,8 +2,8 @@ Package: quizgrader
 Type: Package
 Title: Automated managament and grading of quizzes
 Description: Allows generation of quizzes using simple spreadsheets, student submit online and quizzes are autograded. 
-Version: 0.0.2
-Date: 2021-08-15
+Version: 0.0.4
+Date: 2021-11-11
 Authors@R: c(
     person("Andreas", "Handel", email = "ahandel@uga.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4622-1146") ),
 	  person("Cody", "Dailey",  role = "aut"), 
@@ -23,6 +23,7 @@ Imports:
     rlang,
     shinyFiles,
     shinyjs,
+    shinyWidgets,
     stats,
     stringr,
     tibble,

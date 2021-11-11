@@ -1,13 +1,12 @@
 #' @title Generate a summary of all quizzes in the course
 #'
 #' @description This function creates a dataframe summarizing the quizzes and submissions in the course.
-#' This is used by the quizmanager part of the package
+#' This is a helper function called by the quizmanager app.
 #'
 #' @param courselocation parent folder for the course
 #'
 #' @return
 #' If things went well, a dataframe containing a summary of all quizzes.
-#' Otherwise an error message is returned.
 #' @export
 
 
@@ -25,11 +24,15 @@ analyze_overview <- function(courselocation)
   filenr = which.max(listfiles$modification_time) #find most recently changed file
   submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
 
-  summary_table <- submissions_log %>% dplyr::group_by(QuizID) %>%
-                                       dplyr::summarize( submissions = dplyr::n(), students = length(unique(StudentID)), lowest = min(as.numeric(Score)), highest = max(as.numeric(Score)) )
+  #turn columns into the right types
+  df1 <- submissions_log %>% dplyr::mutate(Attempt = as.numeric(Attempt), Score = as.numeric(Score),
+                                           n_Questions = as.numeric(n_Questions), n_Correct = as.numeric(n_Correct),
+                                           Submit_Date = as.Date(Submit_Date), QuizDueDate = as.Date(QuizDueDate))
+
+  summary_table <- df1 %>% dplyr::group_by(QuizID) %>%
+                           dplyr::summarize( submissions = dplyr::n(), students = length(unique(StudentID)), lowest = min(Score), highest = max(Score) )
 
 
   return(summary_table)
-
 
 }

@@ -134,6 +134,7 @@ server <- function(input, output, session) {
       }
     }
 
+
     showModal(modalDialog(msg, easyClose = FALSE))
   })
 
@@ -157,7 +158,9 @@ server <- function(input, output, session) {
     if (is.list(ret))
     {
 
-      output$studentlist_summary <- shiny::renderText(paste0("There are currently ", ret$nstudents, " students enrolled in your course."))
+      studenttext <- paste0("There are currently ", length(ret$studentIDs), " students enrolled in your course:\n",paste(ret$studentIDs,collapse =', '))
+
+      output$studentlist_summary <- shiny::renderText(studenttext)
       output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
     }
 
@@ -479,17 +482,53 @@ server <- function(input, output, session) {
 #------------------------------------------------------
 
 
+  ################################################################################################
+  #create the student and quiz UI elements
+  ################################################################################################
+
+  observeEvent(input$topmenu == "analyzecourse",
+               {
+
+                 ret <- quizgrader::summarize_course(courselocation)
+
+                 student_var <- ret$studentIDs
+                 quiz_var <- ret$quizdf$QuizID
+
+                 output$student_selector = renderUI({
+                   shinyWidgets::pickerInput("student_selector", "Select Student", student_var, multiple = FALSE, options = list(`actions-box` = TRUE), selected = NULL )
+                 })
+                 output$quiz_selector = renderUI({
+                   shinyWidgets::pickerInput("quiz_selector", "Select Quiz", quiz_var, multiple = FALSE, options = list(`actions-box` = TRUE), selected = NULL )
+                 })
+               })
+
+
+
   #######################################################
-  #start code block that generates overall summary stats
+  #start code block that generates overall quiz summary stats
   #######################################################
   observeEvent(input$analyze_overview,{
 
     analysis_table <- quizgrader::analyze_overview(courselocation)
-    output$summarystats <- DT::renderDataTable({
+    output$statstable <- DT::renderDataTable({
             return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE,
                                  filter = "top", extensions = "Buttons",
                                  options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
           })
+
+  }) #end generate_course_summary code block
+
+  #######################################################
+  #start code block that generates score table
+  #######################################################
+  observeEvent(input$analyze_scoretable,{
+
+    analysis_table <- quizgrader::analyze_scoretable(courselocation)
+    output$statstable <- DT::renderDataTable({
+      return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE,
+                           filter = "top", extensions = "Buttons",
+                           options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+    })
 
   }) #end generate_course_summary code block
 
@@ -499,8 +538,8 @@ server <- function(input, output, session) {
   #######################################################
   observeEvent(input$analyze_student,{
 
-    analysis_table <- quizgrader::analyze_quizzes(courselocation, "student", duedate_filter = TRUE)
-    output$summarystats <- DT::renderDataTable({
+    analysis_table <- quizgrader::analyze_student(courselocation, selected_student = input$student_selector)
+    output$statstable <- DT::renderDataTable({
       return(DT::datatable(analysis_table, class = "cell-border stripe",
                            rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
     })
@@ -513,8 +552,8 @@ server <- function(input, output, session) {
   #######################################################
   observeEvent(input$analyze_quiz,{
 
-    analysis_table <- quizgrader::analyze_quizzes(courselocation, "question", duedate_filter = TRUE)
-    output$summarystats <- DT::renderDataTable({
+    analysis_table <- quizgrader::analyze_quiz(courselocation, selected_quiz = input$quiz_selector)
+    output$statstable <- DT::renderDataTable({
       return(DT::datatable(analysis_table, class = "cell-border stripe",
                            rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
     })
@@ -528,7 +567,7 @@ server <- function(input, output, session) {
   observeEvent(input$analyze_log,{
 
     analysis_table <- quizgrader::analyze_log(courselocation)
-    output$summarystats <- DT::renderDataTable({
+    output$statstable <- DT::renderDataTable({
         return(DT::datatable(analysis_table, class = "cell-border stripe",
                              rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
       })
@@ -633,13 +672,17 @@ ui <- fluidPage(
              tabPanel("Analyze Submissions",  value = "analyzesubmissions", id = 'analyzesubmissions',
                       h2('Show summary data for all submissions'),
                       actionButton("analyze_overview", "Summary Data", class = "actionbutton"),
+                      h2('Show score table for all students/quizzes'),
+                      actionButton("analyze_scoretable", "Score Table", class = "actionbutton"),
                       h2('Show information for a specific student'),
+                      uiOutput('student_selector'),
                       actionButton("analyze_student", "Student Data", class = "actionbutton"),
                       h2('Show information for a specific quiz'),
+                      uiOutput('quiz_selector'),
                       actionButton("analyze_quiz", "Quiz Data", class = "actionbutton"),
-                      h2('Show summary of log'),
+                      h2('Show full submission log'),
                       actionButton("analyze_log", "Log Data", class = "actionbutton"),
-                      DT::dataTableOutput("summarystats")
+                      DT::dataTableOutput("statstable")
                       ), #close "Analyze" tab
 
             fluidRow(column(12,

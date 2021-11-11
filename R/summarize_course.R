@@ -1,11 +1,16 @@
-#' @title Generate a summary of all quizzes in the course
+#' @title Return IDs of all students and a summary table of all quizzes in the course
 #'
-#' @description This function creates a dataframe summarizing the quizzes in the course.
+#' @description This function creates a list based on current student roster
+#' and course quizzes.
 #'
 #' @param courselocation parent folder for all course directories
 #'
-#' @return ret a list
-#' If things went well, a list containing a summary of all quizzes.
+#' @return If things went well, a list containing two elements:
+#' \itemize{
+#'     \item `studentIDs`: A vector with name/ID of all students in course.
+#'     \item `quizstats`: A data frame of basic quiz stats.
+#'   }
+#'
 #' Otherwise an error message is returned.
 #' @export
 
@@ -22,9 +27,9 @@ summarize_course <- function(courselocation)
   if (length(studentlistfile)>0)
   {
     studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
-    nstudents = nrow(studentdf)
+    studentIDs = studentdf$StudentID
   } else {
-    nstudents = 0
+    studentIDs = NULL
   }
 
 
@@ -52,7 +57,7 @@ summarize_course <- function(courselocation)
     quizdf = "No quizzes exist"
   }
 
-  ret = list(nstudents = nstudents, quizdf = quizdf)
+  ret = list(studentIDs = studentIDs, quizdf = quizdf)
 
   return(ret)
 

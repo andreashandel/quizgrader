@@ -25,9 +25,8 @@ analyze_log <- function(courselocation)
   filenr = which.max(listfiles$modification_time) #find most recently changed file
   submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
 
-  overview_table <- submissions_log %>% dplyr::select(-n_Questions, -n_Correct, -Submit_Date) %>%
+  overview_table <- submissions_log %>% dplyr::select(-n_Questions, -n_Correct) %>%
                                         dplyr::arrange(QuizID, StudentID)
-
 
   return(overview_table)
 
