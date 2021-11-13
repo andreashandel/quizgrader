@@ -30,7 +30,7 @@ analyze_scoretable <- function(courselocation)
   # get only the max score for each quiz in case there were multiple attempts allowed
   # that last slice command is there in case someone has multiple submissions with the same score
   # then remove the attempt column
-  df2 <- df1 %>% dplyr::group_by(QuizID, StudentID) %>% dplyr::filter(Score == max(Score)) %>% slice( n = 1) %>% select(-Attempt)
+  df2 <- df1 %>% dplyr::group_by(QuizID, StudentID) %>% dplyr::filter(Score == max(Score)) %>% dplyr::slice( n = 1) %>% dplyr::select(-Attempt)
 
   # change to wide format for display
   df3 <- df2 %>% tidyr::pivot_wider(id_cols = c(StudentID), names_from = QuizID, values_from = Score)
