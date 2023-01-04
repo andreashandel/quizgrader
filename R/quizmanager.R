@@ -1,15 +1,14 @@
 #' @title The main menu for creating and administering quizzes
 #'
-#' @description This function opens a Shiny app called quizgrader with a menu
-#' that allows the user to perform all relevant operations.
+#' @description This function opens a Shiny app called quizmanager_app with a menu
+#' that allows the user to perform all relevant quiz management operations.
 #'
-#' @details Run this function with no arguments to start the main menu (a Shiny app)
+#' @details Run this function with no arguments to start the main menu (a Shiny app).
+#' You can also provide a path to an existing course directory.
 #' @param courselocation Path to main course directory
 #' @examples
 #' \dontrun{quizmanager()}
 #' @author Andreas Handel
-#' @import shiny
-#' @importFrom magrittr %>%
 #' @export
 
 quizmanager <- function(courselocation = NULL) {
@@ -32,7 +31,7 @@ quizmanager <- function(courselocation = NULL) {
 
     appDir <- system.file( "apps", package = "quizgrader") #get directory for main menu app
     appFile <- shinyAppFile(file.path(appDir,"quizmanager_app.R"))
-    shiny::runApp(appDir = appFile) #run quizmanager app
+    shiny::runApp(appDir = appFile, launch.browser = TRUE) #run quizmanager app
 
     print('*************************************************')
     print('Exiting the quizmanager main menu.')

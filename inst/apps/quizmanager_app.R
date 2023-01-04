@@ -15,9 +15,10 @@ packagename <<- "quizgrader"
 quiztemplatefile <<- file.path(system.file("templates", package = packagename),"quiz_template.xlsx")
 studentlisttemplatefile <<- file.path(system.file("templates", package = packagename),"studentlist_template.xlsx")
 
-courselocation <<- courselocation_global #use the variable set in quizmanager()
+# this does currently not work if course is empty
+# courselocation <<- courselocation_global #use the variable set in quizmanager()
 #for debugging/manual fiddling
-#courselocation <- ("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
+courselocation <- ("D:/Dropbox/2023-1-spring-epid8060/quizzes/MADA2023test")
 
 #######################################################
 #server part for shiny app
@@ -49,7 +50,6 @@ server <- function(input, output, session) {
   #set roots folders
   #this is taken from the shinyFilesExample() examples
   volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
-
 
 
 #---------------------------------------------------------------
@@ -133,10 +133,8 @@ server <- function(input, output, session) {
       output$coursedir <- renderText(as.character(courselocation))
       }
     }
-
-
     showModal(modalDialog(msg, easyClose = FALSE))
-  })
+  }) #end create course
 
 
 #------------------------------------------------------
@@ -170,7 +168,6 @@ server <- function(input, output, session) {
     }
   }
   }) #end generate_course_summary code block
-
 
 
 
@@ -234,7 +231,6 @@ server <- function(input, output, session) {
 
     showModal(modalDialog(msg, easyClose = FALSE))
   })
-
 
 
   #---------------------------------------------------------------
@@ -418,7 +414,6 @@ server <- function(input, output, session) {
 
 
 
-
 #---------------------------------------------------------------
 # Course Deployment
 #---------------------------------------------------------------
@@ -515,8 +510,7 @@ server <- function(input, output, session) {
                                  filter = "top", extensions = "Buttons",
                                  options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
           })
-
-  }) #end generate_course_summary code block
+  })
 
   #######################################################
   #start code block that generates score table
@@ -529,8 +523,7 @@ server <- function(input, output, session) {
                            filter = "top", extensions = "Buttons",
                            options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
     })
-
-  }) #end generate_course_summary code block
+  })
 
 
   #######################################################
@@ -558,7 +551,7 @@ server <- function(input, output, session) {
                            rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
     })
 
-  }) #end generate_course_summary code block
+  })
 
 
   #######################################################
@@ -572,17 +565,12 @@ server <- function(input, output, session) {
                              rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
       })
 
-  }) #end generate_course_summary code block
-
-
-
-
-
-
+  })
 
 
   #######################################################
   #Exit quizmanager menu
+  #######################################################
   observeEvent(input$Exit, {
     stopApp('Exit')
   })

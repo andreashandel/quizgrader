@@ -5,7 +5,7 @@
 \alias{quizgrader}
 \title{quizgrader: A package to do grading}
 \description{
-More text here
+More information text here
 }
 \details{
 Start the main menu of the package by calling quizmanager().

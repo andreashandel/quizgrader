@@ -12,6 +12,17 @@ vignette: >
 ---
 
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7
+)
+
+# avoid check where vignette filename must equal the vignette title
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 
 ```{r setup, include = FALSE}
 pkg = 'quizgrader' #so we can easily switch names
@@ -44,7 +55,7 @@ In the UI, specify a name for the course, choose a directory in which you want t
 Alternatively, from the command line you can start a new course with 
 
 ```{r, eval=FALSE, echo=TRUE}
-start_course(coursename = "yourcoursename", courselocation = "path/to/location/for/course")
+create_course(coursename = "yourcoursename", courselocation = "path/to/location/for/course")
 ```
 
 You are required to provide a name for your course (which will be the name of the main course directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current working directory. 
@@ -142,9 +153,8 @@ The question text. You can use basic formatting, e.g. line breaks and such. Fanc
 
 Provide additional instructions to the students, e.g. instructions regarding rounding, entering an integer, etc.
 
----
+
 **The columns just described will be part of the files that are generated for the students. An empty `Answer` column is also incuded. All other columns described next exist only in your complete solution files and are not included in the files given to the students.**  
----
 
 
 #### Answer
@@ -228,7 +238,7 @@ You can remove quizzes (or other files) that you don't want in the `completequiz
 Once you are done creating quizzes, you should have a collection of properly formatted Excel files in the `completequizzes` folder. Remove any files from that folder that are not quizzes you want to use. All your quizzes need to follow the naming convention as described previously. To create quiz sheets that will be given to students, click the `Create student quiz files` button in the GUI, or run:
 
 ```{r, eval=FALSE, echo=TRUE}
-create_student_quizzes(courselocation = "path/to/location/for/course")
+create_studentquizzes(courselocation = "path/to/location/for/course")
 ```
 
 This checks each quiz file in the `completequizzes` folder for proper formatting and content, and if successful, generates a matching sheet to be given to students. The student sheets will contain the columns `QuizID`, `QuestionID`, `Question`, `Instruction` and an empty `Answer` column.
@@ -294,6 +304,6 @@ Steps 1 and 2 above are self-explanatory. The app deployment requires more infor
 
 Each of those approaches are described in the different tutorials.
 
-There are also a tutorials [explaining how to analyze quizzes]() and [how to update quizzes or the class list once students have started submitting]().
+<!-- There are also a tutorials [explaining how to analyze quizzes]() and [how to update quizzes or the class list once students have started submitting](). -->
 
 

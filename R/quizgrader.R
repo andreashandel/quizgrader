@@ -1,6 +1,6 @@
 #' quizgrader: A package to do grading
 #'
-#' More text here
+#' More information text here
 #'
 #' Start the main menu of the package by calling quizmanager().
 #'

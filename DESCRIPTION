@@ -2,8 +2,8 @@ Package: quizgrader
 Type: Package
 Title: Automated managament and grading of quizzes
 Description: Allows generation of quizzes using simple spreadsheets, student submit online and quizzes are autograded. 
-Version: 0.0.4
-Date: 2021-11-11
+Version: 0.0.5
+Date: 2023-01-04
 Authors@R: c(
     person("Andreas", "Handel", email = "ahandel@uga.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4622-1146") ),
 	  person("Cody", "Dailey",  role = "aut"), 
@@ -16,7 +16,6 @@ Imports:
     dplyr,
     DT,
     fs,
-    here,
     lubridate,
     magrittr,
     readxl,
@@ -32,7 +31,7 @@ Imports:
     writexl,
     zip
 Depends:
-    R (>= 3.5),
+    R (>= 4.0),
     shiny (>= 1.2)
 Suggests: 
     covr,
@@ -42,7 +41,7 @@ Suggests:
     rmarkdown,
     roxygen2,
     testthat
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 URL: https://andreashandel.github.io/quizgrader/, https://github.com/andreashandel/quizgrader/
 BugReports: https://github.com/ahgroup/DSAIDE/issues
