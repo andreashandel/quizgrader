@@ -10,11 +10,12 @@ quizmanager(courselocation = NULL)
 \item{courselocation}{Path to main course directory}
 }
 \description{
-This function opens a Shiny app called quizgrader with a menu
-that allows the user to perform all relevant operations.
+This function opens a Shiny app called quizmanager_app with a menu
+that allows the user to perform all relevant quiz management operations.
 }
 \details{
-Run this function with no arguments to start the main menu (a Shiny app)
+Run this function with no arguments to start the main menu (a Shiny app).
+You can also provide a path to an existing course directory.
 }
 \examples{
 \dontrun{quizmanager()}

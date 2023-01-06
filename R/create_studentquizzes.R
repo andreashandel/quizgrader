@@ -37,6 +37,7 @@ create_studentquizzes <- function(courselocation)
     #clean out any previous student quizzes by deleting and rebuilding the student quiz folder
     studentquizpath = fs::path(courselocation,"studentquizzes")
     fs::dir_delete(studentquizpath)
+    Sys.sleep(1) #quick delay before recreation
     fs::dir_create(studentquizpath)
 
     #loop over all complete quizzes and generate student versions

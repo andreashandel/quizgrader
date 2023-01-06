@@ -13,6 +13,7 @@
 
 quizmanager <- function(courselocation = NULL) {
 
+    # if user provides location of existing course
     if (!is.null(courselocation))
     {
       # check the quizgrader.txt in the provided path to ensure it's a valid quizgrader main folder
@@ -23,14 +24,14 @@ quizmanager <- function(courselocation = NULL) {
       } else {
              courselocation_global <<- courselocation #assign course location to global variable, will then be used in quizmanager app
       }
+    # if user doesn't provide location of existing course
     } else {
       #set course location to global variable and to NULL
       courselocation_global <<- NULL
     }
 
-
-    appDir <- system.file( "apps", package = "quizgrader") #get directory for main menu app
-    appFile <- shinyAppFile(file.path(appDir,"quizmanager_app.R"))
+    appDir <- system.file( "quizmanager", package = "quizgrader") #get directory for main menu app
+    appFile <- shinyAppFile(file.path(appDir,"app.R"))
     shiny::runApp(appDir = appFile, launch.browser = TRUE) #run quizmanager app
 
     print('*************************************************')
@@ -39,13 +40,12 @@ quizmanager <- function(courselocation = NULL) {
     print('*************************************************')
 
     # clean up at end
-    courselocation <<- NULL
+    courselocation_global <<- NULL
 
 }
 
 #needed to get CRAN checks to shut up about no visible binding
-utils::globalVariables(c("courselocation_global", "DueDate"))
-
+#utils::globalVariables(c("courselocation_global", "DueDate"))
 
 
 .onAttach <- function(libname, pkgname){

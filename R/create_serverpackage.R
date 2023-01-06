@@ -18,7 +18,7 @@
 create_serverpackage <- function(courselocation, newpackage = TRUE)
 {
 
-    #error message if things don't work, otherwise will remain NULL
+    #will contain either an error or success message
     msg <- NULL
 
     #check that course location exits is performed in calling function quizmanager.R
@@ -71,7 +71,10 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
 
     #create zip file of all files and folders for deployment
     #place zip file in top directory of course
-    zipfilename = fs::path(courselocation,"serverpackage.zip")
+
+    #give each server package file a timestamp to prevent accidental confusion about which is the latest
+    timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+    zipfilename = fs::path(courselocation, paste0("serverpackage_",timestamp,".zip"))
 
     #add completequizzes folder and contents
     zip::zip(zipfile = zipfilename, files = fs::path(courselocation,"completequizzes"),
@@ -86,11 +89,11 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     if (newpackage == TRUE)
     {
         #add the grading app
-        zip::zip_append(zipfile = zipfilename, files = fs::path(fs::path_package(package = "quizgrader","apps"),"app.R"),
+        zip::zip_append(zipfile = zipfilename, files = fs::path(fs::path_package(package = "quizgrader","quizgrader"),"app.R"),
                         mode = "cherry-pick",
                         recurse = TRUE, include_directories = FALSE)
         #add css file
-        zip::zip_append(zipfile = zipfilename, files = fs::path(fs::path_package(package = "quizgrader","apps"),"quizgrader.css"),
+        zip::zip_append(zipfile = zipfilename, files = fs::path(fs::path_package(package = "quizgrader","quizgrader"),"quizgrader.css"),
                         mode = "cherry-pick",
                         recurse = TRUE, include_directories = FALSE)
 
@@ -112,7 +115,12 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
 
     }
 
-    #if things worked ok, return NULL
+    #if things worked ok, return a success message
+    if (is.null(msg))
+    {
+      msg <- paste0('The file ',zipfilename,' has been created for deployment to the shiny server.')
+    }
+
     return(msg)
 
 } #end function

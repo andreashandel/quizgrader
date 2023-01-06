@@ -1,0 +1,150 @@
+/* styling for quizgrader app
+------------------------------------------- */
+
+
+
+/* ------- Tables ------- */
+table {
+	margin: 10px;
+	border-spacing: 0;
+}
+table th {
+ /* Box-model */
+	padding: 5px;
+
+  /* Typography */
+	font-size: 16px;
+	line-height: 36px;
+
+  /* Visual */
+	background-color: #403c3d;
+	color: #fff;
+	border: 1px solid #ccc; /* light grey */
+  border-bottom: 0;
+}
+table thead th:empty {
+	background: transparent;
+	border: none;
+}
+table caption {
+	font-weight: bold;
+}
+tr:nth-child(2n+1) {
+  /* Visual */
+	background-color: #f9f9f9;  /* near white */
+	color: #000; /* black */
+}
+table td {
+	padding: 2px;
+	border-collapse: collapse;
+	border: 1px solid #ccc; /* light grey */
+}
+
+
+/* My additions
+-------------------- */
+
+#shinyheadertitle
+{
+	color: #123c66;
+	font-weight: bold;
+	text-align: center;
+	font-size: 120%;
+}
+
+#shinyheadertext
+{
+	color: #123c66;
+	text-align: center;
+	font-size: 100%;
+}
+
+#shinyapptitle
+{
+	color: #123c66;
+	font-weight: bold;
+	text-align: center;
+	font-size: 1.5em;
+}
+
+
+#classauthor
+{
+	color: black;
+	font-weight: normal;
+	text-align: center;
+
+}
+
+#mylicense
+{
+	text-align: center;
+	font-size: 70%;
+
+}
+
+
+/* shiny progress bar
+-------------------- */
+
+
+.shiny-progress-container {
+	top: 40px;
+}
+
+.progress-message {
+	color: red;
+}
+
+.shiny-notification{
+  position: fixed;
+  top: 33%;
+  left: 33%;
+  right: 33%;
+}
+
+
+.mainbutton {
+	text-align: center;
+	color: #000000;
+	background-color: #bfc8ef;
+	font-size: 1.2em;
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.submitbutton {
+	text-align: center;
+	color: #000000;
+	background-color: #bfc8ef;
+}
+
+
+
+.mainmenurow {
+	align: center;
+	text-align: center;
+	padding-top: 1em;
+	padding-left: 10em;
+  padding-bottom: 0em;
+}
+
+.mainsectionheader {
+	text-align: center;
+	color: #2846cc;
+	font-weight: bold;
+	font-size: 1.5em;
+    padding-top: 1em;
+}
+
+
+#bottomtext {
+	text-align: center;
+	color: black;
+}
+
+.bottomtext {
+	text-align: center;
+
+}
+

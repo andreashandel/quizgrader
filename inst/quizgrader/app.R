@@ -374,14 +374,20 @@ ui <- fluidPage(
       class = "mainmenurow"
     ),
   fluidRow(
-    column(6,
-      h4("Submit a new file"),
-      fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
-      actionButton("submitbutton", "Submit file", class = "submitbutton")
+    column(12,
+          align = "center",
+          h4("Submit a new file"),
+          fileInput("loadfile", label = "", accept = ".xlsx", buttonLabel = "Upload file", placeholder = "No file selected"),
+          actionButton("submitbutton", "Submit file", class = "mainbutton")
     ),
-    column(6,
+    class = "mainmenurow"
+  ), #close fluidRow structure for input
+  br(),
+  fluidRow(
+    column(12,
+         align = "center",
         h4("Check scores"),
-        actionButton("scoresbutton", "Check scores", class = "actionbutton")
+        actionButton("scoresbutton", "Check scores", class = "mainbutton")
     ),
     class = "mainmenurow"
   ), #close fluidRow structure for input
