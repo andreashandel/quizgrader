@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">quizgrader</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -46,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -59,40 +61,10 @@
 <li>
   <a href="news/index.html">Changelog</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="articles/A_introduction.html">quizgrader Introduction</a>
-    </li>
-    <li>
-      <a href="articles/B_quiz_creation.html">Creating a course and quizzes</a>
-    </li>
-    <li>
-      <a href="articles/C_hosting_on_own_shiny_server.html">Hosting quizzes on your own Shiny server</a>
-    </li>
-    <li>
-      <a href="articles/D_hosting_on_shinyappsio.html">Hosting quizzes on shinyapps.io</a>
-    </li>
-    <li>
-      <a href="articles/E_local_hosting.html">Local use of the grading app</a>
-    </li>
-    <li>
-      <a href="articles/F_quiz_administration.html">Ongoing quiz management</a>
-    </li>
-    <li>
-      <a href="articles/G_quiz_analysis.html">Analyzing quiz grades</a>
-    </li>
-  </ul>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/andreashandel/quizgrader">
+  <a href="https://github.com/andreashandel/quizgrader" class="external-link">
     <span class="fab fa-github"></span>
      
   </a>
@@ -109,84 +81,95 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="quizgrader-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#quizgrader-" class="anchor"></a>quizgrader <img src="reference/figures/logo.png" align="right" alt="" width="120">
+<div class="section level1">
+<div class="page-header"><h1 id="quizgrader-">quizgrader <img src="reference/figures/logo.png" align="right" alt="" width="120"><a class="anchor" aria-label="anchor" href="#quizgrader-"></a>
 </h1></div>
 <!-- badges: start -->
 
-<div id="description" class="section level2">
-<h2 class="hasAnchor">
-<a href="#description" class="anchor"></a>Description</h2>
+<div class="section level2">
+<h2 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
+</h2>
 <p>quizgrader is a package for managing and administering auto-graded online quizzes.</p>
 </div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting Started</h2>
+<div class="section level2">
+<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
 <p>For a quick introduction and overview of the package, <a href="./articles/A_introduction.html">see the <em>Introduction</em> tutorial (vignette)</a>.</p>
 </div>
-<div id="contributing-to-the-package" class="section level2">
-<h2 class="hasAnchor">
-<a href="#contributing-to-the-package" class="anchor"></a>Contributing to the package</h2>
-<p>The package is on GitHub and you can use the usual GitHub process to file bug reports, send feature requests, contribute updates and bug fixes, etc. If you have any comments or feedback, I very much welcome them. Please file a <a href="https://github.com/andreashandel/quizgrader/issues">GitHub issue</a> and let me know what you think.</p>
+<div class="section level2">
+<h2 id="contributing-to-the-package">Contributing to the package<a class="anchor" aria-label="anchor" href="#contributing-to-the-package"></a>
+</h2>
+<p>The package is on GitHub and you can use the usual GitHub process to file bug reports, send feature requests, contribute updates and bug fixes, etc. If you have any comments or feedback, I very much welcome them. Please file a <a href="https://github.com/andreashandel/quizgrader/issues" class="external-link">GitHub issue</a> and let me know what you think.</p>
 </div>
-<div id="citation-and-contributors" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation-and-contributors" class="anchor"></a>Citation and Contributors</h2>
-<p>This R package was developed by <a href="https://www.andreashandel.com/">Andreas Handel</a> and <a href="https://daileyco.github.io/">Cody Dailey</a>. It is maintained Andreas Handel. A full list of contributors and a Bibtex entry for the citation <a href="https://andreashandel.github.io/quizgrader/authors.html">can be found here</a>.</p>
+<div class="section level2">
+<h2 id="citation-and-contributors">Citation and Contributors<a class="anchor" aria-label="anchor" href="#citation-and-contributors"></a>
+</h2>
+<p>This R package was developed by <a href="https://www.andreashandel.com/" class="external-link">Andreas Handel</a> and <a href="https://daileyco.github.io/" class="external-link">Cody Dailey</a>. It is maintained Andreas Handel. A full list of contributors and a Bibtex entry for the citation <a href="https://andreashandel.github.io/quizgrader/authors.html" class="external-link">can be found here</a>.</p>
 <p>This project was/is partially supported by NIH.</p>
 </div>
-<div id="further-information" class="section level2">
-<h2 class="hasAnchor">
-<a href="#further-information" class="anchor"></a>Further information</h2>
+<div class="section level2">
+<h2 id="further-information">Further information<a class="anchor" aria-label="anchor" href="#further-information"></a>
+</h2>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/ahgroup/DSAIDE/">https://​github.com/​ahgroup/​DSAIDE/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/ahgroup/DSAIDE/issues">https://​github.com/​ahgroup/​DSAIDE/​issues</a>
-</li>
-</ul>
-</div>
-<div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>
-<a href="https://www.andreashandel.com">Andreas Handel</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-4622-1146" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="https://github.com/ahgroup/DSAIDE/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/ahgroup/DSAIDE/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="license">
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/andreashandel/quizgrader/actions"><img src="https://github.com/andreashandel/quizgrader/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://codecov.io/gh/andreashandel/quizgrader"><img src="https://codecov.io/gh/andreashandel/quizgrader/branch/master/graph/badge.svg?token=OGO3sVEcPD" alt="Coverage status"></a></li>
-<li><a href="https://github.com/andreashandel/quizgrader/actions"><img src="https://github.com/andreashandel/quizgrader/workflows/test-coverage/badge.svg" alt="test-coverage"></a></li>
-<li><a href="https://github.com/andreashandel/quizgrader/actions"><img src="https://github.com/andreashandel/quizgrader/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing quizgrader</a></li>
+</ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>
+<a href="https://www.andreashandel.com" class="external-link">Andreas Handel</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-4622-1146" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Cody Dailey <br><small class="roles"> Author </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/andreashandel/quizgrader/actions" class="external-link"><img src="https://github.com/andreashandel/quizgrader/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://codecov.io/gh/andreashandel/quizgrader" class="external-link"><img src="https://codecov.io/gh/andreashandel/quizgrader/branch/master/graph/badge.svg?token=OGO3sVEcPD" alt="Coverage status"></a></li>
+<li><a href="https://github.com/andreashandel/quizgrader/actions" class="external-link"><img src="https://github.com/andreashandel/quizgrader/workflows/test-coverage/badge.svg" alt="test-coverage"></a></li>
+<li><a href="https://github.com/andreashandel/quizgrader/actions" class="external-link"><img src="https://github.com/andreashandel/quizgrader/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.andreashandel.com">Andreas Handel</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://www.andreashandel.com" class="external-link">Andreas Handel</a>, Cody Dailey.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -194,6 +177,8 @@
 
   
 
+
+  
 
   </body>
 </html>

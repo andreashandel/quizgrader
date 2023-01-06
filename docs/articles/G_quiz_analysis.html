@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">quizgrader</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -46,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -59,40 +61,10 @@
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/A_introduction.html">quizgrader Introduction</a>
-    </li>
-    <li>
-      <a href="../articles/B_quiz_creation.html">Creating a course and quizzes</a>
-    </li>
-    <li>
-      <a href="../articles/C_hosting_on_own_shiny_server.html">Hosting quizzes on your own Shiny server</a>
-    </li>
-    <li>
-      <a href="../articles/D_hosting_on_shinyappsio.html">Hosting quizzes on shinyapps.io</a>
-    </li>
-    <li>
-      <a href="../articles/E_local_hosting.html">Local use of the grading app</a>
-    </li>
-    <li>
-      <a href="../articles/F_quiz_administration.html">Ongoing quiz management</a>
-    </li>
-    <li>
-      <a href="../articles/G_quiz_analysis.html">Analyzing quiz grades</a>
-    </li>
-  </ul>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/andreashandel/quizgrader">
+  <a href="https://github.com/andreashandel/quizgrader" class="external-link">
     <span class="fab fa-github"></span>
      
   </a>
@@ -107,25 +79,36 @@
 
       
 
-      </header><script src="G_quiz_analysis_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Analyzing quiz grades</h1>
-                        <h4 class="author"><a href="https://www.andreashandel.com">Andreas Handel</a></h4>
+                        <h4 data-toc-skip class="author"><a href="https://www.andreashandel.com" class="external-link">Andreas
+Handel</a></h4>
             
-            <h4 class="date">2021-04-20</h4>
+            <h4 data-toc-skip class="date">2023-01-06</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/master/vignettes/G_quiz_analysis.Rmd"><code>vignettes/G_quiz_analysis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/HEAD/vignettes/G_quiz_analysis.Rmd" class="external-link"><code>vignettes/G_quiz_analysis.Rmd</code></a></small>
       <div class="hidden name"><code>G_quiz_analysis.Rmd</code></div>
 
     </div>
 
     
     
-<div id="retrieving-and-analyzing-student-submissions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#retrieving-and-analyzing-student-submissions" class="anchor"></a>Retrieving and Analyzing student submissions</h3>
-<p>Once students start submitting, their grades are recorded in (always time-stamped and not overwritten) <code>gradelist.xlsx</code> files, and all their submissions, including their user ID and timestamp, are placed into the <code>studentsubmissions</code> folder. you’ll want to pull files from the server every so often. Currently, this needs to be done manually. To that end, log into the shiny server and copy everything in the <code>studentsubmissions</code> and <code>gradelists</code> folders to the local versions of your course. Once done, open <code>quizmanager</code>, load the course you want to look at, and use the <code>Analyze Submissions</code> tab to see the performance of students and how the different quiz questions are being answered.</p>
+<div class="section level3">
+<h3 id="retrieving-and-analyzing-student-submissions">Retrieving and Analyzing student submissions<a class="anchor" aria-label="anchor" href="#retrieving-and-analyzing-student-submissions"></a>
+</h3>
+<p>Once students start submitting, their grades are recorded in (always
+time-stamped and not overwritten) <code>gradelist.xlsx</code> files, and
+all their submissions, including their user ID and timestamp, are placed
+into the <code>studentsubmissions</code> folder. you’ll want to pull
+files from the server every so often. Currently, this needs to be done
+manually. To that end, log into the shiny server and copy everything in
+the <code>studentsubmissions</code> and <code>gradelists</code> folders
+to the local versions of your course. Once done, open
+<code>quizmanager</code>, load the course you want to look at, and use
+the <code>Analyze Submissions</code> tab to see the performance of
+students and how the different quiz questions are being answered.</p>
 </div>
   </div>
 
@@ -138,11 +121,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.andreashandel.com">Andreas Handel</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://www.andreashandel.com" class="external-link">Andreas Handel</a>, Cody Dailey.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -150,6 +135,8 @@
 
   
 
+
+  
 
   </body>
 </html>

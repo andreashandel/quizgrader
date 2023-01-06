@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">quizgrader</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -46,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -59,40 +61,10 @@
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/A_introduction.html">quizgrader Introduction</a>
-    </li>
-    <li>
-      <a href="../articles/B_quiz_creation.html">Creating a course and quizzes</a>
-    </li>
-    <li>
-      <a href="../articles/C_hosting_on_own_shiny_server.html">Hosting quizzes on your own Shiny server</a>
-    </li>
-    <li>
-      <a href="../articles/D_hosting_on_shinyappsio.html">Hosting quizzes on shinyapps.io</a>
-    </li>
-    <li>
-      <a href="../articles/E_local_hosting.html">Local use of the grading app</a>
-    </li>
-    <li>
-      <a href="../articles/F_quiz_administration.html">Ongoing quiz management</a>
-    </li>
-    <li>
-      <a href="../articles/G_quiz_analysis.html">Analyzing quiz grades</a>
-    </li>
-  </ul>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/andreashandel/quizgrader">
+  <a href="https://github.com/andreashandel/quizgrader" class="external-link">
     <span class="fab fa-github"></span>
      
   </a>
@@ -107,90 +79,148 @@
 
       
 
-      </header><script src="A_introduction_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>quizgrader Introduction</h1>
-                        <h4 class="author"><a href="https://www.andreashandel.com">Andreas Handel</a></h4>
+                        <h4 data-toc-skip class="author"><a href="https://www.andreashandel.com" class="external-link">Andreas
+Handel</a></h4>
             
-            <h4 class="date">2021-04-20</h4>
+            <h4 data-toc-skip class="date">2023-01-06</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/master/vignettes/A_introduction.Rmd"><code>vignettes/A_introduction.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/HEAD/vignettes/A_introduction.Rmd" class="external-link"><code>vignettes/A_introduction.Rmd</code></a></small>
       <div class="hidden name"><code>A_introduction.Rmd</code></div>
 
     </div>
 
     
     
-<div id="overview" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
-<p>This document provides a quick introduction and overview of the <strong>quizgrader</strong> package, which is a package for managing and administering auto-graded online quizzes.</p>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>This document provides a quick introduction and overview of the
+<strong>quizgrader</strong> package, which is a package for managing and
+administering auto-graded online quizzes.</p>
 <p>Very briefly, here is how it works:</p>
 <ol style="list-style-type: decimal">
-<li>You (= instructor) create quizzes as Excel files using a provided template, then deploy online.</li>
-<li>You give your students the Excel quiz files (minus the answers 😁).</li>
-<li>Students fill out the quiz sheets and upload them using a simple web interface.</li>
-<li>Quizzes are auto-graded on upload, grades recorded, students receive immediate feedback.</li>
-<li>You retrieve submissions/grades, analyze them and compute final grades.</li>
+<li>You (= instructor) create quizzes as Excel files using a provided
+template, then deploy online.</li>
+<li>You give your students the Excel quiz files - minus the answers
+:).</li>
+<li>Students fill out the quiz sheets and upload them using a simple web
+interface.</li>
+<li>Quizzes are auto-graded on upload, grades recorded, students receive
+immediate feedback.</li>
+<li>You retrieve submissions/grades, analyze them and compute final
+grades.</li>
 </ol>
 <p><strong>If this sounds potentially useful, read on.</strong></p>
 </div>
-<div id="motivation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#motivation" class="anchor"></a>Motivation</h2>
-<p>I regularly teach online. In the past, I have used our university’s learning management system (LMS), but I dislike it because it is not user-friendly and elements, such as quizzes and student submissions are locked up inside the LMS and one can only extract very rudimentary statistics. Because of this, I have over the last years slowly moved away from our LMS and tried to replace as much as possible with resources that are as open as possible.</p>
-<p>One feature I liked about the LMS is that it could administer auto-graded quizzes, so once the quiz was written, I didn’t have much to do anymore, students just submitted and got graded automatically each week. I tend to give lots of small quizzes (generally 1-2 per week), so I needed this process automated.</p>
-<p>I decided to write some R code to get the functionality I needed. It turned out well enough that I figured it could be worth turning it into a full <code>R</code> package and making it available to others.</p>
+<div class="section level2">
+<h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
+</h2>
+<p>I regularly teach online. In the past, I have used our university’s
+learning management system (LMS), but I dislike it because it is not
+user-friendly and elements, such as quizzes and student submissions are
+locked up inside the LMS and one can only extract very rudimentary
+statistics. Because of this, I have over the last years slowly moved
+away from our LMS and tried to replace as much as possible with
+resources that are as open as possible.</p>
+<p>One feature I liked about the LMS is that it could administer
+auto-graded quizzes, so once the quiz was written, I didn’t have much to
+do anymore, students just submitted and got graded automatically each
+week. I tend to give lots of small quizzes (generally 1-2 per week), so
+I needed this process automated.</p>
+<p>I decided to write some R code to get the functionality I needed. It
+turned out well enough that I figured it could be worth turning it into
+a full <code>R</code> package and making it available to others.</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p><strong>THE PACKAGE IS NOT YET ON CRAN, USE GITHUB INSTALL OPTION</strong></p>
-<p>After having installed and opened R/Rstudio, you can install the package from CRAN by typing the following into the R console (the bottom left window if you are using RStudio):</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p><strong>THE PACKAGE IS NOT YET ON CRAN, USE GITHUB INSTALL
+OPTION</strong></p>
+<p>After having installed and opened R/Rstudio, you can install the
+package from CRAN by typing the following into the R console (the bottom
+left window if you are using RStudio):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">'quizgrader'</span><span class="op">)</span></code></pre></div>
-<p>Alternatively, you can install the latest development version (with usually both more features and more bugs) from github, using the <code>remotes</code> package. The following commands, typed into the <code>R</code> console, will get you up and running:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'quizgrader'</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, you can install the latest development version (with
+usually both more features and more bugs) from github, using the
+<code>remotes</code> package. The following commands, typed into the
+<code>R</code> console, will get you up and running:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span> <span class="co">#if not already installed</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">'andreashandel/quizgrader'</span><span class="op">)</span></code></pre></div>
-<p>The package depends on other packages, which will also be installed as needed. Package installation is a one-time process, unless you update or re-install R itself, or want to install a newer version of <code>quizgrader</code>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span> <span class="co">#if not already installed</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'andreashandel/quizgrader'</span><span class="op">)</span></span></code></pre></div>
+<p>The package depends on other packages, which will also be installed
+as needed. Package installation is a one-time process, unless you update
+or re-install R itself, or want to install a newer version of
+<code>quizgrader</code>.</p>
 </div>
-<div id="package-use" class="section level2">
-<h2 class="hasAnchor">
-<a href="#package-use" class="anchor"></a>Package use</h2>
-<p>You can make, deploy and analyze student quiz submissions entirely interactively through Shiny apps. Alternatively, you can do all quiz management processes without using the Shiny apps. The tutorials explain both approaches. Here are the steps in overview format.</p>
+<div class="section level2">
+<h2 id="package-use">Package use<a class="anchor" aria-label="anchor" href="#package-use"></a>
+</h2>
+<p>You can make, deploy and analyze student quiz submissions entirely
+interactively through Shiny apps. Alternatively, you can do all quiz
+management processes without using the Shiny apps. The tutorials explain
+both approaches. Here are the steps in overview format.</p>
 <p><strong>Quiz Preparation</strong></p>
 <p>As a teacher, you will start by going through these steps:</p>
 <ul>
 <li>Start a new course that will contain all your quizzes.</li>
 <li>Create your quizzes (using a provided Excel file template).</li>
-<li>Create a roster of students (also using a provided Excel template).</li>
-<li>Process complete quizzes to generate quiz sheets/files that are given to students for filling out.</li>
+<li>Create a roster of students (also using a provided Excel
+template).</li>
+<li>Process complete quizzes to generate quiz sheets/files that are
+given to students for filling out.</li>
 <li>Process everything else and deploy to a Shiny server.</li>
 </ul>
 <p><strong>Quiz submission</strong></p>
-<p>Once the quizzes are deployed to a Shiny server, you tell students the submission website. Before each quiz deadline, students go to the website, upload their filled quiz sheet. The quiz is auto-graded, the grade is recorded and students are being given immediate feedback.</p>
+<p>Once the quizzes are deployed to a Shiny server, you tell students
+the submission website. Before each quiz deadline, students go to the
+website, upload their filled quiz sheet. The quiz is auto-graded, the
+grade is recorded and students are being given immediate feedback.</p>
 <p><strong>Quiz management</strong></p>
-<p>You can download the student submissions while the course is running, analyze the results to investigate individual students or individual questions. You can also make adjustments to the student roster and the quizzes (e.g. modify upcoming quizzes). At the end of the course, you can make final manual adjustments and compute the overall grade.</p>
+<p>You can download the student submissions while the course is running,
+analyze the results to investigate individual students or individual
+questions. You can also make adjustments to the student roster and the
+quizzes (e.g. modify upcoming quizzes). At the end of the course, you
+can make final manual adjustments and compute the overall grade.</p>
 </div>
-<div id="next-steps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#next-steps" class="anchor"></a>Next steps</h2>
-<p>To learn more and see how to get started creating a course and a set of quizzes, see the <a href="./articles/B_quiz_creation.html">Creating Quizzes</a> tutorial.</p>
+<div class="section level2">
+<h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h2>
+<p>To learn more and see how to get started creating a course and a set
+of quizzes, see the <a href="./articles/B_quiz_creation.html">Creating
+Quizzes</a> tutorial.</p>
 </div>
-<div id="some-general-comments-regarding-quizgrader" class="section level2">
-<h2 class="hasAnchor">
-<a href="#some-general-comments-regarding-quizgrader" class="anchor"></a>Some general comments regarding quizgrader</h2>
-<div id="privacy-security-and-ferpa" class="section level3">
-<h3 class="hasAnchor">
-<a href="#privacy-security-and-ferpa" class="anchor"></a>Privacy, Security and FERPA</h3>
-<p>You might want to consider privacy and security as it applies to various laws (e.g. FERPA) when using this app. You will be placing a list with student names, IDs (e.g. emails) and their quiz submissions/grades into the cloud. There is no default public access to any of this information, you (or TAs who have login privileges) are the only one who can access those documents. It thus seems ok to me. But if the server where you host the submission app gets compromised, this might compromise student information. I consider this a low and small risk, but it’s something you might want to think about.</p>
+<div class="section level2">
+<h2 id="some-general-comments-regarding-quizgrader">Some general comments regarding quizgrader<a class="anchor" aria-label="anchor" href="#some-general-comments-regarding-quizgrader"></a>
+</h2>
+<div class="section level3">
+<h3 id="privacy-security-and-ferpa">Privacy, Security and FERPA<a class="anchor" aria-label="anchor" href="#privacy-security-and-ferpa"></a>
+</h3>
+<p>You might want to consider privacy and security as it applies to
+various laws (e.g. FERPA) when using this app. You will be placing a
+list with student names, IDs (e.g. emails) and their quiz
+submissions/grades into the cloud. There is no default public access to
+any of this information, you (or TAs who have login privileges) are the
+only one who can access those documents. It thus seems ok to me. But if
+the server where you host the submission app gets compromised, this
+might compromise student information. I consider this a low and small
+risk, but it’s something you might want to think about.</p>
 </div>
-<div id="excel-is-evil" class="section level3">
-<h3 class="hasAnchor">
-<a href="#excel-is-evil" class="anchor"></a>Excel is evil</h3>
-<p>I know the potential problems that can occur when using Excel. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most importantly students, are familiar with it. This means you need to be careful about Excels over-eager auto-processing, especially of dates. Specific warnings are provided throughout the tutorials to alert you to potential issues. In my experience, if you were careful creating the documents, it shouldn’t cause problems on the student side.</p>
+<div class="section level3">
+<h3 id="excel-is-evil">Excel is evil<a class="anchor" aria-label="anchor" href="#excel-is-evil"></a>
+</h3>
+<p>I know the potential problems that can occur when using Excel. I
+originally started this project with CSV (actually, TSV) files. I ended
+up deciding to go with Excel because instructors, and most importantly
+students, are familiar with it. This means you need to be careful about
+Excels over-eager auto-processing, especially of dates. Specific
+warnings are provided throughout the tutorials to alert you to potential
+issues. In my experience, if you were careful creating the documents, it
+shouldn’t cause problems on the student side.</p>
 </div>
 </div>
   </div>
@@ -206,11 +236,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.andreashandel.com">Andreas Handel</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://www.andreashandel.com" class="external-link">Andreas Handel</a>, Cody Dailey.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -218,6 +250,8 @@
 
   
 
+
+  
 
   </body>
 </html>

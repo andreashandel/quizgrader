@@ -1,7 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/404.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/AB_quiz_creation.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/A_introduction.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/B_hosting_on_own_shiny_server.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/B_quiz_creation.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/C_hosting_on_own_shiny_server.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/C_hosting_on_shinyappsio.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/D_hosting_on_shinyappsio.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/D_quiz_analysis.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/E_local_hosting.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/E_quiz_analysis.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/F_quiz_administration.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/G_quiz_analysis.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/authors.html</loc>
+  </url>
+  <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/index.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/analyze_log.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/analyze_overview.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/analyze_quiz.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/analyze_scoretable.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/analyze_student.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/check_courselocation.html</loc>
   </url>
   <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/check_metadata.html</loc>
@@ -25,7 +91,22 @@
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_serverpackage.html</loc>
   </url>
   <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_studentquizzes.html</loc>
+  </url>
+  <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/create_student_quizzes.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/grade_quiz.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/make_package.html</loc>
+  </url>
+  <url>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/quizgrader.html</loc>
   </url>
   <url>
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/quizmanager.html</loc>
@@ -37,24 +118,9 @@
     <loc>https://andreashandel.github.io/quizgrader/index.html/reference/save_grade.html</loc>
   </url>
   <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/A_introduction.html</loc>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/start_course.html</loc>
   </url>
   <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/B_quiz_creation.html</loc>
-  </url>
-  <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/C_hosting_on_own_shiny_server.html</loc>
-  </url>
-  <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/D_hosting_on_shinyappsio.html</loc>
-  </url>
-  <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/E_local_hosting.html</loc>
-  </url>
-  <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/F_quiz_administration.html</loc>
-  </url>
-  <url>
-    <loc>https://andreashandel.github.io/quizgrader/index.html/articles/G_quiz_analysis.html</loc>
+    <loc>https://andreashandel.github.io/quizgrader/index.html/reference/summarize_course.html</loc>
   </url>
 </urlset>

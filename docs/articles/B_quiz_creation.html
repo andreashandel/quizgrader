@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">quizgrader</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -46,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -59,40 +61,10 @@
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/A_introduction.html">quizgrader Introduction</a>
-    </li>
-    <li>
-      <a href="../articles/B_quiz_creation.html">Creating a course and quizzes</a>
-    </li>
-    <li>
-      <a href="../articles/C_hosting_on_own_shiny_server.html">Hosting quizzes on your own Shiny server</a>
-    </li>
-    <li>
-      <a href="../articles/D_hosting_on_shinyappsio.html">Hosting quizzes on shinyapps.io</a>
-    </li>
-    <li>
-      <a href="../articles/E_local_hosting.html">Local use of the grading app</a>
-    </li>
-    <li>
-      <a href="../articles/F_quiz_administration.html">Ongoing quiz management</a>
-    </li>
-    <li>
-      <a href="../articles/G_quiz_analysis.html">Analyzing quiz grades</a>
-    </li>
-  </ul>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/andreashandel/quizgrader">
+  <a href="https://github.com/andreashandel/quizgrader" class="external-link">
     <span class="fab fa-github"></span>
      
   </a>
@@ -107,254 +79,577 @@
 
       
 
-      </header><script src="B_quiz_creation_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Creating a course and quizzes</h1>
-                        <h4 class="author"><a href="https://www.andreashandel.com">Andreas Handel</a></h4>
+                        <h4 data-toc-skip class="author"><a href="https://www.andreashandel.com" class="external-link">Andreas
+Handel</a></h4>
             
-            <h4 class="date">2021-04-20</h4>
+            <h4 data-toc-skip class="date">2023-01-06</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/master/vignettes/B_quiz_creation.Rmd"><code>vignettes/B_quiz_creation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/HEAD/vignettes/B_quiz_creation.Rmd" class="external-link"><code>vignettes/B_quiz_creation.Rmd</code></a></small>
       <div class="hidden name"><code>B_quiz_creation.Rmd</code></div>
 
     </div>
 
     
     
-<div id="introduction" class="section level2">
-<h2 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h2>
-<p>This document describes the steps required to set up a course and create quizzes using <strong>quizgrader</strong>.</p>
-<p>I assume you read the <a href="./A_introduction.html">introduction vignette</a>.</p>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>This document describes the steps required to set up a course and
+create quizzes using <strong>quizgrader</strong>.</p>
+<p>I assume you read the <a href="./A_introduction.html">introduction
+vignette</a>.</p>
 </div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting started</h2>
-<p>Start by loading the package with <code><a href="https://andreashandel.github.io/quizgrader/">library(quizgrader)</a></code>. You can do most tasks related to quiz management through a user interface (UI). If you want to use the UI, start the main menu with <code><a href="../reference/quizmanager.html">quizmanager()</a></code>. This is the interface you will use to make, manage and analyze the quizzes.</p>
-<p>You can alternatively skip the UI and do everything on the command line and by directly interacting with folders and files. The following documentation explains both ways, always starting with the UI approach, then explaining the equivalent direct approach.</p>
+<div class="section level2">
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<p>Start by loading the package with <code><a href="https://andreashandel.github.io/quizgrader/" class="external-link">library(quizgrader)</a></code>.
+You can do most tasks related to quiz management through a user
+interface (UI). If you want to use the UI, start the main menu with
+<code><a href="../reference/quizmanager.html">quizmanager()</a></code>. This is the interface you will use to make,
+manage and analyze the quizzes.</p>
+<p>You can alternatively skip the UI and do everything on the command
+line and by directly interacting with folders and files. The following
+documentation explains both ways, always starting with the UI approach,
+then explaining the equivalent direct approach.</p>
 </div>
-<div id="setting-up-a-new-course" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setting-up-a-new-course" class="anchor"></a>Setting up a new course</h2>
-<p>In the UI, specify a name for the course, choose a directory in which you want to place all the folders and files for the new course, and click on <code>Start new course</code>.</p>
-<p>Alternatively, from the command line you can start a new course with</p>
+<div class="section level2">
+<h2 id="setting-up-a-new-course">Setting up a new course<a class="anchor" aria-label="anchor" href="#setting-up-a-new-course"></a>
+</h2>
+<p>In the UI, specify a name for the course, choose a directory in which
+you want to place all the folders and files for the new course, and
+click on <code>Start new course</code>.</p>
+<p>Alternatively, from the command line you can start a new course
+with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">start_course</span><span class="op">(</span>coursename <span class="op">=</span> <span class="st">"yourcoursename"</span>, courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></code></pre></div>
-<p>You are required to provide a name for your course (which will be the name of the main course directory). It is recommended you provide a location where you want the course folder and its subfolders to go. If you do not provide that, it will be created in the current working directory.</p>
-<p>If things go wrong, you should get an error message. Otherwise, there should be a new folder with the course name you specified in the location you chose. You will also get a message telling you where the new folder has been created. Inside that main course folder are several other folders and files, namely:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_course.html">create_course</a></span><span class="op">(</span>coursename <span class="op">=</span> <span class="st">"yourcoursename"</span>, courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></span></code></pre></div>
+<p>You are required to provide a name for your course (which will be the
+name of the main course directory). It is recommended you provide a
+location where you want the course folder and its subfolders to go. If
+you do not provide that, it will be created in the current working
+directory.</p>
+<p>If things go wrong, you should get an error message. Otherwise, there
+should be a new folder with the course name you specified in the
+location you chose. You will also get a message telling you where the
+new folder has been created. Inside that main course folder are several
+other folders and files, namely:</p>
 <p><strong>Folders</strong></p>
 <ul>
 <li>
-<code>/studentlists</code> - a folder that will contains Excel spreadsheet(s) with student roster information.</li>
+<code>/studentlists</code> - a folder that will contains Excel
+spreadsheet(s) with student roster information.</li>
 <li>
-<code>/gradelists</code> - a folder that will contain the main Excel grade tracking spreadsheets, created by combining the student list and quiz information (see below for details).</li>
+<code>/gradelists</code> - a folder that will contain the main Excel
+grade tracking spreadsheets, created by combining the student list and
+quiz information (see below for details).</li>
 <li>
-<code>/completequizzes</code> - a folder which will contain Excel files of all your quizzes (with answers) once you made them.</li>
+<code>/completequizzes</code> - a folder which will contain Excel
+files of all your quizzes (with answers) once you made them.</li>
 <li>
-<code>/studentquizzes</code> - a folder that will contain Excel files with versions of the quizzes to be given to the students for filling out and submitting. These files are generated once you made your solution sheets.</li>
+<code>/studentquizzes</code> - a folder that will contain Excel
+files with versions of the quizzes to be given to the students for
+filling out and submitting. These files are generated once you made your
+solution sheets.</li>
 <li>
-<code>/studentsubmissions</code> - all individual submissions by students. Once the grading app is deployed and students start submitting, their grades will be recorded in the main <code>gradelist.csv</code> file. For record keeping and detailed analysis, each individual submission is also kept. For easier organization, a sub-folder for each quiz will be created and student submissions organized into those sub-folders.</li>
+<code>/studentsubmissions</code> - all individual submissions by
+students. Once the grading app is deployed and students start
+submitting, their grades will be recorded in the main
+<code>gradelist.csv</code> file. For record keeping and detailed
+analysis, each individual submission is also kept. For easier
+organization, a sub-folder for each quiz will be created and student
+submissions organized into those sub-folders.</li>
 <li>
-<code>/templates</code> - a folder containing templates for quizzes and student list. Use those as starting points.</li>
+<code>/templates</code> - a folder containing templates for quizzes
+and student list. Use those as starting points.</li>
 </ul>
 <p><strong>Files</strong></p>
 <ul>
 <li>
-<code>studentlist_template.xlsx</code> is a template file inside the <code>/templates</code> folder that should be populated with student information, as described below.</li>
+<code>studentlist_template.xlsx</code> is a template file inside the
+<code>/templates</code> folder that should be populated with student
+information, as described below.</li>
 <li>
-<code>quiz_template.xlsx</code> is a template file for quizzes, generated inside the <code>/templates</code> folder. This file should be used as template for creating your own quizzes, as described below.</li>
+<code>quiz_template.xlsx</code> is a template file for quizzes,
+generated inside the <code>/templates</code> folder. This file should be
+used as template for creating your own quizzes, as described below.</li>
 </ul>
-<p><em>Note that if you retrieve template files through the UI, they will come from inside the package, not your <code>/templates</code> folder. This way, if you accidentally mess up the files in the <code>/templates</code> folder, you can get clean versions again.</em></p>
+<p><em>Note that if you retrieve template files through the UI, they
+will come from inside the package, not your <code>/templates</code>
+folder. This way, if you accidentally mess up the files in the
+<code>/templates</code> folder, you can get clean versions
+again.</em></p>
 </div>
-<div id="loading-an-existing-course" class="section level2">
-<h2 class="hasAnchor">
-<a href="#loading-an-existing-course" class="anchor"></a>Loading an existing course</h2>
-<p>In the UI, you can load a course you created previously, so you can continue working on it. If you are not going through the UI, you will be directly copying files into the course folders. You therefore do not need to set a course folder (but you’ll have to specify the folder when you call the functions).</p>
+<div class="section level2">
+<h2 id="loading-an-existing-course">Loading an existing course<a class="anchor" aria-label="anchor" href="#loading-an-existing-course"></a>
+</h2>
+<p>In the UI, you can load a course you created previously, so you can
+continue working on it. If you are not going through the UI, you will be
+directly copying files into the course folders. You therefore do not
+need to set a course folder (but you’ll have to specify the folder when
+you call the functions).</p>
 </div>
-<div id="add-students-to-the-course" class="section level2">
-<h2 class="hasAnchor">
-<a href="#add-students-to-the-course" class="anchor"></a>Add students to the course</h2>
-<div id="filling-the-template" class="section level3">
-<h3 class="hasAnchor">
-<a href="#filling-the-template" class="anchor"></a>Filling the template</h3>
-<p>Once you created the course as described above, you need to add students to the course. To that end, you need to fill out the provided template with student information. Get the <code>studentlist_template.xlsx</code> file either through the UI or you can find it in the <code>/templates</code> folder on your computer inside the course folder you just created. The template file has several columns that you need to fill:</p>
-<div id="lastnamefirstname" class="section level4">
-<h4 class="hasAnchor">
-<a href="#lastnamefirstname" class="anchor"></a>Lastname/Firstname</h4>
-<p><code>Lastname</code> and <code>Firstname</code> columns should be self-explanatory.</p>
+<div class="section level2">
+<h2 id="add-students-to-the-course">Add students to the course<a class="anchor" aria-label="anchor" href="#add-students-to-the-course"></a>
+</h2>
+<div class="section level3">
+<h3 id="filling-the-template">Filling the template<a class="anchor" aria-label="anchor" href="#filling-the-template"></a>
+</h3>
+<p>Once you created the course as described above, you need to add
+students to the course. To that end, you need to fill out the provided
+template with student information. Get the
+<code>studentlist_template.xlsx</code> file either through the UI or you
+can find it in the <code>/templates</code> folder on your computer
+inside the course folder you just created. The template file has several
+columns that you need to fill:</p>
+<div class="section level4">
+<h4 id="lastnamefirstname">Lastname/Firstname<a class="anchor" aria-label="anchor" href="#lastnamefirstname"></a>
+</h4>
+<p><code>Lastname</code> and <code>Firstname</code> columns should be
+self-explanatory.</p>
 </div>
-<div id="studentid" class="section level4">
-<h4 class="hasAnchor">
-<a href="#studentid" class="anchor"></a>StudentID</h4>
-<p><code>StudentID</code> needs to be a unique identifier for each student. Students will enter this when they upload their quizzes for grading, and ut will be checked/matched to identify the student. Matching is not done on names since those can be non-unique. The best option is probably to use student emails as ID, but any other unique identifier works.</p>
+<div class="section level4">
+<h4 id="studentid">StudentID<a class="anchor" aria-label="anchor" href="#studentid"></a>
+</h4>
+<p><code>StudentID</code> needs to be a unique identifier for each
+student. Students will enter this when they upload their quizzes for
+grading, and ut will be checked/matched to identify the student.
+Matching is not done on names since those can be non-unique. The best
+option is probably to use student emails as ID, but any other unique
+identifier works.</p>
 </div>
-<div id="password" class="section level4">
-<h4 class="hasAnchor">
-<a href="#password" class="anchor"></a>Password</h4>
-<p>The <code>Password</code> column is there to prevent a student from accidentally or purposefully submitting as another student. Of course, this requires students to keep their passwords to themselves. This does not prevent cheating. If students want to, they can share passwords and submit for each other. Or they can share their filled out quiz sheets before submission. I expect students to follow the academic honesty policy, I use lots of low-stake quizzes that count for little of the total grade (a single quiz usually &lt;1% of the total grade) and most of my teaching is at the graduate level and students take my courses because they are interested in the topic. All of these features minimize the risk of cheating to a level that I don’t worry about it. <strong>If you are worried about cheating on these quizzes, this package/setup is likely not suitable for your situation!</strong></p>
-<p>I collect passwords at the beginning of the course through a simple Google form. I suggest you tell students to only use letters and numbers in their password and nothing else (including no blank spaces). Other characters might work, but in my experience this can lead to occasional problems. I copy the passwords from the Google form/sheet into the template. If you want to, you can likely automate this process with some R scripts. (Or you can contribute this feature to the package, pull-requests with new features are very welcome 😁).</p>
-<p>Disabling the password feature is currently not possible. If you think a setup without a password is a feature I should implement, let me know. For the time being, if you don’t want to use this feature, just enter the same password for every student and tell the students what the password is. They’ll still have to enter it during submission, but that should not be much of a nuisance.</p>
-<p><strong>You should tell students that you will be able to read their passwords and that this setup is not very secure, thus they should use a <em>throw-away</em> password for this course and not any passwords they use to protect real systems (e.g. their bank accounts)!</strong></p>
-</div>
-</div>
-<div id="adding-the-filled-template" class="section level3">
-<h3 class="hasAnchor">
-<a href="#adding-the-filled-template" class="anchor"></a>Adding the filled template</h3>
-<p>Once you are done filling the student list, add it to the course by clicking the <code>Add studentlist</code> button in the UI or manually place it into the <code>studentlists</code> folder. <strong>Each student needs to have a <code>StudentID</code> and <code>Password</code> entry.</strong> Name information is recommended but optional. <strong>The only time the <code>studentlist</code> file is checked to ensure it follows the required format is during generation of the grade list, see below.</strong></p>
-<p>If you want to keep track of changes, give the file a new name (e.g. <code>studentlist_new.xlsx</code>). Any pre-existing file with the same name will be overwritten. You can also manually copy the file into this folder. I recommend only using letters, numbers and underscore for file names. Other names might work, but since the files are deployed to a server (which is likely running Unix/Linux), having file names that contain other characters (e.g. dashes or blank) might cause problems. You can have as many versions of the student list file in the <code>/studentlists</code> folder as you like. <strong>When you generate the grade tracking sheet (see below), the most recently modified <code>.xlsx</code> file in this folder will be used.</strong> All other files will be ignored. Make sure this file is a valid student list. Ideally, at this stage when you are ready to make the <code>gradelist</code> file, remove all but the current studentlist file.</p>
-</div>
-</div>
-<div id="create-your-quizzes" class="section level2">
-<h2 class="hasAnchor">
-<a href="#create-your-quizzes" class="anchor"></a>Create your quizzes</h2>
-<p>To create quizzes, use the provided template. You can get the template by clicking <code>Get quiz template</code>, or by manually going into the <code>/templates</code> folder of your course.</p>
-<p>For each quiz, you need to create a separate file based on the template, they should all be structured as shown in the template. <strong>The name of each quiz file needs to agree with the QuizID entry and be <code>QuizID_complete.xlsx</code> (see next).</strong></p>
-<div id="quiz-columns" class="section level3">
-<h3 class="hasAnchor">
-<a href="#quiz-columns" class="anchor"></a>Quiz Columns</h3>
-<p>Each quiz <strong>must have</strong> columns with the following names and content. All column names need to be spelled as shown in the template. Additional columns are optional and will be ignored.</p>
-<div id="quizid" class="section level4">
-<h4 class="hasAnchor">
-<a href="#quizid" class="anchor"></a>QuizID</h4>
-<p>A unique ID. This can only contain letters, numbers and underscore. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. <strong>Quiz files need to have the name <code>QuizID_complete.xlsx</code> where <code>QuizID</code> is the entry in the column of that name.</strong></p>
-</div>
-<div id="questionid" class="section level4">
-<h4 class="hasAnchor">
-<a href="#questionid" class="anchor"></a>QuestionID</h4>
-<p>A unique ID for each question. This can only contain letters, numbers and underscore. It is best to give each question a unique ID across all quizzes for easier question identification during analysis. I recommend combining quiz ID with some additional question ID (e.g. <code>quiz1q1</code>, <code>quiz1q2</code>, etc).</p>
-</div>
-<div id="question" class="section level4">
-<h4 class="hasAnchor">
-<a href="#question" class="anchor"></a>Question</h4>
-<p>The question text. You can use basic formatting, e.g. line breaks and such. Fancy formatting, e.g. equations or pictures or such are currently not supported, and unlikely will be. If you need to provide additional information, you can include a link to a URL into the question, or reference other materials which can contain anything else.</p>
-</div>
-<div id="instruction" class="section level4">
-<h4 class="hasAnchor">
-<a href="#instruction" class="anchor"></a>Instruction</h4>
-<p>Provide additional instructions to the students, e.g. instructions regarding rounding, entering an integer, etc.</p>
-<table class="table"><tbody><tr class="odd">
-<td><strong>The columns just described will be part of the files that are generated for the students. An empty <code>Answer</code> column is also incuded. All other columns described next exist only in your complete solution files and are not included in the files given to the students.</strong></td>
-</tr></tbody></table>
-</div>
-<div id="answer" class="section level4">
-<h4 class="hasAnchor">
-<a href="#answer" class="anchor"></a>Answer</h4>
-<p>The correct answer to the question. Write it exactly the way you want students to specify it. Make sure you don’t have accidental white spaces after your answer. See below for more details on what kinds of answers are implemented.</p>
-</div>
-<div id="feedback" class="section level4">
-<h4 class="hasAnchor">
-<a href="#feedback" class="anchor"></a>Feedback</h4>
-<p>This is optional feedback that will be provided to the student if their submission is found to not be correct. The feedback will not be shown for correct entries. Students will see the feedback after they submit their quiz, together with the <code>Correct</code>/<code>Not Correct</code> label. If you want to allow for more than one submission attempt, you should probably not provide the answer outright here. If there is only one submission and you want students to see the correct answers right away, you can copy the answers into this column.</p>
-</div>
-<div id="type" class="section level4">
-<h4 class="hasAnchor">
-<a href="#type" class="anchor"></a>Type</h4>
-<p>Type of question/answer. Several types are currently allowed. Depending on the type, answers are evaluated differently, as follows:</p>
-<p><strong>Character:</strong> A single character is expected and only the first character is evaluated. Capitalization is ignored. This means if the answer is <code>A</code> and the student provides <code>A)</code> or anything that starts with either <code>A</code> or <code>a</code> it will be marked as <code>correct</code>, otherwise <code>not correct</code>. Good for multiple choice.</p>
-<p><strong>Text:</strong> Matches text provided by student with answer text. Leading and trailing white spaces are trimmed in the submission and capitalization is ignored, but otherwise matching is strict. Thus, if the answer is <code>hello world</code> and the student submits <code>hello  world</code> (extra white space), it would be marked as <code>not correct</code>. So use this type of question/answer with care, as it is easy for there to be a non-match based on benign reasons, e.g. a simple typo. Probably best for single words.</p>
-<p><strong>Logical:</strong> The student is expected to write either <code>TRUE</code> or <code>FALSE</code>. Also allowed are <code>Yes</code> and <code>No</code> and <code>1</code> and <code>0</code>. Only the first character is evaluated and capitalization is ignored. Thus, if a student enters anything starting with <code>t</code>, <code>y</code> or <code>1</code> it will be interpreted to mean <code>TRUE</code>. Similarly, <code>f</code>, <code>n</code> and <code>0</code> are evaluated to mean <code>FALSE</code>. Anything else is automatically interpreted as an incorrect submission and labeled as wrong.</p>
-<p><strong>Integer:</strong> Whatever the student provides is rounded to the nearest integer, then compared with the answer. So if the answer is 42 and the student provides 41.5 or 42.4, that’s evaluated as correct, 41.4 would be evaluated as wrong. So would <code>41</code> or <code>43</code>. Any submitted answer that can’t be converted to numeric is labeled as wrong.</p>
-<p><strong>Fuzzy_Integer:</strong> Similar to <code>Integer</code>, whatever the student provides is rounded to the nearest integer, then compared with the answer. The difference is that this type also allows for a plus/minus 1 difference. This is done in case students don’t know how to round and you don’t want to penalize them for that. So if the answer is 42 and the non-rounded answer the student gets is 41.5 and they round it - wrongly - to 41, it would still be considered correct. Any submitted answer that can’t be converted to numeric is labeled as wrong.</p>
-<p><em>When to use <code>Fuzzy_Integer</code> or <code>Integer</code>:</em> If you know the answer is an integer, e.g. if the question is <em>“How many US states are there”</em> and the right answer is 50, you don’t want to allow 49 or 51 to be considered correct, so you should use the <code>Integer</code> type. If on the other hand you ask students to do some calculation and the result is 41.50123 and you want them to round it to an integer, if you want to be strict and only allow proper rounding (i.e. 42) you should use <code>Integer</code> type, if you do not want to penalize rounding mistakes, you should use <code>Fuzzy_Integer</code> which would also accept 41 as correct. A submission of 40.567 would also be considered correct, since the number is first rounded to an integer, then checked if it is within plus/minus 1 of the correct answer.</p>
-<p><strong>Numeric:</strong> An exact numeric value. Submission is directly compared to answer, an exact match expected. This means if the answer is 42.34 and a student submits 42.343, it is labeled as wrong. Any submitted answer that can’t be converted to numeric is labeled as wrong.</p>
-<p><strong>Rounded_Numeric:</strong> A numeric value rounded to some specified significant digits. Those digits need to match the provided answer. Thus if the answer is 42.42, you should specify that students need to round to 2 significant digits. This again allows for non-proper rounding, e.g. if a student gets 42.4163 and mistakenly rounds to 42.41 it will still be considered as correct. If you don’t want that and want to be strict, use the <code>Numeric</code> type.</p>
-<p><em>A note on answer types: I implemented those that I use for my own teaching. If you have others that you want/need, please let me know. Most of them should not be too hard to implement and I’d be happy to do so (if reasonably easy to do).</em></p>
-</div>
-<div id="comment" class="section level4">
-<h4 class="hasAnchor">
-<a href="#comment" class="anchor"></a>Comment</h4>
-<p>These are any notes/comments you want to add for yourself. Students will never see those.</p>
-</div>
-<div id="duedate" class="section level4">
-<h4 class="hasAnchor">
-<a href="#duedate" class="anchor"></a>Duedate</h4>
-<p>A date on which the quiz is due. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. It should be coded as a text (don’t allow Excel to transform it into a date) and follow the ISO standard, i.e. be of the form YEAR-MO-DA (e.g. 2021-05-22). Times are currently not implemented, thus students have until midnight of the due date to submit. If you very much want/need a due time, let me know and I can implement that. If you want to have a quiz that has no due date, just set a due date very far into the future.</p>
-</div>
-<div id="attempts" class="section level4">
-<h4 class="hasAnchor">
-<a href="#attempts" class="anchor"></a>Attempts</h4>
-<p>Number of submission attempts students can make. Only the entry in the first row matters, anything else in further rows is ignored. It needs to be a positive integer. Note that currently, any new submission will overwrite previous ones (which means if a student submits twice and the second attempt is worse, that lower score will be recorded). If you need unlimited submission attempts, set this to a very large number.</p>
+<div class="section level4">
+<h4 id="password">Password<a class="anchor" aria-label="anchor" href="#password"></a>
+</h4>
+<p>The <code>Password</code> column is there to prevent a student from
+accidentally or purposefully submitting as another student. Of course,
+this requires students to keep their passwords to themselves. This does
+not prevent cheating. If students want to, they can share passwords and
+submit for each other. Or they can share their filled out quiz sheets
+before submission. I expect students to follow the academic honesty
+policy, I use lots of low-stake quizzes that count for little of the
+total grade (a single quiz usually &lt;1% of the total grade) and most
+of my teaching is at the graduate level and students take my courses
+because they are interested in the topic. All of these features minimize
+the risk of cheating to a level that I don’t worry about it. <strong>If
+you are worried about cheating on these quizzes, this package/setup is
+likely not suitable for your situation!</strong></p>
+<p>I collect passwords at the beginning of the course through a simple
+Google form. I suggest you tell students to only use letters and numbers
+in their password and nothing else (including no blank spaces). Other
+characters might work, but in my experience this can lead to occasional
+problems. I copy the passwords from the Google form/sheet into the
+template. If you want to, you can likely automate this process with some
+R scripts. (Or you can contribute this feature to the package,
+pull-requests with new features are very welcome!).</p>
+<p>Disabling the password feature is currently not possible. If you
+think a setup without a password is a feature I should implement, let me
+know. For the time being, if you don’t want to use this feature, just
+enter the same password for every student and tell the students what the
+password is. They’ll still have to enter it during submission, but that
+should not be much of a nuisance.</p>
+<p><strong>You should tell students that you will be able to read their
+passwords and that this setup is not very secure, thus they should use a
+<em>throw-away</em> password for this course and not any passwords they
+use to protect real systems (e.g. their bank accounts)!</strong></p>
 </div>
 </div>
-<div id="notes-for-quiz-creation" class="section level3">
-<h3 class="hasAnchor">
-<a href="#notes-for-quiz-creation" class="anchor"></a>Notes for quiz creation</h3>
-<p>I assume you’ll be making your quiz sheets using Excel or similar (e.g. LibreOffice). These programs are sometimes overly eager when it comes to formatting. The safest approach is to format all cells as text. When these quiz sheets are read in, each cell is read as text and then internally converted (to e.g. a date or a numeric value). If you allow the spreadsheet software to do formatting, things might go wrong (e.g. if you read in a date format from Excel as text, it often shows up wrong). Always test your quizzes before giving them to students.</p>
-<p>Also note that both <strong>Duedate</strong> and <strong>Attempts</strong> columns are not copied over to the student sheets. Instead, I assume that you will provide this information to students in some other way, e.g., when they receive their copies of the quiz files to be filled, or posted somewhere in your syllabus or other course materials.</p>
+<div class="section level3">
+<h3 id="adding-the-filled-template">Adding the filled template<a class="anchor" aria-label="anchor" href="#adding-the-filled-template"></a>
+</h3>
+<p>Once you are done filling the student list, add it to the course by
+clicking the <code>Add studentlist</code> button in the UI or manually
+place it into the <code>studentlists</code> folder. <strong>Each student
+needs to have a <code>StudentID</code> and <code>Password</code>
+entry.</strong> Name information is recommended but optional.</p>
+<p>During this process, all entries are converted to lowercase and any
+leading or trailing blank spaces stripped. This is also done to the
+information students provide when uploading their submissions, thus
+hopefully minimizing mismatches for silly reasons.</p>
+<p><strong>The only time the <code>studentlist</code> file is checked to
+ensure it follows the required format is during generation of the
+servery deploy package.</strong></p>
+<p>If you want to keep track of changes, give the file a new name
+(e.g. <code>studentlist_new.xlsx</code>). Any pre-existing file with the
+same name will be overwritten. You can also manually copy the file into
+this folder. I recommend only using letters, numbers and underscore for
+file names. Other names might work, but since the files are deployed to
+a server (which is likely running Unix/Linux), having file names that
+contain other characters (e.g. dashes or blank) might cause problems.
+You can have as many versions of the student list file in the
+<code>/studentlists</code> folder as you like. <strong>When you generate
+the grade tracking sheet (see below), the most recently modified
+<code>.xlsx</code> file in this folder will be used.</strong> All other
+files will be ignored. Make sure this file is a valid student list.
+Ideally, at this stage when you are ready to make the
+<code>gradelist</code> file, remove all but the current studentlist
+file.</p>
 </div>
 </div>
-<div id="manage-quizzes" class="section level2">
-<h2 class="hasAnchor">
-<a href="#manage-quizzes" class="anchor"></a>Manage quizzes</h2>
-<div id="add-your-quizzes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#add-your-quizzes" class="anchor"></a>Add your quizzes</h3>
-<p>Once you created your quizzes, you need to place them into the <code>completequizzes</code> folder. To do so, use the <code>Add completed quiz to course</code> button in UI. You need to add one quiz at a time. The quiz will be checked for proper content and a file with the name of the QuizID, appended by <code>_complete</code> will be placed in the <code>completequizzes</code> folder.</p>
-<p>You can also add completed quizzes manually to the <code>completequizzes</code> folder. If you do so, files are not checked for correctness. They will be checked during creation of student sheets and the grade sheet. You also need to ensure the files have the right names. <strong>Complete quiz files need to be named <code>QuizID_complete.xlsx</code> where <code>QuizID</code> is the entry in the column of that name inside the quiz sheet.</strong></p>
+<div class="section level2">
+<h2 id="create-your-quizzes">Create your quizzes<a class="anchor" aria-label="anchor" href="#create-your-quizzes"></a>
+</h2>
+<p>To create quizzes, use the provided template. You can get the
+template by clicking <code>Get quiz template</code>, or by manually
+going into the <code>/templates</code> folder of your course.</p>
+<p>For each quiz, you need to create a separate file based on the
+template, they should all be structured as shown in the template.
+<strong>The name of each quiz file needs to agree with the QuizID entry
+and be <code>QuizID_complete.xlsx</code> (see next).</strong></p>
+<div class="section level3">
+<h3 id="quiz-columns">Quiz Columns<a class="anchor" aria-label="anchor" href="#quiz-columns"></a>
+</h3>
+<p>Each quiz <strong>must have</strong> columns with the following names
+and content. All column names need to be spelled as shown in the
+template. Additional columns are optional and will be ignored.</p>
+<div class="section level4">
+<h4 id="quizid">QuizID<a class="anchor" aria-label="anchor" href="#quizid"></a>
+</h4>
+<p>A unique ID. This can only contain letters, numbers and underscore.
+Only the entry in the first row matters, anything else in further rows
+is ignored. It cannot be empty. <strong>Quiz files need to have the name
+<code>QuizID_complete.xlsx</code> where <code>QuizID</code> is the entry
+in the column of that name.</strong> So if you set QuizID to
+<code>firstquiz</code> then the file name needs to be
+<code>firstquiz_complete.xlsx</code>.</p>
 </div>
-<div id="modify-quizzes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#modify-quizzes" class="anchor"></a>Modify quizzes</h3>
-<p>If you want to make changes to any quiz, just edit, then re-upload through the UI. It will overwrite any previous quiz of the same name. Alternatively, you can skip the UI and directly edit the Excel files in the <code>completequizzes</code> folder.</p>
+<div class="section level4">
+<h4 id="questionid">QuestionID<a class="anchor" aria-label="anchor" href="#questionid"></a>
+</h4>
+<p>A unique ID for each question. This can only contain letters, numbers
+and underscore. It is best to give each question a unique ID across all
+quizzes for easier question identification during analysis. I recommend
+combining quiz ID with some additional question ID
+(e.g. <code>quiz1q1</code>, <code>quiz1q2</code>, etc).</p>
 </div>
-<div id="remove-quizzes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#remove-quizzes" class="anchor"></a>Remove quizzes</h3>
+<div class="section level4">
+<h4 id="question">Question<a class="anchor" aria-label="anchor" href="#question"></a>
+</h4>
+<p>The question text. You can use basic formatting, e.g. line breaks and
+such. Fancy formatting, e.g. equations or pictures or such are currently
+not supported, and unlikely will be. If you need to provide additional
+information, you can include a link to a URL into the question, or
+reference other materials which can contain anything else.</p>
+</div>
+<div class="section level4">
+<h4 id="instruction">Instruction<a class="anchor" aria-label="anchor" href="#instruction"></a>
+</h4>
+<p>Provide additional instructions to the students, e.g. instructions
+regarding rounding, entering an integer, etc.</p>
+<p><strong>The columns just described will be part of the files that are
+generated for the students. An empty <code>Answer</code> column is also
+incuded. All other columns described next exist only in your complete
+solution files and are not included in the files given to the
+students.</strong></p>
+</div>
+<div class="section level4">
+<h4 id="answer">Answer<a class="anchor" aria-label="anchor" href="#answer"></a>
+</h4>
+<p>The correct answer to the question. Write it exactly the way you want
+students to specify it. Make sure you don’t have accidental white spaces
+after your answer. See below for more details on what kinds of answers
+are implemented.</p>
+</div>
+<div class="section level4">
+<h4 id="feedback">Feedback<a class="anchor" aria-label="anchor" href="#feedback"></a>
+</h4>
+<p>This is optional feedback that will be provided to the student if
+their submission is found to not be correct. The feedback will not be
+shown for correct entries. Students will see the feedback after they
+submit their quiz, together with the
+<code>Correct</code>/<code>Not Correct</code> label. If you want to
+allow for more than one submission attempt, you should probably not
+provide the answer outright here. If there is only one submission and
+you want students to see the correct answers right away, you can copy
+the answers into this column.</p>
+</div>
+<div class="section level4">
+<h4 id="type">Type<a class="anchor" aria-label="anchor" href="#type"></a>
+</h4>
+<p>Type of question/answer. Several types are currently allowed.
+Depending on the type, answers are evaluated differently, as
+follows:</p>
+<p><strong>Character:</strong> A single character is expected and only
+the first character is evaluated. Capitalization is ignored. This means
+if the answer is <code>A</code> and the student provides <code>A)</code>
+or anything that starts with either <code>A</code> or <code>a</code> it
+will be marked as <code>correct</code>, otherwise
+<code>not correct</code>. Good for multiple choice.</p>
+<p><strong>Text:</strong> Matches text provided by student with answer
+text. Leading and trailing white spaces are trimmed in the submission
+and capitalization is ignored, but otherwise matching is strict. Thus,
+if the answer is <code>hello world</code> and the student submits
+<code>hello  world</code> (extra white space), it would be marked as
+<code>not correct</code>. So use this type of question/answer with care,
+as it is easy for there to be a non-match based on benign reasons,
+e.g. a simple typo. Probably best for single words.</p>
+<p><strong>Logical:</strong> The student is expected to write either
+<code>TRUE</code> or <code>FALSE</code>. Also allowed are
+<code>Yes</code> and <code>No</code> and <code>1</code> and
+<code>0</code>. Only the first character is evaluated and capitalization
+is ignored. Thus, if a student enters anything starting with
+<code>t</code>, <code>y</code> or <code>1</code> it will be interpreted
+to mean <code>TRUE</code>. Similarly, <code>f</code>, <code>n</code> and
+<code>0</code> are evaluated to mean <code>FALSE</code>. Anything else
+is automatically interpreted as an incorrect submission and labeled as
+wrong.</p>
+<p><strong>Integer:</strong> Whatever the student provides is rounded to
+the nearest integer, then compared with the answer. So if the answer is
+42 and the student provides 41.5 or 42.4, that’s evaluated as correct,
+41.4 would be evaluated as wrong. So would <code>41</code> or
+<code>43</code>. Any submitted answer that can’t be converted to numeric
+is labeled as wrong.</p>
+<p><strong>Fuzzy_Integer:</strong> Similar to <code>Integer</code>,
+whatever the student provides is rounded to the nearest integer, then
+compared with the answer. The difference is that this type also allows
+for a plus/minus 1 difference. This is done in case students don’t know
+how to round and you don’t want to penalize them for that. So if the
+answer is 42 and the non-rounded answer the student gets is 41.5 and
+they round it - wrongly - to 41, it would still be considered correct.
+Any submitted answer that can’t be converted to numeric is labeled as
+wrong.</p>
+<p><em>When to use <code>Fuzzy_Integer</code> or
+<code>Integer</code>:</em> If you know the answer is an integer, e.g. if
+the question is <em>“How many US states are there”</em> and the right
+answer is 50, you don’t want to allow 49 or 51 to be considered correct,
+so you should use the <code>Integer</code> type. If on the other hand
+you ask students to do some calculation and the result is 41.50123 and
+you want them to round it to an integer, if you want to be strict and
+only allow proper rounding (i.e. 42) you should use <code>Integer</code>
+type, if you do not want to penalize rounding mistakes, you should use
+<code>Fuzzy_Integer</code> which would also accept 41 as correct. A
+submission of 40.567 would also be considered correct, since the number
+is first rounded to an integer, then checked if it is within plus/minus
+1 of the correct answer.</p>
+<p><strong>Numeric:</strong> An exact numeric value. Submission is
+directly compared to answer, an exact match expected. This means if the
+answer is 42.34 and a student submits 42.343, it is labeled as wrong.
+Any submitted answer that can’t be converted to numeric is labeled as
+wrong.</p>
+<p><strong>Rounded_Numeric:</strong> A numeric value rounded to some
+specified significant digits. Those digits need to match the provided
+answer. Thus if the answer is 42.42, you should specify that students
+need to round to 2 significant digits. This again allows for non-proper
+rounding, e.g. if a student gets 42.4163 and mistakenly rounds to 42.41
+it will still be considered as correct. If you don’t want that and want
+to be strict, use the <code>Numeric</code> type.</p>
+<p><em>A note on answer types: I implemented those that I use for my own
+teaching. If you have others that you want/need, please let me know.
+Most of them should not be too hard to implement and I’d be happy to do
+so (if reasonably easy to do).</em></p>
+</div>
+<div class="section level4">
+<h4 id="comment">Comment<a class="anchor" aria-label="anchor" href="#comment"></a>
+</h4>
+<p>These are any notes/comments you want to add for yourself. Students
+will never see those.</p>
+</div>
+<div class="section level4">
+<h4 id="duedate">DueDate<a class="anchor" aria-label="anchor" href="#duedate"></a>
+</h4>
+<p>A date on which the quiz is due. Only the entry in the first row
+matters, anything else in further rows is ignored. It cannot be empty.
+It should be coded as a text (don’t allow Excel to transform it into a
+date). It needs to follow the ISO standard, i.e. be of the form
+YEAR-MO-DA (e.g. 2021-05-22). Times are currently not implemented, thus
+students have until midnight of the due date to submit. If you very much
+want/need a due time, let me know and I can implement that. If you want
+to have a quiz that has no due date, just set a due date very far into
+the future.</p>
+</div>
+<div class="section level4">
+<h4 id="attempts">Attempts<a class="anchor" aria-label="anchor" href="#attempts"></a>
+</h4>
+<p>Number of submission attempts students can make. Only the entry in
+the first row matters, anything else in further rows is ignored. It
+needs to be a positive integer. Note that currently, any new submission
+will overwrite previous ones (which means if a student submits twice and
+the second attempt is worse, that lower score will be recorded). If you
+need unlimited submission attempts, set this to a very large number.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="notes-for-quiz-creation">Notes for quiz creation<a class="anchor" aria-label="anchor" href="#notes-for-quiz-creation"></a>
+</h3>
+<p>I assume you’ll be making your quiz sheets using Excel or similar
+(e.g. LibreOffice). These programs are sometimes overly eager when it
+comes to formatting. The safest approach is to format all cells as text.
+When these quiz sheets are read in, each cell is read as text and then
+internally converted (to e.g. a date or a numeric value). If you allow
+the spreadsheet software to do formatting, things might go wrong
+(e.g. if you read in a date format from Excel as text, it often shows up
+wrong). Always test your quizzes before giving them to students.</p>
+<p>Also note that both <strong>Duedate</strong> and
+<strong>Attempts</strong> columns are not copied over to the student
+sheets. Instead, I assume that you will provide this information to
+students in some other way, e.g., when they receive their copies of the
+quiz files to be filled, or posted somewhere in your syllabus or other
+course materials.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="manage-quizzes">Manage quizzes<a class="anchor" aria-label="anchor" href="#manage-quizzes"></a>
+</h2>
+<div class="section level3">
+<h3 id="add-your-quizzes">Add your quizzes<a class="anchor" aria-label="anchor" href="#add-your-quizzes"></a>
+</h3>
+<p>Once you created your quizzes, you need to place them into the
+<code>completequizzes</code> folder. To do so, use the
+<code>Add completed quiz to course</code> button in UI. You need to add
+one quiz at a time. The quiz will be checked for proper content and a
+file with the name of the QuizID, appended by <code>_complete</code>
+will be placed in the <code>completequizzes</code> folder.</p>
+<p>You can also add completed quizzes manually to the
+<code>completequizzes</code> folder. If you do so, files are not checked
+for correctness. They will be checked during creation of student sheets
+and the grade sheet. You also need to ensure the files have the right
+names. <strong>Complete quiz files need to be named
+<code>QuizID_complete.xlsx</code> where <code>QuizID</code> is the entry
+in the column of that name inside the quiz sheet.</strong></p>
+</div>
+<div class="section level3">
+<h3 id="modify-quizzes">Modify quizzes<a class="anchor" aria-label="anchor" href="#modify-quizzes"></a>
+</h3>
+<p>If you want to make changes to any quiz, just edit, then re-upload
+through the UI. It will overwrite any previous quiz of the same name.
+Alternatively, you can skip the UI and directly edit the Excel files in
+the <code>completequizzes</code> folder.</p>
+</div>
+<div class="section level3">
+<h3 id="remove-quizzes">Remove quizzes<a class="anchor" aria-label="anchor" href="#remove-quizzes"></a>
+</h3>
 <p><strong>Currently not working through UI.</strong></p>
-<p>You can remove quizzes (or other files) that you don’t want in the <code>completequizzes</code> folder by using the <code>Remove quiz</code> button in the UI. Alternatively, just go into the <code>complete_quizzes</code> folder and delete unwanted files.</p>
+<p>You can remove quizzes (or other files) that you don’t want in the
+<code>completequizzes</code> folder by using the
+<code>Remove quiz</code> button in the UI. Alternatively, just go into
+the <code>complete_quizzes</code> folder and delete unwanted files.</p>
 </div>
 </div>
-<div id="creating-student-quiz-sheets" class="section level2">
-<h2 class="hasAnchor">
-<a href="#creating-student-quiz-sheets" class="anchor"></a>Creating student quiz sheets</h2>
-<p>Once you are done creating quizzes, you should have a collection of properly formatted Excel files in the <code>completequizzes</code> folder. Remove any files from that folder that are not quizzes you want to use. All your quizzes need to follow the naming convention as described previously. To create quiz sheets that will be given to students, click the <code>Create student quiz files</code> button in the GUI, or run:</p>
+<div class="section level2">
+<h2 id="creating-student-quiz-sheets">Creating student quiz sheets<a class="anchor" aria-label="anchor" href="#creating-student-quiz-sheets"></a>
+</h2>
+<p>Once you are done creating quizzes, you should have a collection of
+properly formatted Excel files in the <code>completequizzes</code>
+folder. Remove any files from that folder that are not quizzes you want
+to use. All your quizzes need to follow the naming convention as
+described previously. To create quiz sheets that will be given to
+students, click the <code>Create student quiz files</code> button in the
+GUI, or run:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/create_student_quizzes.html">create_student_quizzes</a></span><span class="op">(</span>courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></code></pre></div>
-<p>This checks each quiz file in the <code>completequizzes</code> folder for proper formatting and content, and if successful, generates a matching sheet to be given to students. The student sheets will contain the columns <code>QuizID</code>, <code>QuestionID</code>, <code>Question</code>, <code>Instruction</code> and an empty <code>Answer</code> column. The remaining columns will not be included in the student sheets.</p>
-<p>You can find all the student quiz files in the <code>studentquizzes</code> folder. There is also a zip file that includes all quizzes. You can get this file by clicking the <code>Get zip file with all student quizzes</code> button in the UI (or as always by going directly into the <code>studentquizzes</code> folder.)</p>
-<p>Distribute these files to the students by any means you like (e.g. email, Dropbox, posting to a course website, etc.). Students will fill out the quiz sheets by entering their answers into the <code>Answer</code> column, and then submit them through the online submission app.</p>
-<p>If you update/edit/add quizzes, make sure all updated files are in the <code>completequizzes</code> folder, then re-generate the student quizzes and re-distribute.</p>
-<p><strong>Note that during the process of student quiz creation, the <code>studentquizzes</code> folder and all its content are deleted and newly created - so don’t store anything in there!</strong></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_studentquizzes.html">create_studentquizzes</a></span><span class="op">(</span>courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></span></code></pre></div>
+<p>This checks each quiz file in the <code>completequizzes</code> folder
+for proper formatting and content, and if successful, generates a
+matching sheet to be given to students. The student sheets will contain
+the columns <code>QuizID</code>, <code>QuestionID</code>,
+<code>Question</code>, <code>Instruction</code> and an empty
+<code>Answer</code> column. The remaining columns will not be included
+in the student sheets.</p>
+<p>You can find all the student quiz files in the
+<code>studentquizzes</code> folder. There is also a zip file that
+includes all quizzes. You can get this file by clicking the
+<code>Get zip file with all student quizzes</code> button in the UI (or
+as always by going directly into the <code>studentquizzes</code>
+folder.)</p>
+<p>Distribute these files to the students by any means you like
+(e.g. email, Dropbox, posting to a course website, etc.). Students will
+fill out the quiz sheets by entering their answers into the
+<code>Answer</code> column, and then submit them through the online
+submission app.</p>
+<p>If you update/edit/add quizzes, make sure all updated files are in
+the <code>completequizzes</code> folder, then re-generate the student
+quizzes and re-distribute.</p>
+<p><strong>Note that during the process of student quiz creation, the
+<code>studentquizzes</code> folder and all its content are deleted and
+newly created - so don’t store anything in there!</strong></p>
 </div>
-<div id="creating-the-main-grade-tracking-document" class="section level2">
-<h2 class="hasAnchor">
-<a href="#creating-the-main-grade-tracking-document" class="anchor"></a>Creating the main grade tracking document</h2>
-<p>At this stage, you should have a filled student list in the <code>studentlists</code> folder and have all your quizzes done and stored in <code>completequizzes</code> (and generated equivalent student quiz sheets). I recommend only having your most current student list file in the <code>studentlists</code> folder and only the quizzes you want to use in the <code>completequizzes</code> folder.</p>
-<p>In this step, you will generate the main file that will track all student grades. This will merge information from the student list and all quiz sheets. To generate this main tracking file, click the <code>Create grade tracking list</code> button or run this command:</p>
+<div class="section level2">
+<h2 id="creating-the-main-grade-tracking-document">Creating the main grade tracking document<a class="anchor" aria-label="anchor" href="#creating-the-main-grade-tracking-document"></a>
+</h2>
+<p>At this stage, you should have a filled student list in the
+<code>studentlists</code> folder and have all your quizzes done and
+stored in <code>completequizzes</code> (and generated equivalent student
+quiz sheets). I recommend only having your most current student list
+file in the <code>studentlists</code> folder and only the quizzes you
+want to use in the <code>completequizzes</code> folder.</p>
+<p>In this step, you will generate the main file that will track all
+student grades. This will merge information from the student list and
+all quiz sheets. To generate this main tracking file, click the
+<code>Create grade tracking list</code> button or run this command:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/create_gradelist.html">create_gradelist</a></span><span class="op">(</span>courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></code></pre></div>
-<p>If you use the UI, this will also run the student quiz generation routine to ensure everything is in sync. If you don’t use the UI, make sure that your student quiz files match the current version of the quizzes.</p>
-<p>Both the student list and each quiz will be checked for proper formatting/content. Fix any errors you might get. If everything works, the grade tracking list will be placed into the <code>gradelists</code> folder. It will have the name <code>DATETIME_gradelist_COURSENAME</code>. Note that the quizzes are ordered in this tracking document based on their file names and not their due dates. If you want to have the quizzes show up in the order in which they are given in class (because you might want to manually look into the grade tracking sheet), you need to make sure the file names of the quizzes follow the order of the due dates.</p>
-<p>If the student roster changes, or if you modify/add quizzes, <strong>before</strong> students have started to submit quiz solutions, you can always re-create a new tracking document. Once students have started submitting quizzes, things get trickier. Managing changes to class list or quizzes in that setting is explained in a later tutorial.</p>
+<code class="sourceCode R"><span><span class="fu">create_gradelist</span><span class="op">(</span>courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></span></code></pre></div>
+<p>If you use the UI, this will also run the student quiz generation
+routine to ensure everything is in sync. If you don’t use the UI, make
+sure that your student quiz files match the current version of the
+quizzes.</p>
+<p>Both the student list and each quiz will be checked for proper
+formatting/content. Fix any errors you might get. If everything works,
+the grade tracking list will be placed into the <code>gradelists</code>
+folder. It will have the name
+<code>DATETIME_gradelist_COURSENAME</code>. Note that the quizzes are
+ordered in this tracking document based on their file names and not
+their due dates. If you want to have the quizzes show up in the order in
+which they are given in class (because you might want to manually look
+into the grade tracking sheet), you need to make sure the file names of
+the quizzes follow the order of the due dates.</p>
+<p>If the student roster changes, or if you modify/add quizzes,
+<strong>before</strong> students have started to submit quiz solutions,
+you can always re-create a new tracking document. Once students have
+started submitting quizzes, things get trickier. Managing changes to
+class list or quizzes in that setting is explained in a later
+tutorial.</p>
 </div>
-<div id="using-the-grading-system" class="section level2">
-<h2 class="hasAnchor">
-<a href="#using-the-grading-system" class="anchor"></a>Using the grading system</h2>
-<p>Once you created the class list and all quizzes, produced quiz sheets for students and generated the main grade tracking document, you are ready to deploy the student-facing part of the quiz system. Those steps involve:</p>
+<div class="section level2">
+<h2 id="using-the-grading-system">Using the grading system<a class="anchor" aria-label="anchor" href="#using-the-grading-system"></a>
+</h2>
+<p>Once you created the class list and all quizzes, produced quiz sheets
+for students and generated the main grade tracking document, you are
+ready to deploy the student-facing part of the quiz system. Those steps
+involve:</p>
 <ol style="list-style-type: decimal">
-<li><p>Provide students with the quiz files they need to fill out.</p></li>
-<li><p>Provide students with any additional information they need for the quizzes (deadlines, allowed submission attempts, website for submission, etc.).</p></li>
-<li><p>Deploy the grading app to a Shiny server and tell the students where to go to submit their completed quizzes.</p></li>
+<li><p>Provide students with the quiz files they need to fill
+out.</p></li>
+<li><p>Provide students with any additional information they need for
+the quizzes (deadlines, allowed submission attempts, website for
+submission, etc.).</p></li>
+<li><p>Deploy the grading app to a Shiny server and tell the students
+where to go to submit their completed quizzes.</p></li>
 </ol>
 <p>Once the grading app is fully deployed, it works as follows:</p>
 <ul>
-<li><p>Students fill out the quiz sheets, the go to the URL where your app lives, enter their information and upload their quiz.</p></li>
-<li><p>The online system grades the submission by checking it against the solution. It provides immediate feedback to students on how they did, and records the grade in the main tracking sheet. All student submitted files are saved in the <code>studentsubmissions</code> folder, which allows for detailed analytics and provides a complete track record of any submission (in case something goes wrong in the main grade tracking file).</p></li>
-<li><p>You occasionally retrieve the grade tracking sheet and the student submissions from the server and use the <code>Analyze Quizzes</code> tab in the UI (or equivalent functions on the command line) to see how students are doing, and to check which questions are problematic and indicate students didn’t fully understand that content (or you wrote a bad question).</p></li>
+<li><p>Students fill out the quiz sheets, the go to the URL where your
+app lives, enter their information and upload their quiz.</p></li>
+<li><p>The online system grades the submission by checking it against
+the solution. It provides immediate feedback to students on how they
+did, and records the grade in the main tracking sheet. All student
+submitted files are saved in the <code>studentsubmissions</code> folder,
+which allows for detailed analytics and provides a complete track record
+of any submission (in case something goes wrong in the main grade
+tracking file).</p></li>
+<li><p>You occasionally retrieve the grade tracking sheet and the
+student submissions from the server and use the
+<code>Analyze Quizzes</code> tab in the UI (or equivalent functions on
+the command line) to see how students are doing, and to check which
+questions are problematic and indicate students didn’t fully understand
+that content (or you wrote a bad question).</p></li>
 </ul>
 </div>
-<div id="next-steps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#next-steps" class="anchor"></a>Next steps</h2>
-<p>Steps 1 and 2 above are self-explanatory. The app deployment requires more information. You have 3 main options:</p>
+<div class="section level2">
+<h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h2>
+<p>Steps 1 and 2 above are self-explanatory. The app deployment requires
+more information. You have 3 main options:</p>
 <ol style="list-style-type: decimal">
-<li><a href="./C_hosting_on_own_shiny_server.html">Deploy to a Shiny server that you have control over</a></li>
-<li><a href="./D_hosting_on_shinyappsio.html">Deploy to shinyapps.io</a></li>
+<li><a href="./C_hosting_on_own_shiny_server.html">Deploy to a Shiny
+server that you have control over</a></li>
+<li><a href="./D_hosting_on_shinyappsio.html">Deploy to
+shinyapps.io</a></li>
 <li><a href="">Keep things local</a></li>
 </ol>
-<p>Each of those approaches are described in the different tutorials.</p>
-<p>There are also a tutorials <a href="">explaining how to analyze quizzes</a> and <a href="">how to update quizzes or the class list once students have started submitting</a>.</p>
+<p>Each of those approaches are described in the different
+tutorials.</p>
+<!-- There are also a tutorials [explaining how to analyze quizzes]() and [how to update quizzes or the class list once students have started submitting](). -->
 </div>
   </div>
 
@@ -369,11 +664,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.andreashandel.com">Andreas Handel</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://www.andreashandel.com" class="external-link">Andreas Handel</a>, Cody Dailey.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -381,6 +678,8 @@
 
   
 
+
+  
 
   </body>
 </html>

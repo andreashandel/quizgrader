@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">quizgrader</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -46,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -59,40 +61,10 @@
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/A_introduction.html">quizgrader Introduction</a>
-    </li>
-    <li>
-      <a href="../articles/B_quiz_creation.html">Creating a course and quizzes</a>
-    </li>
-    <li>
-      <a href="../articles/C_hosting_on_own_shiny_server.html">Hosting quizzes on your own Shiny server</a>
-    </li>
-    <li>
-      <a href="../articles/D_hosting_on_shinyappsio.html">Hosting quizzes on shinyapps.io</a>
-    </li>
-    <li>
-      <a href="../articles/E_local_hosting.html">Local use of the grading app</a>
-    </li>
-    <li>
-      <a href="../articles/F_quiz_administration.html">Ongoing quiz management</a>
-    </li>
-    <li>
-      <a href="../articles/G_quiz_analysis.html">Analyzing quiz grades</a>
-    </li>
-  </ul>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/andreashandel/quizgrader">
+  <a href="https://github.com/andreashandel/quizgrader" class="external-link">
     <span class="fab fa-github"></span>
      
   </a>
@@ -107,67 +79,144 @@
 
       
 
-      </header><script src="C_hosting_on_own_shiny_server_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Hosting quizzes on your own Shiny server</h1>
-                        <h4 class="author"><a href="https://www.andreashandel.com">Andreas Handel</a></h4>
+                        <h4 data-toc-skip class="author"><a href="https://www.andreashandel.com" class="external-link">Andreas
+Handel</a></h4>
             
-            <h4 class="date">2021-04-20</h4>
+            <h4 data-toc-skip class="date">2023-01-06</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/master/vignettes/C_hosting_on_own_shiny_server.Rmd"><code>vignettes/C_hosting_on_own_shiny_server.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ahgroup/DSAIDE/blob/HEAD/vignettes/C_hosting_on_own_shiny_server.Rmd" class="external-link"><code>vignettes/C_hosting_on_own_shiny_server.Rmd</code></a></small>
       <div class="hidden name"><code>C_hosting_on_own_shiny_server.Rmd</code></div>
 
     </div>
 
     
     
-<div id="summary" class="section level2">
-<h2 class="hasAnchor">
-<a href="#summary" class="anchor"></a>Summary</h2>
-<p>This tutorial explains how to deploy the quizzes and grading app to a shiny server that you have access to and that you have control over.</p>
-<p>I assume that you are comfortable connecting to a Shiny server that you or someone else has set up for you, and that you know enough basic Linux/Unix commands (e.g., how to create folders, change permissions) to be able to set up everything.</p>
-<p>I also assume that you set up your course and quizzes as described <a href="./B_quiz_creation.html">in this tutorial</a> and are ready to deploy.</p>
+<div class="section level2">
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h2>
+<p>This tutorial explains how to deploy the quizzes and grading app to a
+shiny server that you have access to and that you have control over.</p>
+<p>I assume that you are comfortable connecting to a Shiny server that
+you or someone else has set up for you, and that you know enough basic
+Linux/Unix commands (e.g., how to create folders, change permissions) to
+be able to set up everything.</p>
+<p>I also assume that you set up your course and quizzes as described <a href="./B_quiz_creation.html">in this tutorial</a> and are ready to
+deploy.</p>
 </div>
-<div id="deploying-to-your-server-and-starting-app" class="section level2">
-<h2 class="hasAnchor">
-<a href="#deploying-to-your-server-and-starting-app" class="anchor"></a>Deploying to your server and starting app</h2>
-<p>Combine all the documents and folders needed for deployment by clicking the <code>Make zip file for deployment</code> button in the UI. Alternatively, you can run</p>
+<div class="section level2">
+<h2 id="deploying-to-your-server-and-starting-app">Deploying to your server and starting app<a class="anchor" aria-label="anchor" href="#deploying-to-your-server-and-starting-app"></a>
+</h2>
+<p>Combine all the documents and folders needed for deployment by
+clicking the <code>Make zip file for deployment</code> button in the UI.
+Alternatively, you can run</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/create_serverpackage.html">create_serverpackage</a></span><span class="op">(</span>courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></code></pre></div>
-<p>This will make a zip file containing almost all the files and folders you need. You’ll get a message telling you where the file has been placed (the main folder of your course).</p>
-<p>Once you have this file, connect to your shiny server. Go into the folder where you host shiny apps (usually <code>shiny-server</code>), make a folder called <code>quizgrader</code> and copy the zip file to that location. Unzip it. You should now have <code>app.R</code> and <code>quizgrader.css</code> in the main directory, and 2 folders, namely <code>completequizzes</code> and <code>gradelists</code>. By hand, create another folder called <code>studentsubmissions</code>. <strong>Change the permissions for all 3 folders such that it allows write access by the shiny server/app. Not having the right permissions is a common problem leading to weird error messages for students.</strong> Start the shiny server and if everything works, students should no be able to go to the URL where your app lives (e.g., <code>https://shiny.mysite.com/quizgrader/</code>) and start submitting.</p>
-<p><strong>It goes without saying that you should test that everything works before telling students to start submitting. I suggest creating one or a few test users in the student tracking sheet, so you can test-submit quizzes to make sure things work as expected.</strong></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_serverpackage.html">create_serverpackage</a></span><span class="op">(</span>courselocation <span class="op">=</span> <span class="st">"path/to/location/for/course"</span><span class="op">)</span></span></code></pre></div>
+<p>This will make a zip file containing almost all the files and folders
+you need. You’ll get a message telling you where the file has been
+placed (the main folder of your course).</p>
+<p>Once you have this file, connect to your shiny server. Go into the
+folder where you host shiny apps (usually
+<code>/srv/shiny-server/</code>), make a new folder. This can be called
+<code>quizgrader</code> or any other name, e.g., the name of the course
+(<code>mycoursename</code>). It will be the URL where students connect
+to, e.g., <code>https://shiny.mysite.com/mycoursename/</code></p>
+<p>Copy the zip file from your local computer into that newly created
+folder, then unzip it. You should now have a <code>app.R</code> and
+<code>quizgrader.css</code> in the main directory, and 3 folders, namely
+<code>completequizzes</code>, <code>studentlists</code> and
+<code>studentsubmissions</code>.</p>
+<p><strong>Change the permissions for at least the
+<code>studentsubmissions</code> folder and all its sub-folders such that
+it allows write access by the shiny server/app. Also make sure
+permissions to other files and folders are correct and at least allow
+for user read access. Not having the right permissions is a common
+problem leading to weird error messages for students.</strong> (I
+usually just set permissions to full read-write-execute for all files
+and folders. Is probably not the safest thing to do, but makes sure no
+permission issues occur.)</p>
+<p>Start the shiny server and if everything works, students should no be
+able to go to the URL where your app lives (e.g.,
+<code>https://shiny.mysite.com/mycoursename/</code> ) and start
+submitting.</p>
+<p><strong>It goes without saying that you should test that everything
+works before telling students to start submitting. I suggest creating
+one or a few test users in the student tracking sheet, so you can
+test-submit quizzes to make sure things work as expected.</strong></p>
 </div>
-<div id="retrieving-and-analyzing-student-submissions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#retrieving-and-analyzing-student-submissions" class="anchor"></a>Retrieving and Analyzing student submissions</h2>
-<p>Once students start submitting, their grades are recorded in (always time-stamped and not overwritten) <code>gradelist.xlsx</code> files, and all their submissions, including their user ID and timestamp, are placed into the <code>studentsubmissions</code> folder. you’ll want to pull files from the server every so often. Currently, this needs to be done manually. To that end, log into the shiny server and copy everything in the <code>studentsubmissions</code> and <code>gradelists</code> folders to the local versions of your course. Once done, open <code>quizmanager</code>, load the course you want to look at, and use the <code>Analyze Submissions</code> tab to see the performance of students and how the different quiz questions are being answered.</p>
+<div class="section level2">
+<h2 id="retrieving-and-analyzing-student-submissions">Retrieving and Analyzing student submissions<a class="anchor" aria-label="anchor" href="#retrieving-and-analyzing-student-submissions"></a>
+</h2>
+<p>Once students start submitting, their submissions (filled Excel
+sheets) are stored in the quiz-specific folder inside
+<code>studentsubmissions</code>. For each submission, there is also a
+new entry (and in fact, a new file) created in the <code>logs</code>
+folder. We decided to create new files instead of just modifying a
+single one to have a better track record of all submissions. Only the
+most recent log file is used, so if too many files start accumulating,
+you can pull them to your local machine, archive there, and delete old
+log files on the server.</p>
+<p>You will want to pull all contents from the
+<code>studentsubmissions</code> folder to your local computer every so
+often. To that end, log into the shiny server and copy everything in the
+<code>studentsubmissions</code> folder to the local versions of your
+course. This can’t be done through the graphical interface, so for this
+you need to find your local instance of the quiz and copy it there. Once
+done, open <code>quizmanager</code>, load the course you want to look
+at, and use the <code>Analyze Submissions</code> tab to see the
+performance of students and how the different quiz questions are being
+answered.</p>
 </div>
-<div id="updating-materials" class="section level2">
-<h2 class="hasAnchor">
-<a href="#updating-materials" class="anchor"></a>Updating materials</h2>
-<p>If you need to make any changes to the class list or the quizzes before submission has started, follow the steps <a href="./B_quiz_creation.html">in the course and quiz creation tutorial</a> and the steps described above. You will simply overwrite the old version with your updated version.</p>
+<div class="section level2">
+<h2 id="updating-materials">Updating materials<a class="anchor" aria-label="anchor" href="#updating-materials"></a>
+</h2>
+<p>If you need to make any changes to the class list or the quizzes
+before submission has started, follow the steps <a href="./B_quiz_creation.html">in the course and quiz creation
+tutorial</a> and the steps described above. You will simply overwrite
+the old version with your updated version.</p>
 <p>This does not work anymore once students have started submitting.</p>
-<p>If you need to make updates to either the main <code>gradelist.xlsx</code> file or the complete quizzes on the server, proceed as follows:</p>
+<p>If you need to make updates to either the main
+<code>gradelist.xlsx</code> file or the complete quizzes on the server,
+proceed as follows:</p>
 <ol style="list-style-type: decimal">
-<li><p>Make any modifications to the quizzes you need to make. Generate and distribute updated student versions.</p></li>
-<li><p>During a time when students won’t submit anything (e.g. right after a submission deadline or Saturday morning at 6am), download materials from the server as described above.</p></li>
+<li><p>Make any modifications to the quizzes you need to make. Generate
+and distribute updated student versions.</p></li>
+<li><p>During a time when students won’t submit anything (e.g. right
+after a submission deadline or Saturday morning at 6am), download
+materials from the server as described above.</p></li>
 <li><p>FIND A WAY TO UPDATE GRADELIST.</p></li>
 </ol>
 <p>CONTINUE HERE AND MAKE SURE THE ONLINE SUBMISSION SYSTEM WORKS</p>
-<p>This function takes the submission app file, the and places them to the Shiny server. Students should now be able to go to the website (e.g. shinyapps.io<code>) and, after entering their identifying information, upload their quiz.  The submission will be checked to make sure it is not past the due date or the number of allowed submissions has been exceeded. Then the quiz is graded by comparing the student submissions with those in the complete quiz files, the grade is recorded in the form of a score, and students are provided with immediate feedback on which questions they did get right and which they didn't. Anything entered into the</code>feedback` column is also displayed. In addition, students can see information about their cumulative performance so far.</p>
-<p>Note that as long as any password is missing from the student list, the app will display a <code>not ready for submission</code> message.</p>
+<p>This function takes the submission app file, the and places them to
+the Shiny server. Students should now be able to go to the website
+(e.g. shinyapps.io<code>) and, after entering their identifying information, upload their quiz.  The submission will be checked to make sure it is not past the due date or the number of allowed submissions has been exceeded. Then the quiz is graded by comparing the student submissions with those in the complete quiz files, the grade is recorded in the form of a score, and students are provided with immediate feedback on which questions they did get right and which they didn't. Anything entered into the</code>feedback`
+column is also displayed. In addition, students can see information
+about their cumulative performance so far.</p>
+<p>Note that as long as any password is missing from the student list,
+the app will display a <code>not ready for submission</code>
+message.</p>
 </div>
-<div id="server-maintenance" class="section level2">
-<h2 class="hasAnchor">
-<a href="#server-maintenance" class="anchor"></a>Server maintenance</h2>
-<p>By default, all student submission files and grade tracking files are kept on the server. This should be ok. If it takes up too much space, you can delete old files after transferring them to your local computer.</p>
+<div class="section level2">
+<h2 id="server-maintenance">Server maintenance<a class="anchor" aria-label="anchor" href="#server-maintenance"></a>
+</h2>
+<p>By default, all student submission files and grade tracking files are
+kept on the server. This should be ok. If it takes up too much space,
+you can delete old files after transferring them to your local
+computer.</p>
 </div>
-<div id="comments" class="section level2">
-<h2 class="hasAnchor">
-<a href="#comments" class="anchor"></a>Comments</h2>
-<p>Using your own Shiny server is cheaper and you have more control. But it requires you knowing how to manage a Shiny server. If you go that route, I assume you know how to manage a shiny server and deploy apps. <a href="https://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean/">Here</a> is a good tutorial on setting up and running your own server. Your company/university might also be able to set one up for you and help manage it. The Rstudio website has information on how to do this.</p>
+<div class="section level2">
+<h2 id="comments">Comments<a class="anchor" aria-label="anchor" href="#comments"></a>
+</h2>
+<p>Using your own Shiny server is cheaper and you have more control. But
+it requires you knowing how to manage a Shiny server. If you go that
+route, I assume you know how to manage a shiny server and deploy apps.
+<a href="https://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean/" class="external-link">Here</a>
+is a good tutorial on setting up and running your own server. Your
+company/university might also be able to set one up for you and help
+manage it. The Rstudio website has information on how to do this.</p>
 </div>
   </div>
 
@@ -182,11 +231,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.andreashandel.com">Andreas Handel</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://www.andreashandel.com" class="external-link">Andreas Handel</a>, Cody Dailey.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -194,6 +245,8 @@
 
   
 
+
+  
 
   </body>
 </html>

@@ -4,7 +4,10 @@
 # The app/package auto-grades the submissions and provides feedback
 ######################################################
 
-library('quizgrader')
+#name of R package
+packagename <- "quizgrader"
+
+library(packagename)
 
 #######################################################
 #general setup
@@ -359,7 +362,9 @@ ui <- fluidPage(
   shinyjs::useShinyjs(),
   includeCSS("quizgrader.css"), #use custom styling
   br(),
-  tags$div(id = "shinyheadertitle", "quizgrader - An R package for submission and grading of quizzes."),
+  tags$div(id = "shinyheadertitle", "quizgrader - an R package for automated submissin, grading and analysis of quizzes/"),
+  tags$div(id = "infotext", paste0('This is ', packagename,  ' version ',utils::packageVersion(packagename),' last updated ', utils::packageDescription(packagename)$Date,'.')),
+  tags$div(id = "infotext", "Written and maintained by", a("Andreas Handel", href="https://www.andreashandel.com", target="_blank"), "with contributions from", a("others.",  href="https://andreashandel.github.io/quizgrader/authors.html", target="_blank")),
   br(),
   fluidRow(
        column(12,
