@@ -8,21 +8,21 @@
 ##############################################
 # Some setup
 ##############################################
-#Set up some variables, define all as global (the <<- notation)
+#define some variables, define all as global (the <<- notation)
 #not fully sure if the global definition is needed, but it was at some point in the development
 #i'm sticking to it for now, doesn't seem to be a problem
 #name of R package
-packagename <<- "quizgrader"
+packagename <- "quizgrader"
 #path to templates
-quiztemplatefile <<- file.path(system.file("templates", package = packagename),"quiz_template.xlsx")
-studentlisttemplatefile <<- file.path(system.file("templates", package = packagename),"studentlist_template.xlsx")
-gradelisttemplatefile <<- file.path(system.file("templates", package = packagename),"gradelist_template.xlsx")
+quiztemplatefile <- file.path(system.file("templates", package = packagename),"quiz_template.xlsx")
+studentlisttemplatefile <- file.path(system.file("templates", package = packagename),"studentlist_template.xlsx")
+gradelisttemplatefile <- file.path(system.file("templates", package = packagename),"gradelist_template.xlsx")
 
 # use the variable set in quizmanager()
 # either NULL for new course, or path to existing course
-courselocation <- courselocation_global
+courselocation <<- courselocation_global
 #for debugging/manual fiddling, or if I don't want to load through UI each time
-#courselocation <- "D:/Dropbox/2023-1-spring-epid8060/quizzes/MADA2023"
+courselocation <- "D:/Dropbox/2023-1-spring-epid8060/quizzes/MADA2023"
 
 
 #######################################################
@@ -76,9 +76,10 @@ server <- function(input, output, session) {
   #if user clicks the button to select a folder for new course
   observeEvent(input$newcoursedir, {
     shinyFiles::shinyDirChoose(input, "newcoursedir", roots = volumes, session = session, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
-    courselocation <<- shinyFiles::parseDirPath(volumes, input$newcoursedir)
-    output$newcoursedir <- renderText(courselocation)
-    output$coursedir <- renderText(courselocation)
+    # not yet official course location, only once it has been created
+    courselocation_tmp <- shinyFiles::parseDirPath(volumes, input$newcoursedir)
+    output$newcoursedir <- renderText(courselocation_tmp)
+    #output$coursedir <- renderText(courselocation_tmp)
     #turn on other tabs now that course has been selected
     shinyjs::enable(selector = '.navbar-nav a[data-value="managecourse"')
     shinyjs::enable(selector = '.navbar-nav a[data-value="analyzesubmissions"')
@@ -136,17 +137,18 @@ server <- function(input, output, session) {
   #this is used for working on an existing course
   observeEvent(input$coursedir, {
     shinyFiles::shinyDirChoose(input, "coursedir", roots = volumes, restrictions = system.file(package = "base"), allowDirCreate = FALSE)
-
     courselocation_temp <- shinyFiles::parseDirPath(volumes, input$coursedir)
     #check that course location is a valid quiz folder
+    # CURRENTLY NOT WORKING, shinyDirChoose doesn't seem fully run before this code is executed
     #msg <- quizgrader::check_courselocation(courselocation_temp)
-    #if (!is.null(msg))
-    #{
-    #  showModal(modalDialog(msg, easyClose = FALSE))
-    #} else {
+    msg <- NULL
+    if (!is.null(msg))
+    {
+      showModal(modalDialog(msg, easyClose = FALSE))
+    } else {
       #if no error, assign to courselocation
       courselocation <<- courselocation_temp
-    #}
+    }
     output$coursedir <- renderText(courselocation)
     #turn on other tabs now that course has been selected
     shinyjs::enable(selector = '.navbar-nav a[data-value="managecourse"')
@@ -166,32 +168,49 @@ server <- function(input, output, session) {
 #------------------------------------------------------
 
   #######################################################
-  #start code block that generates course summary of all quizzes
+  #start code block that generates course overview summary
   #######################################################
 
-  observeEvent(input$topmenu == "managecourse",
-  {
+  observeEvent(input$showoverview,
+               {
 
-  if (!is.null(courselocation))
-  {
-    ret <- quizgrader::summarize_course(courselocation)
+                 # if course hasn't been set or loaded, go back to set course
+                 if (is.null(courselocation))
+                 {
+                   msg <- "Please make or load a course."
+                   showModal(modalDialog(msg, easyClose = FALSE))
+                   updateTabsetPanel(session, "topmenu", selected = "setcourse")
+                   #return()
+                 }
+                 if (!is.null(courselocation))
+                 {
+                   ret <- quizgrader::summarize_course(courselocation)
 
-    # this means it should have worked
-    if (is.list(ret))
-    {
+                   # this means it should have worked
+                   if (is.list(ret))
+                   {
 
-      studenttext <- paste0("There are currently ", length(ret$studentIDs), " students enrolled in your course:\n",paste(ret$studentIDs,collapse =', '))
+                     studenttext <- paste0("There are currently ", length(ret$studentIDs), " students enrolled in your course:\n",paste(ret$studentIDs,collapse =', '))
+                     if (!is.null(ret$gradelist))
+                     {
+                      gradelisttext <- paste0("Additional grade information for these activities is supplied:\n", paste(ret$gradelist,collapse =', '))
+                     } else {
+                       gradelisttext <- "No list with additional grade information is currently supplied."
+                     }
 
-      output$studentlist_summary <- shiny::renderText(studenttext)
-      output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
-    }
+                     output$studentlist_summary <- shiny::renderText(studenttext)
+                     output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
+                     output$gradelist_summary <- shiny::renderText(gradelisttext)
+                   }
 
-    if(!is.list(ret)) #if no list returned, it means it's an error message
-    {
-      output$summary_error <- shiny::renderText(ret)
-    }
-  }
-  }) #end generate_course_summary code block
+                   if(!is.list(ret)) #if no list returned, it means it's an error message
+                   {
+                     output$summary_error <- shiny::renderText(ret)
+                   }
+                 } #end else statement of doing summary if course location is set
+                 # don't run this on initialization (because no course is selected)
+               }, ignoreInit = FALSE
+  ) #end code that listens to manage course tab selection and summarizes course setup
 
 
 
@@ -243,7 +262,7 @@ server <- function(input, output, session) {
       #filename = paste0("studentlist_",timestamp,'.xlsx')
       filename = "studentlist.xlsx"
 
-      new_path = fs::path(courselocation, 'studentlists', filename)
+      new_path = fs::path(courselocation, 'studentlist', filename)
 
       #save data frame to time-stamped file to student list folder
       writexl::write_xlsx(studentdf, path = new_path, col_names = TRUE)
@@ -443,8 +462,8 @@ server <- function(input, output, session) {
       gradedf <- dplyr::mutate_all(gradedf, .funs=trimws)
       # needs to have name gradelist.xlsx
       filename = "gradelist.xlsx"
-      #place in main quiz folder
-      new_path = fs::path(courselocation, filename)
+      #place in gradelist folder
+      new_path = fs::path(courselocation, 'gradelist', filename)
 
       #save data frame to time-stamped file to student list folder
       writexl::write_xlsx(gradedf, path = new_path, col_names = TRUE)
@@ -468,7 +487,7 @@ server <- function(input, output, session) {
   observeEvent(input$makepackage,{
 
       #make zip file
-      msg <- quizgrader:: create_serverpackage(courselocation, newpackage = TRUE)
+      msg <- quizgrader:: create_serverpackage(courselocation, newpackage = input$newpackage)
       # show either success or error message
       showModal(modalDialog(msg, easyClose = FALSE))
   }) #end code block that zips files/folders needed for initial deployment
@@ -522,54 +541,55 @@ server <- function(input, output, session) {
 # Analysis
 #------------------------------------------------------
 
-#
-#   ################################################################################################
-#   #create the student and quiz UI elements
-#   ################################################################################################
-#
-#   observeEvent(input$topmenu == "analyzecourse",
-#                {
-#
-#                  ret <- quizgrader::summarize_course(courselocation)
-#
-#                  student_var <- ret$studentIDs
-#                  quiz_var <- ret$quizdf$QuizID
-#
-#                  output$student_selector = renderUI({
-#                    shinyWidgets::pickerInput("student_selector", "Select Student", student_var, multiple = FALSE, options = list(`actions-box` = TRUE), selected = NULL )
-#                  })
-#                  output$quiz_selector = renderUI({
-#                    shinyWidgets::pickerInput("quiz_selector", "Select Quiz", quiz_var, multiple = FALSE, options = list(`actions-box` = TRUE), selected = NULL )
-#                  })
-#                })
-#
-#
-#
-  # #######################################################
-  # #start code block that generates overall quiz summary stats
-  # #######################################################
-  # observeEvent(input$analyze_overview,{
+
+  ################################################################################################
+  #create the student and quiz UI elements
+  ################################################################################################
+
+  # observeEvent(input$topmenu == "analyzecourse",
+  #              {
   #
-  #   analysis_table <- quizgrader::analyze_overview(courselocation)
-  #   output$statstable <- DT::renderDataTable({
-  #           return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE,
-  #                                filter = "top", extensions = "Buttons",
-  #                                options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-  #         })
-  # })
-#
-#   #######################################################
-#   #start code block that generates score table
-#   #######################################################
-#   observeEvent(input$analyze_scoretable,{
-#
-#     analysis_table <- quizgrader::analyze_scoretable(courselocation)
-#     output$statstable <- DT::renderDataTable({
-#       return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE,
-#                            filter = "top", extensions = "Buttons",
-#                            options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-#     })
-#   })
+  #                ret <- quizgrader::summarize_course(courselocation)
+  #
+  #                student_var <- ret$studentIDs
+  #                quiz_var <- ret$quizdf$QuizID
+  #
+  #                output$student_selector = renderUI({
+  #                  shinyWidgets::pickerInput("student_selector", "Select Student", student_var, multiple = FALSE, options = list(`actions-box` = TRUE), selected = NULL )
+  #                })
+  #                output$quiz_selector = renderUI({
+  #                  shinyWidgets::pickerInput("quiz_selector", "Select Quiz", quiz_var, multiple = FALSE, options = list(`actions-box` = TRUE), selected = NULL )
+  #                })
+  #              })
+
+
+
+  #######################################################
+  #start code block that generates overall quiz summary stats
+  #######################################################
+  observeEvent(input$analyze_overview,{
+
+    analysis_table <- quizgrader::analyze_overview(courselocation)
+    output$statstable <- DT::renderDataTable({
+            return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE,
+                                 filter = "top", extensions = "Buttons",
+                                 options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+          })
+  })
+
+
+  #######################################################
+  #start code block that generates score table
+  #######################################################
+  observeEvent(input$analyze_scoretable,{
+
+    analysis_table <- quizgrader::analyze_scoretable(courselocation)
+    output$statstable <- DT::renderDataTable({
+      return(DT::datatable(analysis_table, class = "cell-border stripe", rownames = FALSE,
+                           filter = "top", extensions = "Buttons",
+                           options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+    })
+  })
 #
 #
 #   #######################################################
@@ -599,21 +619,21 @@ server <- function(input, output, session) {
 #
 #   })
 #
-#
-#   #######################################################
-#   #start code block that generates log table
-#   #######################################################
-#   observeEvent(input$analyze_log,{
-#
-#     analysis_table <- quizgrader::analyze_log(courselocation)
-#     output$statstable <- DT::renderDataTable({
-#         return(DT::datatable(analysis_table, class = "cell-border stripe",
-#                              rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
-#       })
-#
-#   })
-#
-#
+
+  #######################################################
+  #start code block that generates log table
+  #######################################################
+  observeEvent(input$analyze_log,{
+
+    analysis_table <- quizgrader::analyze_log(courselocation)
+    output$statstable <- DT::renderDataTable({
+        return(DT::datatable(analysis_table, class = "cell-border stripe",
+                             rownames = FALSE, filter = "top", extensions = "Buttons", options = list(dom = "Bfrtip", buttons = c("copy", "csv", "excel", "pdf", "print"), pageLength = 30)) )
+      })
+
+  })
+
+
 
   #######################################################
   #Exit quizmanager menu
@@ -645,7 +665,10 @@ ui <- fluidPage(
 
 
   navbarPage(title = "quizmanager", id = "topmenu", selected = "setcourse",
-             tabPanel(title = "Set Course", value = "setcourse",
+             # ---------------------
+             # Tab for setting up/loading course
+             # ---------------------
+             tabPanel(title = "Set Course", value = "setcourse", id = "setcourse",
                                h3('Start a new Course'),
                                textInput("coursename",label = "Course Name"),
                                shinyFiles::shinyDirButton("newcoursedir", "Set parent directory for new course", "Select a parent folder for new course"),
@@ -658,11 +681,16 @@ ui <- fluidPage(
                                br()
                       ), # end set course tab panel
 
+             # ---------------------
+             # Tab for managing course
+             # ---------------------
              tabPanel(title = "Manage Course", value = "managecourse", id = 'managecourse',
                       navlistPanel(id = "manage_submenu", selected = "overview",
                                    tabPanel(title = "Course Overview", value = "overview",
+                                            actionButton("showoverview", "Show/refresh course overview", class = "actionbutton"),
                                             textOutput("studentlist_summary"),
                                             tableOutput("quiz_summary"),
+                                            textOutput("gradelist_summary"),
                                             textOutput("summary_error"),
                                             br()
                                    ), # end setup overview panel
@@ -689,12 +717,14 @@ ui <- fluidPage(
                                    ), # end setup roster panel
                                    tabPanel(title = "Deployment", value = "deployment",
                                             h2('Deploy course'),
-                                            p('This checks student roster file and complete quizzes, re-creates student quizzes, then combines all folders and files needed for server deployment into a zip file.'),
-                                            h3('Remember to first copy everything in studentsubmissions from the server into the local studentsubmissions folder before creating an updated package!'),
-                                            actionButton("makepackage", "Make zip file for deployment", class = "actionbutton"),
-                                            p('Once zip file is created, copy it to the server, delete any prior content, then unzip again (and re-set permissions as needed).'),
+                                            p('This checks all supplied files, re-creates student quizzes, then combines all folders and files needed for server deployment into a zip file.'),
+                                            h3('If you want the app and the folders for student submissions, check this. Note that if you place this on the server, it might overwrite existing student submission!
+                                               Therefore, if you check this, first copy everything in studentsubmissions from the server into the local studentsubmissions folder before creating an updated package!'),
+                                            checkboxInput("newpackage", "Create initial package with everything."),
+                                            p('Once the zip file is created, copy it to the server and unzip (re-set access permissions as needed).'),
                                             p('Any student submissions you previously retrieved from the server and placed in the local studentsubmissions folder will be included and thus preserved upon extraction of this file on the server (but better make a backup).'),
-                                            p('Any prior student lists or quiz files will be overwritten.'),
+                                            p('Any prior student list or quiz files will be overwritten.'),
+                                            actionButton("makepackage", "Make zip file for deployment", class = "actionbutton"),
                                             #actionButton("deploycourse", "Deploy course to shiny server", class = "actionbutton"),
                                             p(textOutput("warningtext")),
                                             br(),
@@ -703,8 +733,11 @@ ui <- fluidPage(
                                    ) # end management nav list
                       ), # end management panel
 
+             # ---------------------
+             # Tab for analyzing submissions
+             # ---------------------
 
-             tabPanel("Analyze Submissions",  value = "analyzesubmissions", id = 'analyzesubmissions',
+             tabPanel(title = "Analyze Submissions",  value = "analyzecourse", id = 'analyzecourse',
                       h2('Show summary data for all submissions'),
                       actionButton("analyze_overview", "Summary Data", class = "actionbutton"),
                       h2('Show score table for all students/quizzes'),
@@ -718,18 +751,16 @@ ui <- fluidPage(
                       h2('Show full submission log'),
                       actionButton("analyze_log", "Log Data", class = "actionbutton"),
                       DT::dataTableOutput("statstable")
-                      ), #close "Analyze" tab
+                      ) #end of "Analyze" tab
 
-            fluidRow(column(12,
-                            actionButton("Exit", "Exit", class="exitbutton")
-                            ),
-                     class = "mainmenurow"
-                     ) #close fluidRow structure for input
-            ), #close NavBarPage
-
-
-
-  tagList( hr(),
+        ), #close navbarPage element
+        # add to bottom
+        fluidRow(column(12,
+                      actionButton("Exit", "Exit", class="exitbutton")
+                      ),
+                 class = "mainmenurow"
+        ), #close fluidRow structure for input
+        tagList( hr(),
            p('All text and figures are licensed under a ',
              a("Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.", href="http://creativecommons.org/licenses/by-nc-sa/4.0/", target="_blank"),
              'Software/Code is licensed under ',
@@ -738,7 +769,7 @@ ui <- fluidPage(
              br(),
              "The development of this package was partially supported by TBD.",
              align = "center", style="font-size:small") #end paragraph
-  ) #end taglist
+        ) #end taglist
 ) #end fluidpage and UI part of app
 
 

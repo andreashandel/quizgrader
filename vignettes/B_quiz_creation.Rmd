@@ -138,7 +138,7 @@ Additional columns are optional and will be ignored.
 
 #### QuizID
 
-A unique ID. This can only contain letters, numbers and underscore. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. **Quiz files need to have the name `QuizID_complete.xlsx` where `QuizID` is the entry in the column of that name.**
+A unique ID. This can only contain letters, numbers and underscore. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. **Quiz files need to have the name `QuizID_complete.xlsx` where `QuizID` is the entry in the column of that name.** So if you set QuizID to `firstquiz` then the file name needs to be `firstquiz_complete.xlsx`.
 
 #### QuestionID
 
@@ -195,9 +195,9 @@ _A note on answer types: I implemented those that I use for my own teaching. If 
 These are any notes/comments you want to add for yourself. Students will never see those.
 
 
-#### Duedate
+#### DueDate
 
-A date on which the quiz is due. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. It should be coded as a text (don't allow Excel to transform it into a date) and follow the ISO standard, i.e. be of the form YEAR-MO-DA (e.g. 2021-05-22). Times are currently not implemented, thus students have until midnight of the due date to submit. If you very much want/need a due time, let me know and I can implement that. If you want to have a quiz that has no due date, just set a due date very far into the future.
+A date on which the quiz is due. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. It should be coded as a text (don't allow Excel to transform it into a date). It needs to follow the ISO standard, i.e. be of the form YEAR-MO-DA (e.g. 2021-05-22). Times are currently not implemented, thus students have until midnight of the due date to submit. If you very much want/need a due time, let me know and I can implement that. If you want to have a quiz that has no due date, just set a due date very far into the future.
 
 
 #### Attempts

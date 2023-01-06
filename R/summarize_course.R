@@ -23,7 +23,7 @@
 summarize_course <- function(courselocation)
 {
   #load student list
-  studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlists"))
+  studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlist"))
   if (length(studentlistfile)>0)
   {
     studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
@@ -57,7 +57,18 @@ summarize_course <- function(courselocation)
     quizdf = "No quizzes exist"
   }
 
-  ret = list(studentIDs = studentIDs, quizdf = quizdf)
+  # get columns of gradelist if exists
+  gradelistfile <- fs::dir_ls(fs::path(courselocation,"gradelist"))
+  if (length(gradelistfile)>0)
+  {
+    gradelistdf <- readxl::read_xlsx(gradelistfile, col_types = "text", col_names = TRUE)
+    gradelistnames = colnames(gradelistdf)
+  } else {
+    gradelistnames = NULL
+  }
+
+
+  ret = list(studentIDs = studentIDs, quizdf = quizdf, gradelist = gradelistnames)
 
   return(ret)
 

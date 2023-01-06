@@ -49,12 +49,11 @@ create_course <- function(coursename, courselocation = NULL)
 
     fs::dir_create(fs::path(newfolder,'templates')) #contains template files submissions
 
-    fs::dir_create(fs::path(newfolder,'studentlists')) #for student roster files
+    fs::dir_create(fs::path(newfolder,'studentlist')) #for student roster files
     fs::dir_create(fs::path(newfolder,'completequizzes')) #for complete quiz sheets
     fs::dir_create(fs::path(newfolder,'studentquizzes')) #for quiz sheets to be given to students
-
+    fs::dir_create(fs::path(newfolder,'gradelist')) #for lists of grades (from other activities) to be shared with students
     fs::dir_create(fs::path(newfolder,'studentsubmissions')) #will contain all student submissions
-
     fs::dir_create(fs::path(newfolder,'studentsubmissions', 'logs')) #will contain student submissions log file
 
     #create an empty log file with just the column headers

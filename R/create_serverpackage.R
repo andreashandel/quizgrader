@@ -34,7 +34,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     ############################################
 
     # check roster
-    studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlists"))
+    studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlist"))
     studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
     msg <- quizgrader::check_studentlist(studentdf)
     if (!is.null(msg))
@@ -82,7 +82,12 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
                                     recurse = TRUE, include_directories = FALSE)
 
     #add studentlist folder and contents
-    zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentlists"),
+    zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentlist"),
+                    mode = "cherry-pick",
+                    recurse = TRUE, include_directories = FALSE)
+
+    #add gradelist folder and contents
+    zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"gradelist"),
                     mode = "cherry-pick",
                     recurse = TRUE, include_directories = FALSE)
 
@@ -97,17 +102,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
                         mode = "cherry-pick",
                         recurse = TRUE, include_directories = FALSE)
 
-        #if exists, add file with additional grades
-        gradelistfile = fs::path(courselocation,"gradelist.xlsx")
-        if (fs::file_exists(gradelistfile))
-        {
-          zip::zip_append(zipfile = zipfilename, files = gradelistfile,
-                          mode = "cherry-pick",
-                          recurse = TRUE, include_directories = FALSE)
-        }
-
-
-        #add folder for submissions and logs
+        #add folder that will/does contain student submissions and logs
         #this folder might initially be empty
         zip::zip_append(zipfile = zipfilename, files = fs::path(courselocation,"studentsubmissions"),
                         mode = "cherry-pick",

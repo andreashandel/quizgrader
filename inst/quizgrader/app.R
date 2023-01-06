@@ -13,7 +13,8 @@ library('quizgrader')
 submission_original <- NULL #the uploaded file
 
 #paths to the different folders
-studentlists_folder = ('./studentlists')
+studentlist_folder = ('./studentlist')
+gradelist_folder = ('./gradelist')
 completequizzes_folder = ('./completequizzes')
 studentsubmissions_folder = ('./studentsubmissions')
 
@@ -22,7 +23,7 @@ completequiz_names = list.files(path = completequizzes_folder, recursive=FALSE, 
 completequiz_ids = stringr::str_replace(completequiz_names,"_complete.xlsx","") #get only part that is name of quiz
 
 #a vector of user IDs who can submit unlimited times and independent of due dates. Potentially good for test users.
-testusers = c("ahandel@uga.edu", "daileyco@uga.edu")
+testusers = c("ahandel@uga.edu","test")
 
 #######################################################
 #small functions not worth sticking into their own files
@@ -96,9 +97,9 @@ server <- function(input, output) {
     metadata$Password = trimws(tolower(input$Password))
 
     #read student list every time submit button is pressed to make sure it's the latest version
-    studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlists_folder)), col_types = "text", col_names = TRUE)
+    studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlist_folder)), col_types = "text", col_names = TRUE)
 
-    #check that student ID and password are correct and can be matched with entry in gradelist
+    #check that provided student ID and password are correct and can be matched with entry in studentlist
     #if student is found, check name and password
     metaerror <- quizgrader::check_metadata(metadata, studentlist)
     if (!is.null(metaerror)) #if errors occur, stop the process with an error message
@@ -130,10 +131,11 @@ server <- function(input, output) {
     #####################################
     #show additional scores if they exist
     #####################################
-    if (fs::file_exists("gradelist.xlsx"))
+    gradelistfile = fs::dir_ls(fs::path(gradelist_folder))
+    if (fs::file_exists(gradelistfile))
     {
       #load list with other grades
-      gradelist <- readxl::read_xlsx("gradelist.xlsx", col_types = "text", col_names = TRUE)
+      gradelist <- readxl::read_xlsx(gradelistfile, col_types = "text", col_names = TRUE)
       #get entry for current student
       other_grades <- dplyr::filter(gradelist, StudentID == metadata$StudentID)
       #return other scores as table
@@ -168,9 +170,9 @@ server <- function(input, output) {
         metadata$Password = trimws(tolower(input$Password))
 
         #read student list every time submit button is pressed to make sure it's the latest version
-        studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlists_folder)), col_types = "text", col_names = TRUE)
+        studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlist_folder)), col_types = "text", col_names = TRUE)
 
-        #check that student ID and password are correct and can be matched with entry in gradelist
+        #check that supplied student ID and password are correct and can be matched with entry in studentlist
         #if student is found, check name and password
         metaerror <- quizgrader::check_metadata(metadata, studentlist)
         if (!is.null(metaerror)) #if errors occur, stop the process with an error message
