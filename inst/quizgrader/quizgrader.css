@@ -137,6 +137,16 @@ table td {
     padding-top: 1em;
 }
 
+#infotext {
+	text-align: center;
+	color: #2a3f9e;
+
+}
+
+#bottomtext {
+	text-align: center;
+	color: black;
+}
 
 #bottomtext {
 	text-align: center;

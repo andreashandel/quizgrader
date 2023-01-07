@@ -7,7 +7,11 @@
 #name of R package
 packagename <- "quizgrader"
 
-library(packagename)
+# load quizgrader package
+# will contain all needed functions and package dependencies
+# MAKE SURE THE VERSION INSTALLED ON THE SERVER IS THE SAME AS THE ONE
+# BEING USED LOCALLY AND FROM WHICH THIS FILE COMES
+library(packagename, character.only = TRUE)
 
 #######################################################
 #general setup
@@ -68,6 +72,7 @@ server <- function(input, output) {
             #remove any previous submission text
             output$currenttext <- NULL
             output$historytext <- NULL
+            output$scoretext <- NULL
             output$warningtext <- NULL
             #and tables
             output$currenttable <- NULL
@@ -86,6 +91,7 @@ server <- function(input, output) {
     #remove any previous submission text
     output$currenttext <- NULL
     output$historytext <- NULL
+    output$scoretext <- NULL
     output$warningtext <- NULL
     #and table
     output$currenttable <- NULL
@@ -126,6 +132,9 @@ server <- function(input, output) {
 
     historytext = "The table below shows your complete quiz submission history."
     output$historytext <- shiny::renderText(historytext)
+
+    scoretext = "If available, the table below shows scores from other assignments."
+    output$scoretext <- shiny::renderText(scoretext)
 
     #some text with a note about the displayed stats
     warningtext = "If anything doesn't look right, let your instructor know."
@@ -362,7 +371,7 @@ ui <- fluidPage(
   shinyjs::useShinyjs(),
   includeCSS("quizgrader.css"), #use custom styling
   br(),
-  tags$div(id = "shinyheadertitle", "quizgrader - an R package for automated submissin, grading and analysis of quizzes/"),
+  tags$div(id = "shinyheadertitle", "quizgrader - an R package for automated submission, grading and analysis of quizzes."),
   tags$div(id = "infotext", paste0('This is ', packagename,  ' version ',utils::packageVersion(packagename),' last updated ', utils::packageDescription(packagename)$Date,'.')),
   tags$div(id = "infotext", "Written and maintained by", a("Andreas Handel", href="https://www.andreashandel.com", target="_blank"), "with contributions from", a("others.",  href="https://andreashandel.github.io/quizgrader/authors.html", target="_blank")),
   br(),
@@ -398,19 +407,23 @@ ui <- fluidPage(
     ),
     class = "mainmenurow"
   ), #close fluidRow structure for input
-  br(),
-  h3(textOutput("currenttext")),
-  br(),
-  tableOutput("currenttable"),
-  br(),
-  h3(textOutput("historytext")),
-  br(),
-  tableOutput("historytable"),
-  br(),
-  tableOutput("scoretable"),
-  br(),
-  h3(textOutput("warningtext"))
-)
+  fluidRow(
+    column(12,
+           align = "center",
+           h3(textOutput("currenttext")),
+           br(),
+           tableOutput("currenttable"),
+           br(),
+           h3(textOutput("historytext")),
+           tableOutput("historytable"),
+           br(),
+           h3(textOutput("scoretext")),
+           tableOutput("scoretable"),
+    ),
+    class = "mainmenurow"
+  ), #close fluidRow structure for output
+
+) # close fluidpage
 
 
 # Run the application

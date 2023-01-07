@@ -541,6 +541,12 @@ server <- function(input, output, session) {
 # Analysis
 #------------------------------------------------------
 
+  ################################################################################################
+  # below code doesn't fully work, disabled for now
+  # would be good to implement without shinyWidgets and DT if possible
+  ################################################################################################
+
+
 
   ################################################################################################
   #create the student and quiz UI elements

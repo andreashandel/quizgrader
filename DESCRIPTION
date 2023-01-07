@@ -14,16 +14,11 @@ License: GPL-3
 Encoding: UTF-8
 Imports:
     dplyr,
-    DT,
     fs,
     lubridate,
-    magrittr,
     readxl,
-    rlang,
     shinyFiles,
     shinyjs,
-    shinyWidgets,
-    stats,
     stringr,
     tibble,
     tidyr,
@@ -31,8 +26,8 @@ Imports:
     writexl,
     zip
 Depends:
-    R (>= 4.0),
-    shiny (>= 1.2)
+    R (>= 4.1),
+    shiny (>= 1.4)
 Suggests: 
     covr,
     devtools,

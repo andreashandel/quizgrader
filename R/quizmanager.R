@@ -9,7 +9,15 @@
 #' @examples
 #' \dontrun{quizmanager()}
 #' @author Andreas Handel
+#' @importFrom stringr str_replace
+#' @import shiny
+#' @importFrom shinyjs enable
+#' @importFrom shinyFiles getVolumes
+#' @importFrom utils globalVariables
 #' @export
+
+# Note the imports above. That's because those packages are used by the apps which are in /inst not /R
+# and therefore R/CRAN checks would complain
 
 quizmanager <- function(courselocation = NULL) {
 
@@ -31,7 +39,7 @@ quizmanager <- function(courselocation = NULL) {
     }
 
     appDir <- system.file( "quizmanager", package = "quizgrader") #get directory for main menu app
-    appFile <- shinyAppFile(file.path(appDir,"app.R"))
+    appFile <- shiny::shinyAppFile(file.path(appDir,"app.R"))
     shiny::runApp(appDir = appFile, launch.browser = TRUE) #run quizmanager app
 
     print('*************************************************')
@@ -44,8 +52,10 @@ quizmanager <- function(courselocation = NULL) {
 
 }
 
-#needed to get CRAN checks to shut up about no visible binding
-#utils::globalVariables(c("courselocation_global", "DueDate"))
+# needed to get CRAN checks to shut up about no visible binding
+# seems better to do it this way eventually:
+# https://dplyr.tidyverse.org/articles/programming.html#eliminating-r-cmd-check-notes
+utils::globalVariables(c("courselocation_global", "DueDate", "QuizID", "Attempt", "QuizDueDate", "Score", "StudentID", "Submit_Date", "n_Correct", "n_Questions"))
 
 
 .onAttach <- function(libname, pkgname){
