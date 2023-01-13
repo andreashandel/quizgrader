@@ -338,6 +338,9 @@ server <- function(input, output) {
                                                )
         new_submission_log <- dplyr::mutate_all(new_submission_log, as.character)
 
+        # if the student list contains first/last names, also add them to submission log
+        WRITE THIS
+
         #name for new file, corresponds to time stamp above
         submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", paste0("submissions_log_", timestamp, ".xlsx"))
 
