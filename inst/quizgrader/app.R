@@ -107,6 +107,12 @@ server <- function(input, output) {
 
     #read student list every time submit button is pressed to make sure it's the latest version
     studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlist_folder)), col_types = "text", col_names = TRUE)
+    # make sure StudentID and Password in studentlist are lowercase
+    # will happen automatically if quizmanager UI is used
+    # might not happen if user adds studentlist manually without UI
+    studentlist$StudentID = trimws(tolower(studentlist$StudentID))
+    studentlist$Password = trimws(tolower(studentlist$Password))
+
 
     #check that provided student ID and password are correct and can be matched with entry in studentlist
     #if student is found, check name and password
@@ -183,6 +189,12 @@ server <- function(input, output) {
 
         #read student list every time submit button is pressed to make sure it's the latest version
         studentlist <- readxl::read_xlsx(fs::dir_ls(fs::path(studentlist_folder)), col_types = "text", col_names = TRUE)
+        # make sure StudentID and Password in studentlist are lowercase
+        # will happen automatically if quizmanager UI is used
+        # might not happen if user adds studentlist manually without UI
+        studentlist$StudentID = trimws(tolower(studentlist$StudentID))
+        studentlist$Password = trimws(tolower(studentlist$Password))
+
 
         #check that supplied student ID and password are correct and can be matched with entry in studentlist
         #if student is found, check name and password
@@ -378,7 +390,7 @@ ui <- fluidPage(
   fluidRow(
        column(12,
               align = "center",
-              textInput("StudentID","Student ID")
+              textInput("StudentID","Student ID for this system (might be different than your offical ID)")
               ),
         class = "mainmenurow"
         ),
