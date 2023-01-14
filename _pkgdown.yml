@@ -9,6 +9,7 @@ navbar:
     left:
     - home
     - intro
+    - articles
     - reference
     - news
     right:
@@ -20,6 +21,23 @@ navbar:
     intro:
       text: Get started
       href: articles/A_introduction.html
+    articles:
+      text: Tutorials
+      menu:
+        - text: Introduction
+          href: articles/A_introduction.html
+        - text: Quiz creation
+          href: articles/B_quiz_creation.html
+        - text: Hosting on own shiny server
+          href: articles/C_hosting_on_own_shiny_server.html
+        - text: Hosting on shinyapps.io
+          href: articles/D_hosting_on_shinyappsio.html
+        - text: Local hosting
+          href: articles/E_local_hosting.html
+        - text: QUiz administration
+          href: articles/F_quiz_administration.html
+        - text: Quiz analysis
+          href: articles/G_quiz_analysis.html
     reference:
       text: Reference
       href: reference/index.html

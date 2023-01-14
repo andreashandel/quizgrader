@@ -272,7 +272,7 @@ server <- function(input, output) {
         submission_original <- try( readxl::read_excel(input$loadfile$datapath, col_types = "text"))
         if (length(submission_original)==1) #if this is true, it means the read_excel failed and instead produced an error string
         {
-            errormsg = "File could not be loaded, make sure it's a valid Excel file"
+            errormsg = "File could not be loaded, make sure it is a valid Excel file"
             show_error(errormsg)
             return()
         }
@@ -327,7 +327,11 @@ server <- function(input, output) {
         #####################################
 
         #log entry to be recorded
-        new_submission_log <- dplyr::bind_cols(StudentID = metadata$StudentID,
+        studentnr = which(metadata$StudentID == studentlist$StudentID)
+
+        new_submission_log <- dplyr::bind_cols(Lastname = studentlist$Lastname[studentnr],
+                                               Firstname = studentlist$Lastname[studentnr],
+                                               StudentID = metadata$StudentID,
                                                QuizID = quizid,
                                                QuizDueDate = solution$DueDate[1],
                                                Attempt = n_attempts+1,
@@ -337,9 +341,6 @@ server <- function(input, output) {
                                                Submit_Date = Sys.Date()
                                                )
         new_submission_log <- dplyr::mutate_all(new_submission_log, as.character)
-
-        # if the student list contains first/last names, also add them to submission log
-        WRITE THIS
 
         #name for new file, corresponds to time stamp above
         submissions_log_filenamepath = fs::path(studentsubmissions_folder, "logs", paste0("submissions_log_", timestamp, ".xlsx"))
