@@ -110,6 +110,21 @@ Disabling the password feature is currently not possible. If you think a setup w
 **You should tell students that you will be able to read their passwords and that this setup is not very secure, thus they should use a _throw-away_ password for this course and not any passwords they use to protect real systems (e.g. their bank accounts)!**
 
 
+#### Testuser
+
+This field can be used to add test users to the system. To do so, enter all the above information for the test user and set this field to `TRUE`. This is good for testing by the instructor, TAs, and other persons. Test users will be ignored in any of the course analysis sections. By default, test users still have limitations on the number of submissions and can't submit beyond the due date, unless this is changed with the settings below.
+
+
+#### Unlimited
+
+If this field is set to `TRUE`, the user can submit an unlimited number of times. This is most often useful for test users. But if you have a specific student who needs that feature too, you can set it here. If you want all students to have unlimited submission attempts for a specific quiz, it is better to set that through the `Attempts` field in the Quiz sheet (see below).  
+
+#### Untimed
+
+If this field is set to `TRUE`, the user can submit a quiz at any time, independent of the due date. This is most often useful for test users. But if you have a specific student who needs that feature too, you can set it here. If you want all students to have submission attempts without due dates for a specific quiz, it is better to set that through the `DueDate` field in the Quiz sheet (see below).  
+
+
+
 ### Adding the filled template
 
 Once you are done filling the student list, add it to the course by clicking the `Add studentlist` button in the UI or manually place it into the `studentlists` folder. **Each student needs to have a `StudentID` and `Password` entry.** Name information is recommended but optional.
@@ -197,12 +212,12 @@ These are any notes/comments you want to add for yourself. Students will never s
 
 #### DueDate
 
-A date on which the quiz is due. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. It should be coded as a text (don't allow Excel to transform it into a date). It needs to follow the ISO standard, i.e. be of the form YEAR-MO-DA (e.g. 2021-05-22). Times are currently not implemented, thus students have until midnight of the due date to submit. If you very much want/need a due time, let me know and I can implement that. If you want to have a quiz that has no due date, just set a due date very far into the future.
+A date on which the quiz is due. Only the entry in the first row matters, anything else in further rows is ignored. It cannot be empty. It should be coded as a text (don't allow Excel to transform it into a date). It needs to follow the ISO standard, i.e. be of the form YEAR-MO-DA (e.g. 2021-05-22). Times are currently not implemented, thus students have until midnight of the due date to submit. If you very much want/need a due time, let me know and I can implement that. If you want to have a quiz that has no due date, just set a due date beyond the end of the course.
 
 
 #### Attempts
 
-Number of submission attempts students can make. Only the entry in the first row matters, anything else in further rows is ignored. It needs to be a positive integer. Note that currently, any new submission will overwrite previous ones (which means if a student submits twice and the second attempt is worse, that lower score will be recorded). If you need unlimited submission attempts, set this to a very large number.
+Number of submission attempts students can make. Only the entry in the first row matters, anything else in further rows is ignored. It needs to be a positive integer. Note that currently, any new submission will overwrite previous ones (which means if a student submits twice and the second attempt is worse, that lower score will be recorded). If you need unlimited submission attempts, set this to a very large number (e.g., 9999).
 
 
 ### Notes for quiz creation

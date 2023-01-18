@@ -29,9 +29,6 @@ studentsubmissions_folder = ('./studentsubmissions')
 completequiz_names = list.files(path = completequizzes_folder, recursive=FALSE, pattern = "\\.xlsx$", full.names = FALSE)
 completequiz_ids = stringr::str_replace(completequiz_names,"_complete.xlsx","") #get only part that is name of quiz
 
-#a vector of user IDs who can submit unlimited times and independent of due dates. Potentially good for test users.
-testusers = c("ahandel@uga.edu","test")
-
 #######################################################
 #small functions not worth sticking into their own files
 #######################################################
@@ -240,16 +237,21 @@ server <- function(input, output) {
         solution <- data.frame(dplyr::mutate_all(solution_raw, ~ tidyr::replace_na(.x, "")))
 
 
+        ##########################
+        # Check due date and submission attempts
+        #########################
+        # note that test users are by default checked, unless they have
+        # Untimed or Unlimited set to TRUE
+        # (non-test users can also have those flags as TRUE)
 
+        # get row for current student
+        studentnr = which(metadata$StudentID == studentlist$StudentID)
 
-        #check due date and check attempts
-        #skip check for test users
-        #count number of files that exist for that student to determine number of already taken attempts
-        n_attempts <- length(fs::dir_ls(path = fs::path(studentsubmissions_folder, quizid),
-                                        regexp = paste0(metadata$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
-                                        )
-                             )
-        if ( !(metadata$StudentID %in% testusers))
+        ################################
+        #check due date
+        ################################
+        #skip check for users that have Untimed set to TRUE
+        if ( !(studentlist$Untimed[studentnr] == TRUE))
         {
 
           #check that submission is before due data
@@ -259,6 +261,18 @@ server <- function(input, output) {
             show_error(errormsg)
             return()
           }
+        }
+        ################################
+        #check submission attempts
+        ################################
+        #skip check for users that have Unlimited set to TRUE
+        if ( !(studentlist$Unlimited[studentnr] == TRUE))
+        {
+          #count number of files that exist for that student to determine number of already taken attempts
+          n_attempts <- length(fs::dir_ls(path = fs::path(studentsubmissions_folder, quizid),
+                                          regexp = paste0(metadata$StudentID, "_.*?_", quizid, "_submission[.]xlsx")
+              )
+          )
           if (n_attempts >= solution$Attempts[1]) #if this is true, it means max number of attempts is reached
           {
             errormsg = "You have already submitted the maximum number of attempts."
@@ -266,6 +280,10 @@ server <- function(input, output) {
             return()
           }
         }
+
+        ################################
+        # load file and do a bit of cleaning
+        ################################
 
         #if file names, solution file, due date, attempt number are okay, proceed by loading the submitted file
         #read each column as character/text, this is safer for comparison
@@ -284,6 +302,10 @@ server <- function(input, output) {
         #therefore do this before quiz format check
         submission <- data.frame(dplyr::mutate_all(submission_original, ~ tidyr::replace_na(.x, "")))
 
+        ################################
+        # check submission file with original file to make sure they match
+        ################################
+
         #check submitted file against solution to make sure content is right
         #if file is not right, this will return an error message
         #then display error message and stop the process
@@ -294,6 +316,10 @@ server <- function(input, output) {
           return()
         }
 
+        ################################
+        # if all checks passed, we grade
+        ################################
+
         #if all seems  ok, we can go ahead and grade
         result_table <- quizgrader::grade_quiz(submission,solution)
         # if an error occurs during grading, result_table will contain the error message as a string
@@ -302,7 +328,6 @@ server <- function(input, output) {
           show_error(result_table)
           return()
         }
-
 
         #compute score for submission
         score = sum(result_table$Score == "Correct")/nrow(result_table)*100
@@ -330,7 +355,7 @@ server <- function(input, output) {
         studentnr = which(metadata$StudentID == studentlist$StudentID)
 
         new_submission_log <- dplyr::bind_cols(Lastname = studentlist$Lastname[studentnr],
-                                               Firstname = studentlist$Lastname[studentnr],
+                                               Firstname = studentlist$Firstname[studentnr],
                                                StudentID = metadata$StudentID,
                                                QuizID = quizid,
                                                QuizDueDate = solution$DueDate[1],

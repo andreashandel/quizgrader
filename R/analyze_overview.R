@@ -24,12 +24,21 @@ analyze_overview <- function(courselocation)
   filenr = which.max(listfiles$modification_time) #find most recently changed file
   submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
 
+  # load the student list, pull out the test users
+  # those test users will be removed below
+  studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlist"))
+  studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
+  testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == TRUE]))
+
   #turn columns into the right types
   df1 <- dplyr::mutate(submissions_log, Attempt = as.numeric(Attempt), Score = as.numeric(Score),
                                            n_Questions = as.numeric(n_Questions), n_Correct = as.numeric(n_Correct),
                                            Submit_Date = as.Date(Submit_Date), QuizDueDate = as.Date(QuizDueDate))
 
-  summary_table <- df1 |> dplyr::group_by(QuizID) |>
+  # kick out any entries from the test users
+  df2 <- df1 |> dplyr::filter(!(StudentID %in% testusers))
+
+  summary_table <- df2 |> dplyr::group_by(QuizID) |>
                           dplyr::summarize( submissions = dplyr::n(), students = length(unique(StudentID)), lowest = min(Score), highest = max(Score) )
 
 
