@@ -22,7 +22,7 @@ grade_quiz <-  function(submission, solution)
     #set up data frame that will hold both the question number and the correct/not correct evaluation
     #start by labeling answer as not correct
     #then based on checks below, overwrite by declaring it correct
-    grade_table = data.frame(QuestionID = solution$QuestionID, Score = "Not correct")
+    grade_table = data.frame(QuestionID = solution$Question, YourAnswer = "", Score = "Not correct", Feedback = solution$Feedback)
 
     #run through each row of submitted sheet, compare answer with solution
     #for this to work, the submitted and solution file need to have exactly the same structure
@@ -33,6 +33,9 @@ grade_quiz <-  function(submission, solution)
       #save answer and submission in their own variables for easier processing
       true_answer = solution$Answer[n]
       submitted_answer = submission$Answer[n]
+
+      #record their answer
+      gradetable$YourAnswer[n] = submitted_answer
 
       #record type of answer, treat accordingly
       answertype = solution$Type[n]
@@ -55,7 +58,7 @@ grade_quiz <-  function(submission, solution)
         #then keep only first character
         true_answer = tolower(true_answer)
         submitted_answer = substr(trimws(tolower(submitted_answer)),1,1)
-        if (submitted_answer == true_answer) {grade_table[n,2]="Correct"}
+        if (submitted_answer == true_answer) {grade_table$Score[n]="Correct"}
       }
       #expect some text
       #currently, match by requiring the submitted text contains the answer
@@ -71,7 +74,7 @@ grade_quiz <-  function(submission, solution)
         #match for substring
         #if (grepl(true_answer, submitted_answer, fixed = TRUE)) {grade_table[n,2]="Correct"}
         #below is for exact match
-        if (submitted_answer == true_answer) {grade_table[n,2]="Correct"}
+        if (submitted_answer == true_answer) {grade_table$Score[n] = "Correct"}
       }
 
       #expect either Yes/No or True/False
@@ -94,7 +97,7 @@ grade_quiz <-  function(submission, solution)
         submitted_answer = substr(trimws(tolower(submitted_answer)),1,1)
         if (submitted_answer == "y" | submitted_answer == "t" | submitted_answer=="1") {submission_numeric = 1}
         if (submitted_answer == "n" | submitted_answer == "f" | submitted_answer=="0") {submission_numeric = 0}
-        if (submission_numeric == answer_numeric) {grade_table[n,2]="Correct"}
+        if (submission_numeric == answer_numeric) {grade_table$Score[n] = "Correct"}
       }
 
       #expect integer
@@ -108,7 +111,7 @@ grade_quiz <-  function(submission, solution)
         {
           true_answer = as.numeric(true_answer)
           submitted_answer = round(as.numeric(submitted_answer),0)
-          if (submitted_answer==true_answer) {grade_table[n,2] = "Correct"}
+          if (submitted_answer==true_answer) {grade_table$Score[n] = "Correct"}
         }
       }
 
@@ -123,7 +126,7 @@ grade_quiz <-  function(submission, solution)
           true_answer = as.numeric(true_answer)
           submitted_answer = as.numeric(submitted_answer)
           #check that submitted value is either true_answer or true_answer-1 or true_answer+1
-          if  (submitted_answer==true_answer | submitted_answer==(true_answer+1) | submitted_answer==(true_answer-1)) {grade_table[n,2] = "Correct"}
+          if  (submitted_answer==true_answer | submitted_answer==(true_answer+1) | submitted_answer==(true_answer-1)) {grade_table$Score[n] = "Correct"}
         }
       }
 
@@ -136,7 +139,7 @@ grade_quiz <-  function(submission, solution)
         {
           true_answer = as.numeric(true_answer)
           submitted_answer = as.numeric(submitted_answer)
-          if (submitted_answer == true_answer) {grade_table[n,2] = "Correct"}
+          if (submitted_answer == true_answer) {grade_table$Score[n] = "Correct"}
         }
       }
       #expect rounded to the same digits as in the answer
@@ -153,7 +156,7 @@ grade_quiz <-  function(submission, solution)
           true_answer = as.numeric(true_answer)*10^digits #convert to integer
           submitted_answer = round(as.numeric(submitted_answer)*10^digits,0) #convert to what should be an integer if given with the right digits, then round
           #allow mistake in student rounding
-          if  (abs(submitted_answer-true_answer) < 2) {grade_table[n,2] = "Correct"}
+          if  (abs(submitted_answer-true_answer) < 2) {grade_table$Score[n] = "Correct"}
         }
       }
     } #end loop over all answers

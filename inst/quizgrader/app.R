@@ -264,7 +264,7 @@ server <- function(input, output) {
         #####################################
         #write the submission to a file for record keeping
         #####################################
-        #filename contains student email, date and quiz ID
+        #filename contains student ID, date and quiz ID
         #this allows checking if things in the app go wrong
         #give each submission a time-stamp
         timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
@@ -308,7 +308,7 @@ server <- function(input, output) {
         #####################################
         #display results
         #if no errors occurred during grading, show and record results
-        output$currenttable <- shiny::renderTable(cbind(result_table, Feedback = solution$Feedback))
+        output$currenttable <- shiny::renderTable(result_table)
 
         #show a success text
         success_text = paste0("Your submission for quiz ",quizid," has been successfully graded and recorded. \n The table below shows detailed feedback for each question.")
