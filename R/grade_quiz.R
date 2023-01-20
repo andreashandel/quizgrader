@@ -35,7 +35,7 @@ grade_quiz <-  function(submission, solution)
       submitted_answer = submission$Answer[n]
 
       #record their answer
-      gradetable$YourAnswer[n] = submitted_answer
+      grade_table$YourAnswer[n] = submitted_answer
 
       #record type of answer, treat accordingly
       answertype = solution$Type[n]
