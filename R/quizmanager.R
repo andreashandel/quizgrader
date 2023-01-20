@@ -11,6 +11,7 @@
 #' @author Andreas Handel
 #' @importFrom stringr str_replace
 #' @import shiny
+#' @importFrom shinyWidgets pickerInput
 #' @importFrom shinyjs enable
 #' @importFrom shinyFiles getVolumes
 #' @importFrom utils globalVariables

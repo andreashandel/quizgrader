@@ -16,10 +16,7 @@ analyze_scoretable <- function(courselocation)
 {
 
   # read latest log file
-  listfiles <- fs::dir_info(fs::path(courselocation, "studentsubmissions", "logs"))
-  #load the most recent one, which is the one to be used
-  filenr = which.max(listfiles$modification_time) #find most recently changed file
-  submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
+  submissions_log <- load_logfile(courselocation)
 
   #turn columns into the right types
   df1 <- dplyr::mutate(submissions_log, Attempt = as.numeric(Attempt), Score = as.numeric(Score),

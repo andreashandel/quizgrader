@@ -22,4 +22,21 @@ analyze_quiz <- function(courselocation, selected_quiz)
   #also maybe some summary stats for each question (distribution of answers and % who got it right)
 
 
+  #################
+  # this code doesn't quite do the right thing, it only pulls the log file with the summary information
+  # and filters by quiz
+  # should eventually be replaced with more detailed code
+  #################
+
+  submissions_log <- load_logfile(courselocation)
+
+  #turn columns into the right types
+  df1 <- dplyr::mutate(submissions_log, Attempt = as.numeric(Attempt), Score = as.numeric(Score),
+                       n_Questions = as.numeric(n_Questions), n_Correct = as.numeric(n_Correct),
+                       Submit_Date = as.Date(Submit_Date), QuizDueDate = as.Date(QuizDueDate))
+
+  # kick out any entries from the test users
+  summary_table <- df1 |> dplyr::filter((QuizID == selected_quiz))
+
+
 }

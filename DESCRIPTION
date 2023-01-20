@@ -19,6 +19,7 @@ Imports:
     readxl,
     shinyFiles,
     shinyjs,
+    shinyWidgets,
     stringr,
     tibble,
     tidyr,

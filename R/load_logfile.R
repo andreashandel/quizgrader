@@ -1,12 +1,13 @@
-#' @title Generate a table of the log file for all quizzes in the course
+#' @title Find and load the most recent log file
 #'
-#' @description This function creates a dataframe summarizing the quizzes and submissions in the course.
-#' This is used by the quizmanager part of the package
+#' @description Determines the most recent log file at time of function call
+#' and loads it.
+#' This is used by both the quizgrader and quizmanager parts of the package
 #'
 #' @param courselocation parent folder for the course
 #'
 #' @return
-#' If things went well, a dataframe containing a summary of all quizzes.
+#' If things went well, a dataframe containing the entries of the latest log file.
 #' Otherwise an error message is returned.
 #' @export
 
@@ -16,7 +17,7 @@
 # this function calls summarize_course, compile_submissions and compile_submission_logs
 
 
-analyze_log <- function(courselocation)
+load_logfile <- function(courselocation)
 {
 
   # read latest log file
@@ -25,10 +26,6 @@ analyze_log <- function(courselocation)
   filenr = which.max(listfiles$modification_time) #find most recently changed file
   submissions_log <- readxl::read_xlsx(listfiles$path[filenr], col_types = "text", col_names = TRUE)
 
-  overview_table <- dplyr::select(submissions_log, -n_Questions, -n_Correct) |>
-                                        dplyr::arrange(QuizID, StudentID)
-
-  return(overview_table)
-
+  return(submissions_log)
 
 }
