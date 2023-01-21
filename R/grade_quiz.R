@@ -22,7 +22,7 @@ grade_quiz <-  function(submission, solution)
     #set up data frame that will hold both the question number and the correct/not correct evaluation
     #start by labeling answer as not correct
     #then based on checks below, overwrite by declaring it correct
-    grade_table = data.frame(QuestionID = solution$Question, YourAnswer = "", Score = "Not correct", Feedback = solution$Feedback)
+    grade_table = data.frame(Question = solution$Question, YourAnswer = "", Score = "Not correct", Feedback = solution$Feedback)
 
     #run through each row of submitted sheet, compare answer with solution
     #for this to work, the submitted and solution file need to have exactly the same structure
