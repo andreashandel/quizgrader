@@ -74,6 +74,8 @@ Additional packages are needed for development (but not use) of the package. Tho
 
 ### Github action integration
 To enable continuous checking and other GitHub actions, use the 'usethis' package as follows:
+https://usethis.r-lib.org/reference/github_actions.html
+
 * use_github_action_check_release()
 
 

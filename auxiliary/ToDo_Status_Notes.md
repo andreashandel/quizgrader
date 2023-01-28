@@ -1,9 +1,10 @@
-library(quizgrader)
-quizmanager("D:/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
-#quizmanager("C:/data/Dropbox/2021-3-fall-MADA/quizzes/MADA2021")
-
-
 # Andreas comments
+
+
+# ToDo 
+
+* Fix Github integration.
+
 
 
 ### QUIZMANAGER
@@ -18,7 +19,6 @@ MANAGEMENT
 
 GENERAL
 * Thorough testing of all quizmanager functionality (changes were made).
-* Fix warning message related to navigation containers that shows up when exiting the app.
 
 
 # ToDo for later
