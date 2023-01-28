@@ -2,8 +2,8 @@ Package: quizgrader
 Type: Package
 Title: Automated managament and grading of quizzes
 Description: Allows generation of quizzes using simple spreadsheets, student submit online and quizzes are autograded. 
-Version: 0.0.6
-Date: 2023-01-21
+Version: 0.0.7
+Date: 2023-01-28
 Authors@R: c(
     person("Andreas", "Handel", email = "ahandel@uga.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4622-1146") ),
 	  person("Cody", "Dailey",  role = "ctb"), 

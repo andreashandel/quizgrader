@@ -30,7 +30,7 @@ analyze_scoretable <- function(courselocation)
   df2 <- df1 |> dplyr::group_by(QuizID, StudentID) |> dplyr::filter(Score == max(Score)) |> dplyr::slice( n = 1) |> dplyr::select(-Attempt)
 
   # change to wide format for display
-  df3 <- tidyr::pivot_wider(df2, id_cols = c(StudentID), names_from = QuizID, values_from = Score)
+  df3 <- tidyr::pivot_wider(df2, id_cols = c(StudentID, Lastname, Firstname), names_from = QuizID, values_from = Score)
 
   return(df3)
 }

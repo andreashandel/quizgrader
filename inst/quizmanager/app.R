@@ -598,7 +598,7 @@ server <- function(input, output, session) {
 
 
   #######################################################
-  #start code block that generates score table
+  #start code block that generates score table for all students/quizzes
   #######################################################
   observeEvent(input$analyze_scoretable,{
 
@@ -613,7 +613,7 @@ server <- function(input, output, session) {
 
 
   #######################################################
-  #start code block that generates student table
+  #start code block that generates detailed student view table
   #######################################################
   observeEvent(input$analyze_student,{
 
@@ -628,7 +628,7 @@ server <- function(input, output, session) {
 
 
   #######################################################
-  #start code block that generates question table
+  #start code block that generates detailed quiz view table
   #######################################################
   observeEvent(input$analyze_quiz,{
 

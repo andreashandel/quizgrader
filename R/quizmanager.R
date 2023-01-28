@@ -31,7 +31,7 @@ quizmanager <- function(courselocation = NULL) {
       {
         stop(msg) #if the quiz location check is not successful, an error message is returned. otherwise NULL.
       } else {
-             courselocation_global <<- courselocation #assign course location to global variable, will then be used in quizmanager app
+             courselocation_global <- courselocation #assign course location to global variable, will then be used in quizmanager app
       }
     # if user doesn't provide location of existing course
     } else {
@@ -49,14 +49,14 @@ quizmanager <- function(courselocation = NULL) {
     print('*************************************************')
 
     # clean up at end
-    courselocation_global <<- NULL
+    # courselocation_global <<- NULL
 
 }
 
 # needed to get CRAN checks to shut up about no visible binding
 # seems better to do it this way eventually:
 # https://dplyr.tidyverse.org/articles/programming.html#eliminating-r-cmd-check-notes
-utils::globalVariables(c("courselocation_global", "DueDate", "QuizID", "Attempt", "QuizDueDate", "Score", "StudentID", "Submit_Date", "n_Correct", "n_Questions"))
+utils::globalVariables(c("courselocation_global", "DueDate", "QuizID", "Attempt", "QuizDueDate", "Score", "StudentID", "Submit_Date", "n_Correct", "n_Questions","Lastname","Firstname"))
 
 
 .onAttach <- function(libname, pkgname){
