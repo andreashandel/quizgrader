@@ -42,6 +42,16 @@ Possibly interesting package for interacting with dropbox:
 https://github.com/karthik/rdrop2
 
 
+# Resources
+
+* There is a gradeR R package: https://cran.r-project.org/web/packages/gradeR/index.html
+* Another similar package: https://cran.r-project.org/web/packages/ProfessR/
+* A package to grade learnr documents: https://rstudio-education.github.io/gradethis/
+https://cran.r-project.org/web/packages/exams/index.html
+
+
+
+
 #############################
 ### Old/Archived information
 #############################
@@ -63,35 +73,3 @@ Due date and attempts road blocks in place. Reading solution file before submiss
 quizmanager.R app is paginated. Buttons work, but need better placement.
 
 
-## 16 June 2021
-
-Adapt to a single log file; 
-generate shell during course creation and package with deployment; 
-portion of log file can be printed during submission in the grading app;
-
-public vs private functions: decide which (if any) should be private;
-
-singly-directional flow of files (schematic?);
-
-
-## 23 June 2021
-
-course summary with final rechecking and status checklist just before deployment
-play with workflow on server
-- alternative to hadley/emo package?
-
-remove the quizstats from app.R, just show table and let them calculate themselves
-add time to the submissions log
-
-look for implementation of check_studentlist.R
-
-update docs for developers file with structure, descriptions, ...
-
-useful to have packaging on server side?
-
-
-## 30 June 2021
-
-Delete quiz functionality during initial set-up versus post-doc
-
-Update notes / documentation to be able to pick back up quickly
