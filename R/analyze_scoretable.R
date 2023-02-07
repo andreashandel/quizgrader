@@ -24,10 +24,18 @@ analyze_scoretable <- function(courselocation)
                                            Submit_Date = as.Date(Submit_Date), QuizDueDate = as.Date(QuizDueDate))
 
 
+  # get the test users from the student list file
+  studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlist"))
+  studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
+  studentdf$StudentID <- tolower(studentdf$StudentID)
+  testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == TRUE]))
+
   # get only the max score for each quiz in case there were multiple attempts allowed
   # that last slice command is there in case someone has multiple submissions with the same score
   # then remove the attempt column
-  df2 <- df1 |> dplyr::group_by(QuizID, StudentID) |> dplyr::filter(Score == max(Score)) |> dplyr::slice( n = 1) |> dplyr::select(-Attempt)
+  df2 <- df1 |> dplyr::filter(!(StudentID %in% testusers)) |>
+                dplyr::group_by(QuizID, StudentID) |> dplyr::slice_max( Score, with_ties = FALSE)
+  #df2 <- df1 |> dplyr::group_by(QuizID, StudentID) |> dplyr::filter(Score == max(Score)) |> dplyr::slice_max( Score) |> dplyr::select(-Attempt)
 
   # change to wide format for display
   df3 <- tidyr::pivot_wider(df2, id_cols = c(StudentID, Lastname, Firstname), names_from = QuizID, values_from = Score)
