@@ -397,6 +397,7 @@ server <- function(input, output) {
     {
       #load list with other grades
       gradelist <- readxl::read_xlsx(gradelistfile, col_types = "text", col_names = TRUE)
+      gradelist$StudentID = trimws(tolower(gradelist$StudentID))
       #get entry for current student
       other_grades <- dplyr::filter(gradelist, StudentID == metadata$StudentID)
       #return other scores as table
