@@ -22,8 +22,8 @@ gradelisttemplatefile <- file.path(system.file("templates", package = packagenam
 # either NULL for new course, or path to existing course
 courselocation <<- courselocation_global
 #for debugging/manual fiddling, or if I don't want to load through UI each time
-courselocation <- "D:/Dropbox/2023-1-spring-epid8060/quizzes/MADA2023"
-
+#courselocation <- "D:/Dropbox/2023-1-spring-epid8060/quizzes/MADA2023"
+courselocation <- "C:/Data/Dropbox/2023-1-spring-epid8060/quizzes/MADA2023"
 
 #######################################################
 #server part for shiny app
