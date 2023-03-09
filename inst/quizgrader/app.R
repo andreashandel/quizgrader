@@ -269,7 +269,14 @@ server <- function(input, output) {
         #give each submission a time-stamp
         timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
         submission_filename = paste(metadata$StudentID, timestamp, quizid, 'submission.xlsx', sep='_')
-        submission_filenamepath = fs::path(studentsubmissions_folder, quizid, submission_filename)
+        # check if folder for quiz exists, if not create it
+        submission_path = fs::path(studentsubmissions_folder, quizid)
+        if (fs::dir_exists(submission_path) == FALSE)
+        {
+           fs::dir_create(submission_path, mode = "ugo=rwx")
+        }
+        # location and name for submission file
+        submission_filenamepath = fs::path(submission_path, submission_filename)
         writexl::write_xlsx(submission, submission_filenamepath, col_names = TRUE, format_headers = TRUE)
 
 
