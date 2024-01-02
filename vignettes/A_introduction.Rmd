@@ -101,7 +101,7 @@ You can download the student submissions while the course is running, analyze th
 
 ## Next steps
 
-To learn more and see how to get started creating a course and a set of quizzes, see the [Creating Quizzes](./articles/B_quiz_creation.html) tutorial.
+To learn more and see how to get started creating a course and a set of quizzes, see the [Creating Quizzes](./B_quiz_creation.html) tutorial.
 
 
 
@@ -113,7 +113,7 @@ To learn more and see how to get started creating a course and a set of quizzes,
 You might want to consider privacy and security as it applies to various laws (e.g. FERPA) when using this app. You will be placing a list with student names, IDs (e.g. emails) and their quiz submissions/grades into the cloud. There is no default public access to any of this information, you (or TAs who have login privileges) are the only one who can access those documents. It thus seems ok to me. But if the server where you host the submission app gets compromised, this might compromise student information. I consider this a low and small risk, but it's something you might want to think about.
 
 
-### Excel is evil
+### Excel, really?!
 
 I know the potential problems that can occur when using Excel. I originally started this project with CSV (actually, TSV) files. I ended up deciding to go with Excel because instructors, and most importantly students, are familiar with it. This means you need to be careful about Excels over-eager auto-processing, especially of dates. Specific warnings are provided throughout the tutorials to alert you to potential issues. In my experience, if you were careful creating the documents, it shouldn't cause problems on the student side.
 
