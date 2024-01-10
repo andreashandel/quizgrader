@@ -435,7 +435,7 @@ ui <- fluidPage(
   fluidRow(
        column(12,
               align = "center",
-              textInput("StudentID","Student ID for this system (might be different than your offical ID)")
+              textInput("StudentID","User name for this system (might be different than your offical ID)")
               ),
         class = "mainmenurow"
         ),

@@ -22,7 +22,8 @@ gradelisttemplatefile <- file.path(system.file("templates", package = packagenam
 # either NULL for new course, or path to existing course
 courselocation <<- courselocation_global
 #for debugging/manual fiddling, or if I don't want to load through UI each time
-courselocation <- "C:/Data/Dropbox/2024-1-spring-epid8060/quizzes/MADA2024"
+#courselocation <- "C:/Data/Dropbox/2024-1-spring-epid8060/quizzes/MADA2024"
+courselocation <- "D:/Dropbox/2024-1-spring-epid8060/quizzes/MADA2024"
 
 #######################################################
 #server part for shiny app
@@ -759,7 +760,7 @@ ui <- fluidPage(
                                    tabPanel(title = "Deployment", value = "deployment",
                                             h2('Deploy course'),
                                             p('This checks all supplied files, re-creates student quizzes, then combines all folders and files needed for server deployment into a zip file.'),
-                                            h3('If you want the app and the folders for student submissions, check this. Note that if you place this on the server, it might overwrite existing student submission!
+                                            h3('If you want the app and the folders for student submissions, check this. Note that if you place this on the server, it might overwrite existing student submissions!
                                                Therefore, if you check this, first copy everything in studentsubmissions from the server into the local studentsubmissions folder before creating an updated package!'),
                                             checkboxInput("newpackage", "Create initial package with everything."),
                                             p('Once the zip file is created, copy it to the server and unzip (re-set access permissions as needed).'),
