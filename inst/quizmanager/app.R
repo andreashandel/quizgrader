@@ -22,8 +22,8 @@ gradelisttemplatefile <- file.path(system.file("templates", package = packagenam
 # either NULL for new course, or path to existing course
 courselocation <<- courselocation_global
 #for debugging/manual fiddling, or if I don't want to load through UI each time
-#courselocation <- "C:/Data/Dropbox/2024-1-spring-epid8060/quizzes/MADA2024"
-courselocation <- "D:/Dropbox/2024-1-spring-epid8060/quizzes/MADA2024"
+courselocation <- "C:/Data/Dropbox/2024-1-spring-epid8060/quizzes/MADA2024"
+#courselocation <- "D:/Dropbox/2024-1-spring-epid8060/quizzes/MADA2024"
 
 #######################################################
 #server part for shiny app
@@ -194,9 +194,9 @@ server <- function(input, output, session)
                    if (is.list(ret))
                    {
 
-                     studenttext <- paste0("There are currently ", length(ret$studentids), " students enrolled in your course:\n")
-
-                     studenttable <- data.frame(Names = ret$studentnames, UserIDs = ret$studentids)
+                     studenttext <- paste0("There are currently ", length(ret$usernames), " students enrolled in your course:\n")
+                     usernames <- paste(ret$usernames, collapse = ", ")
+                     studenttext <- paste(studenttext, usernames)
                      if (!is.null(ret$gradelist))
                      {
                       gradelisttext <- paste0("Additional grade information for these activities is supplied:\n", paste(ret$gradelist,collapse =', '))
@@ -205,7 +205,6 @@ server <- function(input, output, session)
                      }
 
                      output$studentlist_text <- shiny::renderText(studenttext)
-                     output$studentlist_table <- shiny::renderTable(studenttable)
                      output$quiz_summary <- shiny::renderTable(ret$quizdf, digits = 0)
                      output$gradelist_summary <- shiny::renderText(gradelisttext)
                    }
@@ -265,8 +264,6 @@ server <- function(input, output, session)
       studentdf <- dplyr::mutate_all(studentdf, .funs=trimws)
 
       #add time stamp to filename
-      #timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
-      #filename = paste0("studentlist_",timestamp,'.xlsx')
       filename = "studentlist.xlsx"
 
       new_path = fs::path(courselocation, 'studentlist', filename)
@@ -730,7 +727,6 @@ ui <- fluidPage(
                                    tabPanel(title = "Course Overview", value = "overview",
                                             actionButton("showoverview", "Show/refresh course overview", class = "actionbutton"),
                                             textOutput("studentlist_text"),
-                                            tableOutput("studentlist_table"),
                                             tableOutput("quiz_summary"),
                                             textOutput("gradelist_summary"),
                                             textOutput("summary_error"),

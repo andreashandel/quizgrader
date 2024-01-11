@@ -67,7 +67,7 @@ create_course <- function(coursename, courselocation = NULL)
                                   Submit_Date = NA
                                   )
 
-    timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+    timestamp = format(Sys.time(), '%Y_%m_%d_%H_%M_%S')
 
     submissions_log_filename = paste0("submissions_log_", timestamp, ".xlsx")
     submissions_log_filenamepath = fs::path(newfolder, "studentsubmissions", "logs", submissions_log_filename)

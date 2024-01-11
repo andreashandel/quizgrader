@@ -73,7 +73,7 @@ create_serverpackage <- function(courselocation, newpackage = TRUE)
     #place zip file in top directory of course
 
     #give each server package file a timestamp to prevent accidental confusion about which is the latest
-    timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+    timestamp = format(Sys.time(), '%Y_%m_%d_%H_%M_%S')
     zipfilename = fs::path(courselocation, paste0("serverpackage_",timestamp,".zip"))
 
     #add completequizzes folder and contents

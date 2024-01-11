@@ -15,7 +15,9 @@ check_studentlist <- function(studentdf)
 
 
   #check that all required columns are present and have the right names
-  colnames = c("Lastname", "Firstname", "StudentID", "Password")
+  #used to require names, turned that off to limit potential privacy issues
+  #colnames = c("Lastname", "Firstname", "StudentID", "Password")
+  colnames = c("StudentID", "Password")
   if (sum( !(colnames %in% colnames(studentdf)) ) >0 )
   {
     return('Your student roster sheet does not have the required columns/names.')

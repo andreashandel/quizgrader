@@ -267,7 +267,7 @@ server <- function(input, output) {
         #filename contains student ID, date and quiz ID
         #this allows checking if things in the app go wrong
         #give each submission a time-stamp
-        timestamp = gsub(" ","_",gsub("-","_", gsub(":", "_", Sys.time())))
+        timestamp = format(Sys.time(), '%Y_%m_%d_%H_%M_%S')
         submission_filename = paste(metadata$StudentID, timestamp, quizid, 'submission.xlsx', sep='_')
         # check if folder for quiz exists, if not create it
         submission_path = fs::path(studentsubmissions_folder, quizid)
@@ -383,11 +383,19 @@ server <- function(input, output) {
 
 
     log_table <- dplyr::filter(submissions_log, StudentID == metadata$StudentID)
-    log_table$Score <- as.numeric(log_table$Score) #convert to numeric so we can round
-    output$historytable <- shiny::renderTable(log_table, digits = 1)
-
-    historytext = "The table below shows your complete quiz submission history."
-    output$historytext <- shiny::renderText(historytext)
+    # if there is at least one submission
+    if (nrow(log_table)>0)
+    {
+      log_table$Score <- as.numeric(log_table$Score) #convert to numeric so we can round
+      output$historytable <- shiny::renderTable(log_table, digits = 1)
+      historytext = "The table below shows your complete quiz submission history."
+      output$historytext <- shiny::renderText(historytext)
+    } else
+    {
+      output$historytable <- NULL
+      historytext = "No submissions so far."
+      output$historytext <- shiny::renderText(historytext)
+    }
 
     scoretext = "If available, the table below shows scores from other assignments."
     output$scoretext <- shiny::renderText(scoretext)

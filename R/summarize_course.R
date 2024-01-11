@@ -28,11 +28,11 @@ summarize_course <- function(courselocation)
   {
     studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
     studentids = tolower(studentdf$StudentID)
-    studentnames = paste(tolower(studentdf$Firstname),tolower(studentdf$Lastname))
+    #those are not used anymore
+    #studentnames = paste(tolower(studentdf$Firstname),tolower(studentdf$Lastname))
 
   } else {
     studentids = NULL
-    studentnames = NULL
   }
 
 
@@ -71,7 +71,7 @@ summarize_course <- function(courselocation)
   }
 
 
-  ret = list(studentids = studentids, studentnames = studentnames, quizdf = quizdf, gradelist = gradelistnames)
+  ret = list(usernames = studentids, quizdf = quizdf, gradelist = gradelistnames)
 
   return(ret)
 
