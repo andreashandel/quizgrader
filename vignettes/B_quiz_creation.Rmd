@@ -89,11 +89,7 @@ In the UI, you can load a course you created previously, so you can continue wor
 
 ### Filling the template
 
-Once you created the course as described above, you need to add students to the course. To that end, you need to fill out the provided template with student information. Get the `studentlist_template.xlsx` file either through the UI or you can find it in the `/templates` folder on your computer inside the course folder you just created. The template file has several columns that you need to fill: 
-
-#### Lastname/Firstname
-
-`Lastname` and `Firstname` columns should be self-explanatory.
+Once you created the course as described above, you need to add students to the course. To that end, you need to fill out the provided template with student information. Get the `studentlist_template.xlsx` file either through the UI or you can find it in the `/templates` folder on your computer inside the course folder you just created. The template file has two columns that you need to fill. You should be able to add further columns after those two required columns and things should work, but I don't guarantee it. The two required columns are: 
 
 #### StudentID 
 

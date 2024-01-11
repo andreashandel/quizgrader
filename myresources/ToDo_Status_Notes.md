@@ -3,22 +3,20 @@
 
 # ToDo 
 
-* Fix Github integration.
+* At some point, rename all studentID to username.
+* Fix check for valid course when user opens existing course in quizmanager_app.* Fix all bugs that happen especially when no course exists yet.
+* Thorough testing of all quizmanager functionality.
+
 
 
 
 ### QUIZMANAGER
 
-ANALYSIS
-* Implement the 'per student' and 'per quiz' functionality by writing the analyze_student and analyze_quiz functions.
-
 
 MANAGEMENT
-* Fix check for valid course when user opens existing course in quizmanager_app.
 
 
 GENERAL
-* Thorough testing of all quizmanager functionality (changes were made).
 
 
 # ToDo for later

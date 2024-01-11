@@ -37,11 +37,8 @@ analyze_student <- function(courselocation, selected_student)
                        n_Questions = as.numeric(n_Questions), n_Correct = as.numeric(n_Correct),
                        Submit_Date = as.Date(Submit_Date), QuizDueDate = as.Date(QuizDueDate))
 
-  # reorder
-  df2 <- dplyr::relocate(df1, Lastname, Firstname)
-
   # filter by student
-  summary_table <- df2 |> dplyr::filter((StudentID == selected_student))
+  summary_table <- df1 |> dplyr::filter((StudentID == selected_student))
 
 
 
