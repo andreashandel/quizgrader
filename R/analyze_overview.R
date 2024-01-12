@@ -30,7 +30,7 @@ analyze_overview <- function(courselocation)
   studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlist"))
   studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
   studentdf$StudentID <- tolower(studentdf$StudentID)
-  testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == TRUE]))
+  testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == "true"]))
 
   # kick test users out of the submission log entries
   sub_df <- sub_df |> dplyr::filter(!(StudentID %in% testusers))

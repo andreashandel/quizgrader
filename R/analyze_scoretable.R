@@ -28,7 +28,7 @@ analyze_scoretable <- function(courselocation)
   studentlistfile <- fs::dir_ls(fs::path(courselocation,"studentlist"))
   studentdf <- readxl::read_xlsx(studentlistfile, col_types = "text", col_names = TRUE)
   studentdf$StudentID <- tolower(studentdf$StudentID)
-  testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == TRUE]))
+  testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == "true"]))
 
   # get only the max score for each quiz in case there were multiple attempts allowed
   # that last slice command is there in case someone has multiple submissions with the same score
@@ -38,7 +38,7 @@ analyze_scoretable <- function(courselocation)
   #df2 <- df1 |> dplyr::group_by(QuizID, StudentID) |> dplyr::filter(Score == max(Score)) |> dplyr::slice_max( Score) |> dplyr::select(-Attempt)
 
   # change to wide format for display
-  df3 <- tidyr::pivot_wider(df2, id_cols = c(StudentID), names_from = QuizID, values_from = Score)
+  df3 <- df2 |> tidyr::pivot_wider(id_cols = c(StudentID), names_from = QuizID, values_from = Score)
 
   return(df3)
 }

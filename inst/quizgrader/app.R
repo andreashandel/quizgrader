@@ -173,7 +173,8 @@ server <- function(input, output) {
         #check due date
         ################################
         #skip check for users that have Untimed set to TRUE
-        if ( !(studentlist$Untimed[studentnr] == TRUE))
+        #note that 'true' is a lower case character, not logical
+        if ( !(studentlist$Untimed[studentnr] == "true"))
         {
 
           #check that submission is before due data
@@ -198,7 +199,8 @@ server <- function(input, output) {
         #count number of files that exist for that student to determine number of already taken attempts
         #n_attempts <- length(fs::dir_ls(path = fs::path(studentsubmissions_folder, quizid), regexp = paste0(metadata$StudentID, "_.*?_", quizid, "_submission[.]xlsx")))
         #skip check for users that have Unlimited set to TRUE
-        if ( !(studentlist$Unlimited[studentnr] == TRUE))
+        #note that 'true' is a lower case character, not logical
+        if ( !(studentlist$Unlimited[studentnr] == "true"))
         {
           if (n_attempts >= solution$Attempts[1]) #if this is true, it means max number of attempts is reached
           {
