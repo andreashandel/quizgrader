@@ -37,7 +37,7 @@ Suggests:
     rmarkdown,
     roxygen2,
     testthat
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 VignetteBuilder: knitr
 URL: https://andreashandel.github.io/quizgrader/, https://github.com/andreashandel/quizgrader/
 BugReports: https://github.com/ahgroup/DSAIDE/issues

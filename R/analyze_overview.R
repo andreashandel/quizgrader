@@ -32,8 +32,11 @@ analyze_overview <- function(courselocation)
   studentdf$StudentID <- tolower(studentdf$StudentID)
   testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == "true"]))
 
+  # remove any submissions of students not in the current roster
   # kick test users out of the submission log entries
-  sub_df <- sub_df |> dplyr::filter(!(StudentID %in% testusers))
+  sub_df <- sub_df |> dplyr::filter(!(StudentID %in% testusers)) |>
+                      dplyr::filter(StudentID %in% studentdf$StudentID)
+
 
   summary_table <- sub_df |> dplyr::group_by(QuizID) |>
                           dplyr::summarize( submissions = dplyr::n(), students = length(unique(StudentID)), lowest = min(Score), highest = max(Score) )

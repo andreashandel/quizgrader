@@ -2,6 +2,7 @@
 % Please edit documentation in R/quizgrader.R
 \docType{package}
 \name{quizgrader}
+\alias{quizgrader-package}
 \alias{quizgrader}
 \title{quizgrader: A package to do grading}
 \description{
@@ -13,4 +14,23 @@ Start the main menu of the package by calling quizmanager().
 To learn more about how to use the package, see the documentation
 on the package website:
 https://andreashandel.github.io/quizgrader/
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://andreashandel.github.io/quizgrader/}
+  \item \url{https://github.com/andreashandel/quizgrader/}
+  \item Report bugs at \url{https://github.com/ahgroup/DSAIDE/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Andreas Handel \email{ahandel@uga.edu} (\href{https://orcid.org/0000-0002-4622-1146}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Cody Dailey [contributor]
+  \item Brian McKay [contributor]
+}
+
 }

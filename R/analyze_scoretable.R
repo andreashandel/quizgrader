@@ -30,10 +30,12 @@ analyze_scoretable <- function(courselocation)
   studentdf$StudentID <- tolower(studentdf$StudentID)
   testusers = trimws(tolower(studentdf$StudentID[studentdf$Testuser == "true"]))
 
+  # remove any submissions of students not in the current roster, also remove test users
   # get only the max score for each quiz in case there were multiple attempts allowed
   # that last slice command is there in case someone has multiple submissions with the same score
   # then remove the attempt column
-  df2 <- df1 |> dplyr::filter(!(StudentID %in% testusers)) |>
+  df2 <- df1 |> dplyr::filter(StudentID %in% studentdf$StudentID) |>
+                dplyr::filter(!(StudentID %in% testusers)) |>
                 dplyr::group_by(QuizID, StudentID) |> dplyr::slice_max( Score, with_ties = FALSE)
   #df2 <- df1 |> dplyr::group_by(QuizID, StudentID) |> dplyr::filter(Score == max(Score)) |> dplyr::slice_max( Score) |> dplyr::select(-Attempt)
 
