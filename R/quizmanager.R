@@ -14,7 +14,6 @@
 #' @importFrom shinyWidgets pickerInput
 #' @importFrom shinyjs enable
 #' @importFrom shinyFiles getVolumes
-#' @importFrom utils globalVariables
 #' @export
 
 # Note the imports above. That's because those packages are used by the apps which are in /inst not /R
