@@ -1,8 +1,9 @@
 #' @keywords internal
 "_PACKAGE"
 
+#' @name
 #' quizgrader: A package to do grading
-#'
+
 #' @description
 #' More information text here
 #'
@@ -11,7 +12,6 @@
 #' To learn more about how to use the package, see the documentation
 #' on the package website:
 #' https://andreashandel.github.io/quizgrader/
-NULL
 
 #' @importFrom utils globalVariables
 NULL
