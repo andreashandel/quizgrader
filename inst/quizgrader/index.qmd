@@ -5,4 +5,4 @@ format: html
 
 ## quizgrader package
 
-The course is currently not running, therefore the submission system is not available.
+The quiz submission system is currently not available.
