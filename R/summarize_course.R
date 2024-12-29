@@ -57,7 +57,8 @@ summarize_course <- function(courselocation)
 
     quizdf <- data.frame(dplyr::arrange(dplyr::bind_rows(summary_df), DueDate))
   } else {
-    quizdf = "No quizzes exist"
+    # if no quizzes exist yet, return NULL
+    quizdf = NULL
   }
 
   # get columns of gradelist if exists
