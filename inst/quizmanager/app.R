@@ -22,7 +22,8 @@ gradelisttemplatefile <- file.path(system.file("templates", package = packagenam
 # either NULL for new course, or path to existing course
 courselocation <<- courselocation_global
 #for debugging/manual fiddling, or if I don't want to load through UI each time
-courselocation <- "C:/Data/Dropbox/2025-spring-MADA/quizzes/MADA2025"
+#courselocation <- "D:/OneDrive - University of Georgia/2026-sping-MADA/quizzes/MADA2026/"
+courselocation <- "D:/GDrive/2026-sping-MADA/quizzes/MADA2026/"
 #courselocation <- "D:/Dropbox/2025-spring-MADA/quizzes/MADA2025"
 
 #######################################################
