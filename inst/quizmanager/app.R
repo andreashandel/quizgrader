@@ -22,7 +22,7 @@ gradelisttemplatefile <- file.path(system.file("templates", package = packagenam
 # either NULL for new course, or path to existing course
 courselocation <<- courselocation_global
 #for debugging/manual fiddling, or if I don't want to load through UI each time
-#courselocation <- "D:/Data/2026-MADA-quizzes/MADA2026/"
+courselocation <- "D:/2026-MADA-quizzes/MADA-2026/"
 
 #######################################################
 #server part for shiny app
